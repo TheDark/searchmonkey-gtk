@@ -37,5 +37,7 @@ rm -fr %{buildroot}
 %{_datadir}/icons/hicolor/24x24/apps/searchmonkey.png
 %{_datadir}/icons/hicolor/32x32/apps/searchmonkey.png
 %{_datadir}/icons/hicolor/48x48/apps/searchmonkey.png
+%{_datadir}/pixmaps/searchmonkey/*.png
 # Only required for GNOME
 %{_datadir}/applications/searchmonkey.desktop
+%{_datadir}/locale/*/LC_MESSAGES/*.mo
