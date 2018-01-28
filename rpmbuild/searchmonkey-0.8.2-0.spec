@@ -30,8 +30,12 @@ make install DESTDIR=%{buildroot}
 rm -fr %{buildroot}
 
 %files
-%doc README INSTALL COPYING
+%doc README INSTALL COPYING.LESSER
 %{_bindir}/searchmonkey
-%{_datadir}/share/pixmaps/searchmonkey-32x32.png
+%{_datadir}/icons/hicolor/16x16/apps/searchmonkey.png
+%{_datadir}/icons/hicolor/22x22/apps/searchmonkey.png
+%{_datadir}/icons/hicolor/24x24/apps/searchmonkey.png
+%{_datadir}/icons/hicolor/32x32/apps/searchmonkey.png
+%{_datadir}/icons/hicolor/48x48/apps/searchmonkey.png
 # Only required for GNOME
-%{_datadir}/share/applications/searchmonkey.desktop
+%{_datadir}/applications/searchmonkey.desktop

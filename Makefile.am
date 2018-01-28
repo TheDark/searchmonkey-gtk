@@ -1,45 +1,17 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src po
+SUBDIRS = src po pixmaps
 
 EXTRA_DIST = \
 	autogen.sh \
-	search.glade \
-	search.gladep \
+	searchmonkey-0-8-2.glade \
+	searchmonkey.desktop \
+	pixmaps/* \
 	rpmbuild/* \
 	bsdports/*
 
-install-data-local:
-	@$(NORMAL_INSTALL)
-	if test -d $(srcdir)/pixmaps; then \
-	  $(mkinstalldirs) $(DESTDIR)$(datadir)/pixmaps/$(PACKAGE); \
-	  for pixmap in $(srcdir)/pixmaps/*; do \
-	    if test -f $$pixmap; then \
-	      $(INSTALL_DATA) $$pixmap $(DESTDIR)$(datadir)/pixmaps/$(PACKAGE); \
-	    fi \
-	  done; \
-	  ln -sf $(DESTDIR)$(datadir)/pixmaps/$(PACKAGE)/searchmonkey-48x48.png $(DESTDIR)$(datadir)/pixmaps/searchmonkey.png; \
-	fi
+desktopdir = $(datadir)/applications
+desktop_in_files = searchmonkey.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
-dist-hook:
-	if test -d pixmaps; then \
-	  mkdir $(distdir)/pixmaps; \
-	  for pixmap in pixmaps/*; do \
-	    if test -f $$pixmap; then \
-	      cp -p $$pixmap $(distdir)/pixmaps; \
-	    fi \
-	  done \
-	fi
-
-# Special commands for creating Gnome menu item - does not add dependancy
-install-gnome: install
-	if test -f $(srcdir)/rpmbuild/@PACKAGE@.desktop; then \
-	  if test -d $(DESTDIR)$(datadir)/applications; then \
- 	    $(INSTALL_DATA) $(srcdir)/rpmbuild/@PACKAGE@.desktop $(DESTDIR)$(datadir)/applications; \
-	  fi \
-	fi
-
-uninstall-gnome: uninstall
-	if test -f $(DESTDIR)$(datadir)/applications/@PACKAGE@.desktop; then \
-	  rm -f $(DESTDIR)$(datadir)/applications/@PACKAGE@.desktop; \
-	fi
+@INTLTOOL_DESKTOP_RULE@

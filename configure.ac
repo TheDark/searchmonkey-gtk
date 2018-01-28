@@ -1,8 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT
+AC_INIT(searchmonkey, 0.8.2)
 AC_CONFIG_SRCDIR([configure.ac])
-AM_INIT_AUTOMAKE(searchmonkey, 0.8.2)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 IT_PROG_INTLTOOL
@@ -29,6 +29,7 @@ AC_CONFIG_FILES([
 Makefile
 src/Makefile
 po/Makefile.in
+pixmaps/Makefile
 ])
 AC_OUTPUT
 
