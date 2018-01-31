@@ -1,0 +1,30 @@
+Creating locale translations for searchmonkey is simple, and quick to do!
+
+To create your own language, first run:
+ make update-po
+
+This will create "searchmonkey.pot" - the template for you to work with.
+Rename this file to match your language locale, for example:
+ mv searchmonkey.pot en_GB.po
+
+See unix application locale for details of your current locale, and valid names for locales.
+
+Using your favourite po file editor (e.g. Emacs), open up the file, and start modifying the strings to make sense in your language.
+
+Using Emacs makes it simple to edit po files. Pressing enter on any string, will opens up a new window to type in the translation. [C-c C-c] saves the change. Pressing [V] at any time, will verify the file will compile without error. Remember to update the header and ChangeLog file to reflect your changes.
+
+Once complete, add your po file name (e.g. en_GB), and any symbolic links, to ../configure.in under the heading. For example:
+ ALL_LINGUAS="en_GB en_US"
+
+To see your results in action, run:
+ ./autogen.sh prefix=/usr
+ make
+ sudo make install
+ searchmonkey
+
+If your locale is set correctly, you should see a magical transformation!
+
+Enjoy!
+
+For more information, see:
+http://searchmonkey.sf.net/index.php/Translate_searchmonkey
