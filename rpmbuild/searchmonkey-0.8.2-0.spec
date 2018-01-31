@@ -1,6 +1,6 @@
 Summary: Graphical equivalent of find + grep
 Name: searchmonkey
-Version: 0.7.2
+Version: 0.8.2
 Release: 1%{?dist}
 License: LGPL
 Group: Applications/File
