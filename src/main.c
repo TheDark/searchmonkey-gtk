@@ -7,6 +7,10 @@
 #  include <config.h>
 #endif
 
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -28,11 +32,16 @@ int main (int argc, char *argv[])
 {
   GdkPixbuf* pixBuf;
   gchar *tmpStr;
+  gint opt;
+  gboolean fDparameter = FALSE;
+  gboolean fTparameter = FALSE;
+  gboolean fFparameter = FALSE;
   
   /* Initiate threads */
-  g_thread_init (NULL);
-  gdk_threads_init ();
-  gdk_threads_enter ();
+  if(!g_thread_supported()) /* Luc A janv 2018 ; useless if gtk >=2.32*/
+     g_thread_init (NULL);/* deprecated since 2.32 */
+  gdk_threads_init ();/* deprecated since gtk 3.6 */
+  gdk_threads_enter ();/* id */
   
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
@@ -60,12 +69,58 @@ int main (int argc, char *argv[])
   tmpStr = g_strdup_printf(_("N/A"));
   g_object_set_data_full(G_OBJECT(mainWindowApp), "notApplicable", tmpStr, g_free);
 
+ /* some stuff to launch SearchMonkey with parameters - Luc A Janv 2018 */
+ /* -? = help
+    -d = directory
+    -f = files
+    -t containing text 
+ exemple : searchmonkey -d /home/tux -f ODT -t linux
+
+*/
+  // g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter1", NULL);        
+   while ((opt = getopt(argc, argv, "?d:f:t:")) != -1) 
+      {
+               switch (opt) {
+               case 'f':
+                 if(!fFparameter) {
+                   printf("-f file name parameter=%s\n", optarg);    
+                   if(optarg!=NULL)             
+                       g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter2", optarg);  
+                         else g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter2", NULL);  
+                   fFparameter = TRUE;}               
+                   break;
+               case 't':
+                 if(!fTparameter) {
+                   printf("-t containing text parameter=%s\n", optarg);                 
+                   if(optarg!=NULL)  
+                       g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter3", optarg);
+                           else g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter3", NULL);    
+                   fTparameter = TRUE;}
+                   break;
+               case 'd':
+                 if(!fDparameter) {
+                   printf("-d directory parameter=%s\n", optarg);   
+                   if(optarg!=NULL)
+                      g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter1", optarg);                
+                          else g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter1", NULL);  
+                   fDparameter = TRUE;}
+                   break;
+               default: /* '?' */
+                   printf("\n----------------\nhow to launch Searchmonkey with parameters :\nsearchmonkey -d {directory} -f {file name} -t {containing text}\nExample :\n searchmonkey -d /home/tux/documents -f txt -t linux\n");
+               }
+      }/* wend */
+ //if(argv[1]!=NULL)
+   // {
+     // printf("** started with %s: **\n", argv[1]);
+     // g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter1", argv[1]);
+  //  }
+  //else g_object_set_data(G_OBJECT(mainWindowApp), "argvParameter1", NULL);
   /* Show app, and start main loop */
   gtk_widget_show (mainWindowApp);
   gtk_main ();
 
   /* Clean exit */
-  gdk_threads_leave ();
+  gdk_threads_leave ();/* deprecated since gtk 3.6 */
   return 0;
 }
 

@@ -10,6 +10,8 @@
  */
 extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
 
+/* max size for parser's buffer */
+#define MAX_PARSER_BUFFER 256000
 /*
 /* keycodes in order to set a sort of 'switch' command with a gchar
 /*
@@ -135,6 +137,7 @@ typedef struct { /* Structure to store each line within the file that has a matc
   gsize offsetEnd; /* Match offset end */
   gsize lineLen; /* Size of pLine */
   guint invMatchIndex; /* inverse pointer to textMatch array */
+  gboolean fOfficeFile; /* flag : if it's an Office, i.e. structured text file, then the text is cuted in paragraphs and not lines */
 } lineMatch;
 typedef struct { /* Structure to store all results together */
   GPtrArray *pLocationArray; /* pointer to actual location chunk */
@@ -212,7 +215,7 @@ void *walkDirectories(void *args);
 glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, statusbarData *status);
 glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, statusbarData *status);
 gboolean symLinkReplace(gchar **pFullFileName, gchar **pFileName);
-gboolean getAllMatches(searchData *mSearchData, gchar *contents, gsize length, regex_t *search);
+gboolean getAllMatches(searchData *mSearchData, gchar *contents, gsize length, regex_t *search, gboolean fOffice);
 void dereferenceAbsolutes(searchData *mSearchData,gchar *contents, gsize length, gint numLines);
 void getLength(searchData *mSearchData, textMatch *newMatch);
 void getFileType(searchData *mSearchData, textMatch *newMatch);

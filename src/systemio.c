@@ -30,6 +30,20 @@ const gchar *G_EXE_LIST[G_EXE_LIST_MAX_DEPTH][G_EXE_LIST_MAX_WIDTH] = {
   {"nautilus", "iexplore", NULL}
 };
 
+
+/* *********************************
+   function to get a valid file name
+   in the $TEMPDIR system repertory
+
+***********************************/
+gchar *GetTempFileName(gchar *fileSchema)
+{
+ gchar *tmpFile = NULL;
+
+ tmpFile = tempnam(NULL, fileSchema );
+ return tmpFile;
+}
+
 /*
  * Internal helper: save results to CSV.
  * Iterates through table results (if any), and then returns a CSV string
@@ -986,7 +1000,7 @@ gchar *comboBoxReadCleanFolderName(GtkComboBox *combobox)
   gchar *retStr = NULL;
   
   /* Retrieve look-in directory, ensuring terminated with (extra?) directory separator */
-  tmpStr[0] = gtk_combo_box_get_active_text(combobox);
+  tmpStr[0] = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combobox));
   g_assert(tmpStr[0] != NULL);
   tmpStr[1] = g_strconcat(tmpStr[0], G_DIR_SEPARATOR_S, NULL);
   g_assert(tmpStr[1] != NULL);
@@ -1028,7 +1042,7 @@ gchar *comboBoxReadCleanFolderName(GtkComboBox *combobox)
   gchar *retStr = NULL;
   gchar *tmpStr[3];
   gchar **test, **test2;
-  tmpStr[0] = gtk_combo_box_get_active_text(combobox);
+  tmpStr[0] = gtk_combo_box_text_get_active_text (combobox);
 
   /* Test that it is a proper filename */
   if (g_file_test (tmpStr[0], G_FILE_TEST_IS_DIR)) {

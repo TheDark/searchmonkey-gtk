@@ -12,7 +12,7 @@
 #include "interface.h" /* glade requirement */
 #include "support.h" /* glade requirement */
 #include "regexwizard.h"
-
+#include "misc.h"
 
 /*
  * Callback helper: within test regular expression dialog box.
@@ -22,6 +22,10 @@
  */
 void refreshTestResults(GtkWidget *widget)
 {
+    gint tmpStartOffset, tmpEndOffset;/* Luc A feb 2018 */
+    gchar *tmptext=NULL;
+    GtkTextIter tmpStartIter, tmpEndIter;
+
     GtkTextBuffer *tBuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(lookup_widget(widget, "SampleTextView")));
     GtkTextIter startIter, endIter;
     gtk_text_buffer_get_start_iter (tBuffer, &startIter);
@@ -64,16 +68,24 @@ void refreshTestResults(GtkWidget *widget)
         if (subMatches[i].rm_so == -1) {
           break;
         }
-        gtk_text_buffer_get_iter_at_offset (tBuffer, &startIter, intMatch + subMatches[i].rm_so);
-        gtk_text_buffer_get_iter_at_offset (tBuffer, &endIter, intMatch + subMatches[i].rm_eo);
+        /* Luc A feb 2018 */
+        gtk_text_buffer_get_end_iter (tBuffer, &tmpEndIter);
+        gtk_text_buffer_get_start_iter (tBuffer, &tmpStartIter);
+        tmptext = gtk_text_buffer_get_text (tBuffer, &tmpStartIter, &tmpEndIter, FALSE);
+        tmpStartOffset = convertRegexGtk(intMatch + subMatches[i].rm_so, tmptext);
+        tmpEndOffset = convertRegexGtk(intMatch + subMatches[i].rm_eo, tmptext); 
+        gtk_text_buffer_get_iter_at_offset (tBuffer, &startIter, tmpStartOffset);
+        gtk_text_buffer_get_iter_at_offset (tBuffer, &endIter, tmpEndOffset);
         switch(i) {
 #ifdef NOT_YET
         case 0:
           gtk_text_buffer_apply_tag_by_name (tBuffer, "word_highlight", &startIter, &endIter);
+          g_free(tmptext);
           break;
 #endif
         default:
           gtk_text_buffer_apply_tag_by_name (tBuffer, "word_highlight", &startIter, &endIter);
+          g_free(tmptext);
           break;
         }
 #ifdef NOT_YET

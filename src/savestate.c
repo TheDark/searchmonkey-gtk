@@ -29,6 +29,9 @@ extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. 
 extern GStaticMutex mutex_Data; /* Created in search.c to control access to search results data. */
 extern GStaticMutex mutex_Control; /* Created in search.c to control access to search controls. */
 
+
+
+
 /**************************************************************
  *    Keyfile interface commands
  **************************************************************/
@@ -195,6 +198,10 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   GKeyFile *keyString = getGKeyFile(widget);
   GtkComboBox* tmpCombo;
   GtkTreeIter iter;
+  /* luc A janv 2018 */
+  gchar *sParamater1 = g_object_get_data(G_OBJECT(mainWindowApp), "argvParameter1");
+  gchar *sParamater2 = g_object_get_data(G_OBJECT(mainWindowApp), "argvParameter2");
+  gchar *sParamater3 = g_object_get_data(G_OBJECT(mainWindowApp), "argvParameter3");
 
   /* Global stuff */
   realizeWindow(widget, keyString, "application", "window1"); /* restore window size */
@@ -208,18 +215,58 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   initComboBox(lookup_widget(widget, "lookIn2"));
   realize_searchNotebook(widget);
 
+  /* directories parameters = parameter1 from command line - Luc A janv 2018 */
   tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "lookIn"));
   g_assert(tmpCombo != NULL);
-  if (gtk_tree_model_get_iter_first(gtk_combo_box_get_model(tmpCombo), &iter) == FALSE) {
-    addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
-  }
+
+  if(sParamater1!=NULL) 
+       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater1); /* Luc A janv 2018 */
+  else
+    if (gtk_tree_model_get_iter_first(gtk_combo_box_get_model(tmpCombo), &iter) == FALSE) 
+       {    
+         addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
+       }
   
   tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "lookIn2"));
   g_assert(tmpCombo != NULL);
-  if (gtk_tree_model_get_iter_first(gtk_combo_box_get_model(tmpCombo), &iter) == FALSE) {
-    addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
-  }
+
+  if(sParamater1!=NULL) 
+       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater1); /* Luc A janv 2018 */
+  else
+    if (gtk_tree_model_get_iter_first(gtk_combo_box_get_model(tmpCombo), &iter) == FALSE) 
+       {    
+         addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
+       }
+
+  /* file(s) name parameters = parameter2 from command line - Luc A janv 2018 */
+
+  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
+  g_assert(tmpCombo != NULL);
+
+  if(sParamater2!=NULL) 
+       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater2); /* Luc A janv 2018 */
   
+  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName2"));
+  g_assert(tmpCombo != NULL);
+
+  if(sParamater2!=NULL) 
+       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater2); /* Luc A janv 2018 */
+  
+  /* containing text parameters = parameter3 from command line - Luc A janv 2018 */
+
+  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "containingText"));
+  g_assert(tmpCombo != NULL);
+
+  if(sParamater3!=NULL) 
+       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater3); /* Luc A janv 2018 */
+  
+  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "containingText2"));
+  g_assert(tmpCombo != NULL);
+
+  if(sParamater3!=NULL) 
+       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater3); /* Luc A janv 2018 */
+
+
   /* Results stuff */
   setResultsViewHorizontal(widget, TRUE); /* Default to horizontal */
   gboolean autoColumnWidth = ((!g_key_file_has_key (keyString, "configuration", "autosize_columns", NULL)) ||
@@ -238,6 +285,7 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   /* Menu stuff (do this last so that all view options get set) */
   realize_menubar(widget);
   gtk_widget_grab_focus (lookup_widget(widget, "playButton1"));
+  // g_free(sParamater1);
 }
 
 
@@ -359,8 +407,10 @@ void realize_searchNotebook (GtkWidget *widget)
   realizeToggle(widget, keyString, "history", "searchSubfoldersCheck");
   realizeToggle(widget, keyString, "history", "moreThanCheck");
   realizeString(widget, keyString, "history", "moreThanEntry");
+  realizeComboBoxText(widget, keyString, "configuration", "MoreThanSize");/* Luc A - janv 2018 */
   realizeToggle(widget, keyString, "history", "lessThanCheck");
   realizeString(widget, keyString, "history", "lessThanEntry");
+  realizeComboBoxText(widget, keyString, "configuration", "LessThanSize");/* Luc A - janv 2018 */
   realizeToggle(widget, keyString, "history", "afterCheck");
   realizeString(widget, keyString, "history", "afterEntry");
   realizeToggle(widget, keyString, "history", "beforeCheck");
@@ -421,8 +471,10 @@ void unrealize_searchNotebook (GtkWidget *widget)
   unrealizeToggle(widget, keyString, "history", "searchSubfoldersCheck");
   unrealizeToggle(widget, keyString, "history", "moreThanCheck");
   unrealizeString(widget, keyString, "history", "moreThanEntry");
+  unrealizeComboBox(widget, keyString, "configuration", "MoreThanSize");/* Luc A - janv 2018 */
   unrealizeToggle(widget, keyString, "history", "lessThanCheck");
   unrealizeString(widget, keyString, "history", "lessThanEntry");
+  unrealizeComboBox(widget, keyString, "configuration", "LessThanSize");/* Luc A - janv 2018 */
   unrealizeToggle(widget, keyString, "history", "afterCheck");
   unrealizeString(widget, keyString, "history", "afterEntry");
   unrealizeToggle(widget, keyString, "history", "beforeCheck");
@@ -643,20 +695,21 @@ void initTextView_aux(GtkTextView *textview)
 {
   GtkTextBuffer *buffer;
   GtkTextTag *tag;
-
   g_assert(textview != NULL);
   
+
   buffer = gtk_text_view_get_buffer (textview);
 
   /* Used to highlight each match result */
   tag = gtk_text_buffer_create_tag (buffer, "word_highlight",
-                                    "foreground", "blue",
+                                    "foreground", "black","background", "#6DED2F",
 				    "weight", PANGO_WEIGHT_NORMAL,
 				    "weight-set", TRUE,
                                     "style", PANGO_STYLE_NORMAL,
 				    "style-set", TRUE,
                                     "underline", PANGO_UNDERLINE_SINGLE,
-                                    "underline-set", TRUE,
+                                    "underline-set", FALSE,
+                                     "justification", GTK_JUSTIFY_LEFT,
                                     NULL);
 
   /* Used to force the default font to standard i.e. no bold/italics */
@@ -667,6 +720,7 @@ void initTextView_aux(GtkTextView *textview)
 				    "style-set", TRUE,
 				    "left-margin", 30,
 				    "left-margin-set", TRUE,
+                                    "justification", GTK_JUSTIFY_LEFT,
                                     NULL);
 
   /* Used to make the heading line stand out i.e. bold and italics */
@@ -1022,7 +1076,7 @@ void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gcha
     newColor = g_key_file_get_string (keyString, group, name, NULL);
     if (newColor != NULL) {
       if (gdk_color_parse (newColor, &cp)) {
-        g_object_set( G_OBJECT(tag), "foreground-gdk", &cp, NULL);
+        g_object_set( G_OBJECT(tag), "background-gdk", &cp, NULL);
       }
       g_free(newColor);
     }
@@ -1047,7 +1101,7 @@ void unrealizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gc
   GtkTextTagTable* tagTable = gtk_text_buffer_get_tag_table(textBuf);
   GtkTextTag* tag = gtk_text_tag_table_lookup(tagTable, "word_highlight");
   
-  g_object_get( G_OBJECT(tag), "foreground-gdk", &cp, NULL);
+  g_object_get( G_OBJECT(tag), "background-gdk", &cp, NULL);
   newColor = gtk_color_selection_palette_to_string(cp, 1);
   
   g_key_file_set_string (keyString, group, name, newColor);
@@ -1104,6 +1158,32 @@ void realizeComboBox(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
       gtk_combo_box_set_active (comboBox, activeRow);
     }
     g_free(readString);
+}
+
+/*
+  callback only for size of files units
+
+ Luc A - Janv 2018
+*/
+
+void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name )
+{
+  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget(widget, name));
+  gchar* keyname;
+  gint setActive;
+
+  /* Retrieve active row */
+  setActive = (gint *)g_malloc(sizeof(gint));
+  keyname = g_strconcat(name, "-active", NULL);
+
+  if (g_key_file_has_key(keyString, group, keyname, NULL)) {
+      setActive = g_key_file_get_integer (keyString, group, keyname, NULL);
+    } else {
+      setActive = 0;
+    }
+  g_free(keyname);
+  // printf("valeur de cette clef:%d\n", setActive);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (comboBox),setActive);
 }
 
 
@@ -1436,6 +1516,7 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   gchar *fullFileName, *size, *mdate, tmpString[MAX_FILENAME_STRING + 1];
   gchar *tmpString2;
   GtkTextIter txtIter, tmpIter;
+  GtkTextIter tmpStartIter, tmpEndIter;
   GtkTextIter start, end;
   gsize count, tmpCount;
   guint matchIndex;
@@ -1447,10 +1528,18 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   gchar *tmpStr = g_object_get_data(G_OBJECT(mainWindowApp), "noContextSearchString");
   gint errorCount = 0; /* Temp debug */
   gint a,b;
-
+  gint tmpStartOffset, tmpEndOffset;
+  gchar *tmptext = NULL;
+  gint count_hits = 0; /* counter INSIDE a line in order to manage the max display hits option for results - Luc A janv 2018 */
+  gint max_count_hits = (gint) gtk_spin_button_get_value( 
+                                      GTK_SPIN_BUTTON(g_object_get_data(G_OBJECT(mainWindowApp), 
+                                       "maxContentHitsSpinResults")));
   g_assert(tmpStr != NULL);
   g_assert(selection != NULL);
-  /* moi pour test */
+
+// printf("max count hits = %d \n", max_count_hits);
+
+
 if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 {
 // printf("//// salut je suis dans savstat ////\n");
@@ -1465,8 +1554,13 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 
     window1 = G_OBJECT(lookup_widget(GTK_WIDGET(textBox), "window1"));
     setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(textBox, "word_wrap1")));
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textBox), setWordWrap);
+   /* luc A janv 2018 */
+    GtkWrapMode wrap = GTK_WRAP_NONE;  
+    if(setWordWrap)
+        wrap = GTK_WRAP_WORD;
 
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textBox), wrap);
+    gtk_text_view_set_justification( GTK_TEXT_VIEW(textBox), GTK_JUSTIFY_LEFT );
     g_assert(textBox != NULL);
     g_assert(window1 != NULL);
     
@@ -1494,57 +1588,84 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
       g_assert(fullFileName != NULL);
       g_assert(size != NULL);
       g_assert(mdate != NULL);
-      
+      /* affiche le hAUT de la prévisua : chemin vers fichier avec sa date, en noir gras */
       tmpString2 = g_strconcat(fullFileName, " (", size, " ", mdate, ")\n", NULL);
       gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "results_header", NULL);
       g_free(tmpString2);
 
-      /* Add line to describe options applied at run-time */
+      /* Add line to describe options applied at run-time in medium grey*/
+
       tmpString2 = generateContentOptionsString(mSearchControl);
       gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "no_context", NULL);
       g_free(tmpString2);
 
       //g_static_mutex_lock(&mutex_Data);
+      /* count = number of text hits inside the current text == all the file buffer*/
       if (mSearchControl->flags & SEARCH_EXTRA_LINES) {
 	for (i=0; i<count; i++) {
-      g_assert((i+matchIndex) <= mSearchData->lineMatchArray->len);
+          g_assert((i+matchIndex) <= mSearchData->lineMatchArray->len);
 	  newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray, (i + matchIndex));
 	  g_assert(newTextMatch != NULL);
 	  
 	  if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
-	    
-	    tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), newTextMatch->lineNum);
+	    /* tmpcount = nbre caractères écrits, tmpstring buffer avec la chaîne, MAX_FILENAME_STRING longueur maxi autorisée, _("line" ) format d'affichage type C classique, nexyexymatch la valeur numérique sui sera passée dans %d */
+            if(newTextMatch->fOfficeFile)
+               tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Paragraph Number: %d\n"),(gint) newTextMatch->lineNum);
+                 else  
+	            tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"),(gint) newTextMatch->lineNum);
+
 	    gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString, -1, "results_line_number", NULL);
 	    gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, newTextMatch->pLine, -1, "results_text", NULL);
 	    gtk_text_buffer_insert (buffer, &txtIter, "\n", -1);
-	    
+	    count_hits = 0; /* reset at every new line/paragraph */
 	    lineCount += newTextMatch->lineCountBefore;
 	  } else {
 	    lineCount -= (prevTextMatch->lineCountAfter + 1);
 	  }
-	  
-	  gtk_text_buffer_get_iter_at_line (buffer, &tmpIter, lineCount);
-	  a = gtk_text_iter_get_chars_in_line(&tmpIter);
-	  b = gtk_text_iter_get_bytes_in_line(&tmpIter);
-	  
-	  if (((a >= (newTextMatch->offsetEnd)) &&
-	       (a >= (newTextMatch->offsetStart))) &&
-	      ((b >= (newTextMatch->offsetEnd)) &&
-	       (b >= (newTextMatch->offsetStart)))) {
-	    gtk_text_buffer_get_iter_at_line_offset (buffer, &start, lineCount, (newTextMatch->offsetStart));
-	    gtk_text_buffer_get_iter_at_line_offset (buffer, &end, lineCount, (newTextMatch->offsetEnd));
-	    gtk_text_buffer_apply_tag_by_name(buffer, "word_highlight", &start, &end);
-	  } else {
-	    errorCount ++;
-	    g_printf(_("\nInternal error %d! Unable to highlight line - offset beyond line-end.\n"), errorCount);
-	    g_printf(_("Please email all debug text to cottrela@users.sf.net.\n"));
-	    g_printf(_("  Debug: fn='%s'\n"), fullFileName);
-	    g_printf(_("  Debug: tc=%d + os=%d || oe=%d\n"), tmpCount, newTextMatch->offsetStart, newTextMatch->offsetEnd);
-	    g_printf(_("  Debug: %d) '%s'\n"), newTextMatch->lineNum, newTextMatch->pLine);
-	    if (errorCount > 3) {
-	      break; /* Exit loop as the rest of the file is likely to be corrupt too...*/
-	    }
-	  }
+	  /* Luc A janv 2018 */
+          if(count_hits<max_count_hits)
+           {
+             /* display block : only if we have not reached the limit to hits's display - Luc A Janv 2018 */
+	       gtk_text_buffer_get_iter_at_line (buffer, &tmpIter, lineCount);
+               gtk_text_buffer_get_iter_at_line (buffer, &tmpStartIter, lineCount); 
+               gtk_text_buffer_get_end_iter (buffer, &tmpEndIter);/* get the end of line iter */
+               tmptext = gtk_text_buffer_get_text (buffer, &tmpStartIter, &tmpEndIter, FALSE);/* get the text FOR the CURRENT line lineCount*/
+
+	       a = gtk_text_iter_get_chars_in_line(&tmpIter);
+	       b = gtk_text_iter_get_bytes_in_line(&tmpIter);
+               // printf("la ligne d'aff. %d contient %d octets et %d cars \n", lineCount, b,  a);
+              /* converts from regex format to Gtk gchar format */
+               tmpStartOffset = convertRegexGtk(newTextMatch->offsetStart, tmptext);
+               tmpEndOffset = convertRegexGtk(newTextMatch->offsetEnd, tmptext); 	
+               g_free(tmptext);
+               //  printf("lineCiunt=%d  pline:::\n%s////\n", lineCount, newTextMatch->pLine);  
+	       if (
+	          ((b >= (tmpEndOffset)) &&
+	          (b >= (tmpStartOffset)))) 
+                    {
+                      // printf("off départ =%d corrigé = %d fin =%d corrigé=%d \n",newTextMatch->offsetStart, 
+                      //   tmpStartOffset ,newTextMatch->offsetEnd,tmpEndOffset );
+	              //gtk_text_buffer_get_iter_at_line_offset (buffer, &start, lineCount, (newTextMatch->offsetStart));
+	              //gtk_text_buffer_get_iter_at_line_offset (buffer, &end, lineCount, (newTextMatch->offsetEnd));
+                      gtk_text_buffer_get_iter_at_line_offset (buffer, &start, lineCount, tmpStartOffset);
+                      gtk_text_buffer_get_iter_at_line_offset (buffer, &end, lineCount, tmpEndOffset);
+	              gtk_text_buffer_apply_tag_by_name(buffer, "word_highlight", &start, &end);
+                      count_hits++;
+// printf("***line %d  hits inside =%d ***\n", lineCount, count_hits);
+	            }/* if tests a b */ 
+               else {
+	          errorCount ++;
+	          g_printf(_("\nInternal error %d! Unable to highlight line - offset beyond line-end.\n"),(gint) errorCount);
+	          g_printf(_("Please email all debug text to cottrela@users.sf.net.\n"));
+	          g_printf(_("  Debug: fn='%s'\n"), fullFileName);
+	          g_printf(_("  Debug: tc=%d + os=%d || oe=%d\n"),(gint) tmpCount,(gint) newTextMatch->offsetStart,
+                                                            (gint) newTextMatch->offsetEnd);
+	          g_printf(_("  Debug: %d) '%s'\n"), (gint)newTextMatch->lineNum, newTextMatch->pLine);
+	          if (errorCount > 3) {
+	             break; /* Exit loop as the rest of the file is likely to be corrupt too...*/
+	             }
+	        }/* elseif test a b */
+           }/* end display block */
 	  lineCount += (newTextMatch->lineCountAfter + 1);
 	  prevTextMatch = newTextMatch;
 	}	
@@ -1555,7 +1676,7 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 	  
 	  if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
 	    
-	    tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), newTextMatch->lineNum);
+	    tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), (gint)newTextMatch->lineNum);
 	    gtk_text_buffer_insert (buffer, &txtIter, tmpString, -1);
 	    lineCount += newTextMatch->lineCountBefore;
 	  } else {
@@ -1605,6 +1726,9 @@ gchar *generateContentOptionsString(searchControl *mSearchControl)
   //g_static_mutex_lock(&mutex_Control);
   options_flag = mSearchControl->flags;
   count1 = mSearchControl->numExtraLines;
+
+// printf("* nbre extra lines :%d *\n", count1);
+
   count2 = mSearchControl->limitContentResults;
   //g_static_mutex_unlock(&mutex_Control);
 

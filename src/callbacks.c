@@ -102,7 +102,10 @@ on_word_wrap1_activate                 (GtkMenuItem     *menuitem,
     }
     
     setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem));
-    gtk_text_view_set_wrap_mode(textBox, setWordWrap);
+    if(setWordWrap)
+        gtk_text_view_set_wrap_mode(textBox, GTK_WRAP_WORD);
+          else gtk_text_view_set_wrap_mode(textBox, GTK_WRAP_NONE);
+    gtk_text_view_set_justification( GTK_TEXT_VIEW(textBox), GTK_JUSTIFY_LEFT );
 }
 
 
@@ -163,13 +166,13 @@ on_set_highligting_colour1_activate    (GtkMenuItem     *menuitem,
     g_assert(dialog != NULL);
     g_assert(colorsel != NULL);
     
-    g_object_get( G_OBJECT(tag), "foreground-gdk", &cp, NULL);
+    g_object_get( G_OBJECT(tag), "background-gdk", &cp, NULL);
     gtk_color_selection_set_current_color(colorsel, cp);
     gdk_color_free(cp);
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
         GtkColorSelection *colorsel = GTK_COLOR_SELECTION(lookup_widget(dialog, "color_selection1"));
         gtk_color_selection_get_current_color(colorsel, &color);
-        g_object_set( G_OBJECT(tag), "foreground-gdk", &color, NULL);
+        g_object_set( G_OBJECT(tag), "background-gdk", &color, NULL);
     }
     gtk_widget_destroy(dialog);
 }
@@ -381,7 +384,7 @@ void
 on_contents1_activate                  (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  SMsyscall(_("http://searchmonkey.sourceforge.net/index.php/SearchMonkey_User_Guide"), BROWSER_LIST);
+  SMsyscall(_("http://searchmonkey.embeddediq.com/index.php/contribute"), BROWSER_LIST);/* must ne changed, Luc A feb 2018 */
 }
 
 
@@ -389,7 +392,7 @@ void
 on_support1_activate                   (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  SMsyscall(_("http://sourceforge.net/support/getsupport.php?group_id=175143"), BROWSER_LIST);
+  SMsyscall(_("http://searchmonkey.embeddediq.com/index.php/support"), BROWSER_LIST);
 }
 
 
@@ -448,7 +451,7 @@ on_containingText_changed              (GtkComboBox     *combobox,
     checkBox = GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(combobox), "containingTextCheck2"));
   }
 
-  gchar *test = gtk_combo_box_get_active_text   (combobox);
+  gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combobox));
 
   if (test == NULL){
     gtk_toggle_button_set_active(checkBox, FALSE);
@@ -471,14 +474,14 @@ on_folderSelector_clicked              (GtkButton       *button,
   GtkWidget *dialog;
   GtkComboBox *fileWidget;
   gint result;
-  gchar *currentFolderName = gtk_combo_box_get_active_text(GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "lookIn")));
+  gchar *currentFolderName = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(GTK_WIDGET(button), "lookIn")));
   
   dialog = create_folderChooserDialog();
   gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), currentFolderName);
   g_free(currentFolderName);
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
-    char *filename;
+    gchar *filename;
     
     filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
     if (getExpertSearchMode(GTK_WIDGET(button)) == TRUE) {
@@ -557,61 +560,58 @@ on_treeview1_button_press_event        (GtkWidget       *widget,
 
   GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
 
-  if (gtk_tree_selection_count_selected_rows(selection)<1)
-    {
-     printf("*** Warning, no selection ! ***\n");
-     // return FALSE;/* added by Luc A., 28 dec 2017 */
-    }
+
   /* Capture right button click */
-  if ((event->button == 3) && (event->type == GDK_BUTTON_PRESS)) 
+  if ((event->button == 3) && (event->type == GDK_BUTTON_PRESS) && (gtk_tree_selection_count_selected_rows(selection)==1 ) ) 
    {
     if (gtk_tree_view_get_path_at_pos (treeview,
                                        event->x, event->y,
                                        &path, NULL, NULL, NULL)) 
      {
-       gtk_tree_selection_unselect_all(selection); /* added by Luc A., 28 dec 2017 */
+       // gtk_tree_selection_unselect_all(selection); /* added by Luc A., 28 dec 2017 */
        gtk_tree_selection_select_path (selection, path);
        if (path!=NULL) 
          {
           gtk_tree_path_free(path);
          }/* if path!=NULL */
        do_popup_menu(widget, event);
+       return TRUE;
      }/* if test path at pos OK */   
-    return TRUE;
+    else return FALSE;
    }/* endif right-click */ 
 /* capture double-click */
- if ((event->button == 1) && (event->type == GDK_2BUTTON_PRESS)) 
-   {
-    gchar *fullFileName = getFullFileName(treeview, FULL_FILENAME_COLUMN);
-    if (fullFileName != NULL) 
-      {
-        SMsyscall(fullFileName, TEXTEDITOR_LIST);
-        g_free(fullFileName);
-      }
-    return TRUE;
-    }/* endif double-click */
-
-/* capture simple-left-click, i.e. select a row */
- if ((event->button == 1) && (event->type == GDK_BUTTON_PRESS)) 
+ if ((event->button == 1) && (event->type == GDK_2BUTTON_PRESS) && (gtk_tree_selection_count_selected_rows(selection)==1 )) 
    {
      if (gtk_tree_view_get_path_at_pos (treeview,event->x, event->y,
                                     &path, NULL, NULL, NULL)) 
       {
-// printf("** je considère que c'est un simple-clic **\n");
-             // printf("* Je suis avant le select path * \n");
-             gtk_tree_selection_unselect_all(selection); /* ajout */
-             // printf("* passé un-select * \n");
+          gchar *fullFileName = getFullFileName(treeview, FULL_FILENAME_COLUMN);
+          if (fullFileName != NULL) 
+            {
+              SMsyscall(fullFileName, TEXTEDITOR_LIST);
+              g_free(fullFileName);
+            }
+          return TRUE;
+      }/* endif at pos */
+    }/* endif double-click */
+   
+/* capture simple-left-click, i.e. select a row */
+ if ((event->button == 1) && (event->type == GDK_BUTTON_PRESS)  && (gtk_tree_selection_count_selected_rows(selection)==1 )) 
+   {
+     if (gtk_tree_view_get_path_at_pos (treeview,event->x, event->y,
+                                    &path, NULL, NULL, NULL)) 
+      {
+            gtk_tree_selection_unselect_all(selection); /* ajout */
             if (gtk_tree_selection_count_selected_rows(selection)==1)
              {
                gtk_tree_selection_select_path (selection, path);
-               // printf("* Je suis après le select path *\n");
                if (path!=NULL) 
                 {
 		 // printf("* avant libère mémoire *\n");
                  gtk_tree_path_free(path);
                  // printf("* après libère mémoire *\n");
                 }    
-              return TRUE;/* pb ici si met FALSE interdit sélections */
+              return TRUE;
              }
       }
    }/* endif left-click */
@@ -726,9 +726,7 @@ on_SampleTextView_realize              (GtkWidget       *widget,
   GtkTextTag *tag;
   
   tag = gtk_text_buffer_create_tag (buffer, "word_highlight",
-                                    "foreground", "blue",
-                                    "underline", PANGO_UNDERLINE_SINGLE,
-                                    "underline-set", TRUE,
+                                    "foreground", "black","background", "lightBlue",
                                     NULL);
 #ifdef NOT_YET
   tag = gtk_text_buffer_create_tag (buffer, "word_highlight1",
@@ -913,9 +911,9 @@ on_addMidContents_clicked              (GtkButton       *button,
     
     appendTableRow(lookup_widget(GTK_WIDGET(button), "midTreeView"),
                    5,
-                   gtk_combo_box_get_active_text(type),
+                   gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(type)),
                    gtk_entry_get_text(entry),
-                   gtk_combo_box_get_active_text(repeat),
+                   gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(repeat)),
                    gtk_combo_box_get_active(type),
                    gtk_combo_box_get_active(repeat));
     gtk_combo_box_set_active(type, 0);
@@ -1068,9 +1066,9 @@ on_updateSelectedContents_clicked      (GtkButton       *button,
   }
     
   gtk_list_store_set (GTK_LIST_STORE(model), &iter,
-                      REGEX_TYPE_COLUMN, gtk_combo_box_get_active_text(type),
+                      REGEX_TYPE_COLUMN, gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(type)),
                       REGEX_ENTRY_COLUMN, gtk_entry_get_text(entry),
-                      REGEX_REPEAT_COLUMN, gtk_combo_box_get_active_text(repeat),
+                      REGEX_REPEAT_COLUMN, gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(repeat)),
                       REGEX_TYPE_INT_COLUMN, gtk_combo_box_get_active(type),
                       REGEX_REPEAT_INT_COLUMN, gtk_combo_box_get_active(repeat),
                       -1);
@@ -1160,7 +1158,7 @@ on_online_release_notes1_activate      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   /* Browse to a new release notes subset. Note redirect required by website */
-  gchar *website = g_strdup_printf(_("http://%s.sf.net/index.php?title=V%s_Release_Notes"), PACKAGE, VERSION);
+  gchar *website = g_strdup_printf(_("https://sourceforge.net/projects/searchmonkey/files/gSearchmonkey%20GTK%20%28Gnome%29/0.8.2%20%5Bstable%5D/"), PACKAGE, VERSION);
   SMsyscall(website, BROWSER_LIST);
 }
 
@@ -1210,7 +1208,7 @@ void
 on_forums1_activate                    (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  SMsyscall(_("http://sf.net/forum/?group_id=175143"), BROWSER_LIST);
+  SMsyscall(_("http://searchmonkey.embeddediq.com/index.php/support/index"), BROWSER_LIST);
 }
 
 
@@ -1553,6 +1551,30 @@ on_beforeCalendatBtn_clicked           (GtkButton       *button,
   g_free(newDate);
 }
 
+/* Luc A - janv 2018 */
+gboolean
+on_LessThanSize_focus_out_event         (GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data)
+{
+  gchar * regexp;
+  guint flags;
+  printf("combo Less changée \n");  
+  return FALSE;
+}
+
+/* Luc A - janv 2018 */
+gboolean
+on_MoreThanSize_focus_out_event         (GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data)
+{
+  gchar * regexp;
+  guint flags;
+  printf("combo More changée \n");
+  return FALSE;
+}
+
 
 gboolean
 on_regexp_focus_out_event              (GtkWidget       *widget,
@@ -1569,7 +1591,7 @@ on_regexp_focus_out_event              (GtkWidget       *widget,
     }
     flags |= REG_NOSUB;
 
-    regexp = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+    regexp = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
   
     if (test_regexp(regexp, flags, error)) {
       addUniqueRow(widget, regexp);
@@ -1592,7 +1614,7 @@ on_regexp2_focus_out_event             (GtkWidget       *widget,
   }
   flags |= REG_NOSUB;
 
-  regexp = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+  regexp = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
   
   if (test_regexp(regexp, flags, error)) {
     addUniqueRow(widget, regexp);

@@ -71,6 +71,7 @@ void realizeTreeview(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
 void unrealizeTreeview(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name, gboolean autoColumnWidth);
 void realizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name, gboolean autoColumnWidth);
 void unrealizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name, gboolean autoColumnWidth);
+void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name );
 
 /* Tree view handlers (Right click + left click + sort columns) */
 void undo_popup_menu(GtkWidget *attach_widget, GtkMenu *menu);

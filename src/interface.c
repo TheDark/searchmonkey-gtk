@@ -166,7 +166,7 @@ create_window1 (void)
   GtkWidget *label253;
   GtkObject *folderDepthSpin_adj;
   GtkWidget *folderDepthSpin;
-  GtkWidget *searchModifierTable;
+//  GtkWidget *searchModifierTable;
   GtkWidget *moreThanEntry;
   GtkWidget *lessThanEntry;
   GtkWidget *label17;
@@ -270,6 +270,7 @@ create_window1 (void)
     }
 
   vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 4);
   gtk_widget_show (vbox1);
   gtk_container_add (GTK_CONTAINER (window1), vbox1);
 
@@ -677,13 +678,15 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (vbox1), expander1, FALSE, TRUE, 0);
   gtk_expander_set_expanded (GTK_EXPANDER (expander1), TRUE);
 
-  hbox68 = gtk_hbox_new (FALSE, 0);
+  hbox68 = gtk_hbox_new (FALSE, 2);
   gtk_widget_show (hbox68);
   gtk_container_add (GTK_CONTAINER (expander1), hbox68);
 
+ 
+
   searchNotebook = gtk_notebook_new ();
   gtk_widget_show (searchNotebook);
-  gtk_box_pack_start (GTK_BOX (hbox68), searchNotebook, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox68), searchNotebook, TRUE, TRUE, 4);
 
   vbox6 = gtk_vbox_new (FALSE, 4);
   gtk_container_set_border_width (GTK_CONTAINER (vbox6),
@@ -695,14 +698,14 @@ create_window1 (void)
   gtk_widget_show (hbox14);
   gtk_box_pack_start (GTK_BOX (vbox6), hbox14, FALSE, TRUE, 0);
 
-  table4 = gtk_table_new (2, 2, FALSE);
+  table4 = gtk_table_new (2, 5, FALSE);
   gtk_widget_show (table4);
   gtk_box_pack_start (GTK_BOX (hbox14), table4, TRUE, TRUE, 0);
 
-  fileName2 = gtk_combo_box_entry_new_text ();
+  fileName2 = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (fileName2);
   gtk_table_attach (GTK_TABLE (table4), fileName2, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0 | 0),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
   GTK_WIDGET_SET_FLAGS (fileName2, GTK_CAN_FOCUS);
   gtk_tooltips_set_tip (tooltips, fileName2,
@@ -715,14 +718,14 @@ create_window1 (void)
 
   containingTextCheck2 = gtk_check_button_new_with_mnemonic (_("_Containing:"));
   gtk_widget_show (containingTextCheck2);
-  gtk_table_attach (GTK_TABLE (table4), containingTextCheck2, 0, 1, 1, 2,
+  gtk_table_attach (GTK_TABLE (table4), containingTextCheck2, 2, 3, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_tooltips_set_tip (tooltips, containingTextCheck2, _("Enable contents search to find files with matching content too."), NULL);
 
-  containingText2 = gtk_combo_box_entry_new_text ();
+  containingText2 = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (containingText2);
-  gtk_table_attach (GTK_TABLE (table4), containingText2, 1, 2, 1, 2,
+  gtk_table_attach (GTK_TABLE (table4), containingText2, 3, 5, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (GTK_FILL), 0, 0);
   GTK_WIDGET_SET_FLAGS (containingText2, GTK_CAN_FOCUS);
@@ -743,7 +746,7 @@ create_window1 (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 5, 0);
 
-  lookIn2 = gtk_combo_box_entry_new_text ();
+  lookIn2 = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (lookIn2);/* origin : 1, 2, 0, 1, */
   gtk_table_attach (GTK_TABLE (table5), lookIn2, 1, 2, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -804,7 +807,7 @@ create_window1 (void)
   gtk_widget_show (label22);
   gtk_box_pack_start (GTK_BOX (fileNameHbox), label22, FALSE, FALSE, 5);
 
-  fileName = gtk_combo_box_entry_new_text ();
+  fileName = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (fileName);
   gtk_box_pack_start (GTK_BOX (fileNameHbox), fileName, TRUE, TRUE, 0);
   GTK_WIDGET_SET_FLAGS (fileName, GTK_CAN_FOCUS);
@@ -824,7 +827,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (containingTextHbox), containingTextCheck, FALSE, FALSE, 5);
   gtk_tooltips_set_tip (tooltips, containingTextCheck, _("Use this option to restrict your search results to files containing the provided text (or pattern)."), NULL);
 
-  containingText = gtk_combo_box_entry_new_text ();
+  containingText = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (containingText);
   gtk_box_pack_start (GTK_BOX (containingTextHbox), containingText, TRUE, TRUE, 0);
   GTK_WIDGET_SET_FLAGS (containingText, GTK_CAN_FOCUS);
@@ -849,7 +852,7 @@ create_window1 (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  lookIn = gtk_combo_box_entry_new_text ();/* position modifyed - Luc A. 29 dec 2017 */
+  lookIn = gtk_combo_box_text_new_with_entry ();/* position modifyed - Luc A. 29 dec 2017 - replaced deprecated 12 janv 2018*/
   gtk_widget_show (lookIn);
   gtk_table_attach (GTK_TABLE (table7), lookIn, 1, 3, 0, 1,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -912,83 +915,77 @@ create_window1 (void)
   gtk_widget_show (hseparator1c);
   gtk_box_pack_start (GTK_BOX (vbox3), hseparator1c, FALSE, TRUE, 0);
 /* end Luc A. */
-  searchModifierTable = gtk_table_new (2, 5, FALSE);
-  gtk_widget_show (searchModifierTable);
-  gtk_box_pack_start (GTK_BOX (vbox3), searchModifierTable, FALSE, TRUE, 0);
+  GtkWidget *hboxSizeModifier = gtk_hbox_new(FALSE, 0) ; /* Luc A janv 2018 */
+  gtk_widget_show (hboxSizeModifier);
+  gtk_box_pack_start (GTK_BOX (vbox3), hboxSizeModifier, FALSE, TRUE, 0);
 
+  label17 = gtk_label_new (_("Size :"));
+  gtk_widget_show (label17);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), label17, FALSE, TRUE, 0);
+
+  moreThanCheck = gtk_check_button_new_with_mnemonic (_("More than:"));
+  gtk_widget_show (moreThanCheck);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), moreThanCheck, FALSE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, moreThanCheck, _("Use this option to restrict your search results to files that are bigger than the provided number of kilo Bytes."), NULL);
   moreThanEntry = gtk_entry_new ();
   gtk_widget_show (moreThanEntry);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), moreThanEntry, 2, 3, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), moreThanEntry, FALSE, TRUE, 0);
   gtk_widget_set_sensitive (moreThanEntry, FALSE);
-  gtk_tooltips_set_tip (tooltips, moreThanEntry, _("Maximum filesize in kBytes."), NULL);
+  gtk_tooltips_set_tip (tooltips, moreThanEntry, _("Maximum filesize in kBytes/mBytes/gBytes."), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (moreThanEntry), 9);
   gtk_entry_set_invisible_char (GTK_ENTRY (moreThanEntry), 8226);
   gtk_entry_set_activates_default (GTK_ENTRY (moreThanEntry), TRUE);
   gtk_entry_set_width_chars (GTK_ENTRY (moreThanEntry), 10);
-
+/* combo more than */
+  GtkWidget *MoreThanSize = gtk_combo_box_text_new ();
+  gtk_widget_show (MoreThanSize);
+  gtk_tooltips_set_tip (tooltips, MoreThanSize, _("Use this option to choose the file size units."), NULL);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), MoreThanSize, FALSE, TRUE, 0);
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (MoreThanSize), _("Kb"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (MoreThanSize), _("Mb"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (MoreThanSize), _("Gb"));
+  gtk_combo_box_set_active (GTK_COMBO_BOX (MoreThanSize),0);
+  lessThanCheck = gtk_check_button_new_with_mnemonic (_("Less than:"));
+  gtk_widget_show (lessThanCheck);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), lessThanCheck, FALSE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, lessThanCheck, _("Use this option to restrict your search results to files that are smaller than the provided number of kilo Bytes."), NULL);
   lessThanEntry = gtk_entry_new ();
   gtk_widget_show (lessThanEntry);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), lessThanEntry, 4, 5, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), lessThanEntry, FALSE, TRUE, 0);
   gtk_widget_set_sensitive (lessThanEntry, FALSE);
-  gtk_tooltips_set_tip (tooltips, lessThanEntry, _("Minimum filesize in kBytes."), NULL);
+  gtk_tooltips_set_tip (tooltips, lessThanEntry, _("Minimum filesize in kBytes/mBytes/gBytes."), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (lessThanEntry), 9);
   gtk_entry_set_invisible_char (GTK_ENTRY (lessThanEntry), 8226);
   gtk_entry_set_activates_default (GTK_ENTRY (lessThanEntry), TRUE);
   gtk_entry_set_width_chars (GTK_ENTRY (lessThanEntry), 10);
-
-  label17 = gtk_label_new (_("Size (kB):"));
-  gtk_widget_show (label17);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), label17, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 5, 0);
+ /* LessThanSize */
+  GtkWidget *LessThanSize = gtk_combo_box_text_new ();
+  gtk_widget_show (LessThanSize);
+  gtk_tooltips_set_tip (tooltips, LessThanSize, _("Use this option to choose the file size units."), NULL);
+  gtk_box_pack_start (GTK_BOX (hboxSizeModifier), LessThanSize, FALSE, TRUE, 0);
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (LessThanSize), _("Kb"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (LessThanSize), _("Mb"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (LessThanSize), _("Gb"));
+  gtk_combo_box_set_active (GTK_COMBO_BOX (LessThanSize),0);
+  GtkWidget *hboxDateModifier = gtk_hbox_new(FALSE, 0) ; /* Luc A janv 2018 */
+  gtk_widget_show (hboxDateModifier);
+  gtk_box_pack_start (GTK_BOX (vbox3), hboxDateModifier, FALSE, TRUE, 0);
 
   label16 = gtk_label_new (_("Modified:"));
   gtk_widget_show (label16);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), label16, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 5, 0);
-
-  lessThanCheck = gtk_check_button_new_with_mnemonic (_("Less than:"));
-  gtk_widget_show (lessThanCheck);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), lessThanCheck, 3, 4, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 5, 0);
-  gtk_tooltips_set_tip (tooltips, lessThanCheck, _("Use this option to restrict your search results to files that are smaller than the provided number of kilo Bytes."), NULL);
-
-  beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
-  gtk_widget_show (beforeCheck);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), beforeCheck, 3, 4, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 5, 0);
-  gtk_tooltips_set_tip (tooltips, beforeCheck, _("Use this option to restrict your search results to files that were last modified before the provided time."), NULL);
-
-  moreThanCheck = gtk_check_button_new_with_mnemonic (_("More than:"));
-  gtk_widget_show (moreThanCheck);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), moreThanCheck, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 5, 0);
-  gtk_tooltips_set_tip (tooltips, moreThanCheck, _("Use this option to restrict your search results to files that are bigger than the provided number of kilo Bytes."), NULL);
-
+  gtk_box_pack_start (GTK_BOX (hboxDateModifier), label16, FALSE, TRUE, 0);
+  
   afterCheck = gtk_check_button_new_with_mnemonic (_("After:"));
   gtk_widget_show (afterCheck);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), afterCheck, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 5, 0);
+  gtk_box_pack_start (GTK_BOX (hboxDateModifier), afterCheck, FALSE, TRUE, 0);
   gtk_tooltips_set_tip (tooltips, afterCheck, _("Use this option to restrict your search results to files that were last modified after the provided time."), NULL);
 
   hbox70 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox70);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), hbox70, 2, 3, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
-
+  gtk_box_pack_start (GTK_BOX (hboxDateModifier), hbox70, FALSE, TRUE, 0); 
   afterEntry = gtk_entry_new ();
   gtk_widget_show (afterEntry);
-  gtk_box_pack_start (GTK_BOX (hbox70), afterEntry, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox70), afterEntry, FALSE, TRUE, 0);
   gtk_widget_set_sensitive (afterEntry, FALSE);
   gtk_editable_set_editable (GTK_EDITABLE (afterEntry), FALSE);
   gtk_entry_set_invisible_char (GTK_ENTRY (afterEntry), 9679);
@@ -999,15 +996,16 @@ create_window1 (void)
   gtk_widget_set_sensitive (afterCalendarBtn, FALSE);
   gtk_tooltips_set_tip (tooltips, afterCalendarBtn, _("Open calendar dialog to choose modified date."), NULL);
 
-  image93 = gtk_image_new_from_stock ("gtk-properties", GTK_ICON_SIZE_BUTTON);
+  image93 = gtk_image_new_from_icon_name ("calendar", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image93);
   gtk_container_add (GTK_CONTAINER (afterCalendarBtn), image93);
-
+beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
+  gtk_widget_show (beforeCheck);
+  gtk_box_pack_start (GTK_BOX (hboxDateModifier), beforeCheck, FALSE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, beforeCheck, _("Use this option to restrict your search results to files that were last modified before the provided time."), NULL);
   hbox71 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox71);
-  gtk_table_attach (GTK_TABLE (searchModifierTable), hbox71, 4, 5, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+  gtk_box_pack_start (GTK_BOX (hboxDateModifier), hbox71, FALSE, TRUE, 0); 
 
   beforeEntry = gtk_entry_new ();
   gtk_widget_show (beforeEntry);
@@ -1022,10 +1020,11 @@ create_window1 (void)
   gtk_widget_set_sensitive (beforeCalendarBtn, FALSE);
   gtk_tooltips_set_tip (tooltips, beforeCalendarBtn, _("Open calendar dialog to choose modified date."), NULL);
 
-  image94 = gtk_image_new_from_stock ("gtk-properties", GTK_ICON_SIZE_BUTTON);
+  image94 = gtk_image_new_from_icon_name ("calendar", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image94);
   gtk_container_add (GTK_CONTAINER (beforeCalendarBtn), image94);
 
+ 
   label1 = gtk_label_new (_("Advanced"));
   gtk_widget_show (label1);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (searchNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (searchNotebook), 1), label1);
@@ -1116,7 +1115,7 @@ create_window1 (void)
   wildcardCheckContents = gtk_radio_button_new_with_mnemonic (NULL, _("Use simple search syntax"));
   gtk_widget_show (wildcardCheckContents);
   gtk_box_pack_start (GTK_BOX (vbox46), wildcardCheckContents, FALSE, FALSE, 0);
-  gtk_widget_set_sensitive (wildcardCheckContents, FALSE);
+  gtk_widget_set_sensitive (wildcardCheckContents, TRUE);
   gtk_tooltips_set_tip (tooltips, wildcardCheckContents, _("Use wildcard or glob syntax for file search criteria. E.g. *.txt"), NULL);
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (wildcardCheckContents), wildcardCheckContents_group);
   wildcardCheckContents_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (wildcardCheckContents));
@@ -1161,7 +1160,7 @@ create_window1 (void)
   maxHitsSpinResults_adj = gtk_adjustment_new (25, 1, 99999, 1, 10, 10);
   maxHitsSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (maxHitsSpinResults_adj), 1, 0);
   gtk_widget_show (maxHitsSpinResults);
-  gtk_box_pack_start (GTK_BOX (limit_results_hbox), maxHitsSpinResults, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (limit_results_hbox), maxHitsSpinResults, TRUE, TRUE, 2);
 
   hseparator7 = gtk_hseparator_new ();
   gtk_widget_show (hseparator7);
@@ -1185,25 +1184,25 @@ create_window1 (void)
   showLinesSpinResults_adj = gtk_adjustment_new (0, 0, 20, 1, 5, 5);
   showLinesSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (showLinesSpinResults_adj), 1, 0);
   gtk_widget_show (showLinesSpinResults);
-  gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), showLinesSpinResults, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), showLinesSpinResults, TRUE, TRUE, 2);
 
   hseparator11 = gtk_hseparator_new ();
   gtk_widget_show (hseparator11);
   gtk_box_pack_start (GTK_BOX (vbox45), hseparator11, TRUE, TRUE, 0);
 
-  limitContentsCheckResults = gtk_check_button_new_with_mnemonic (_("Limit Content Hits"));
+  limitContentsCheckResults = gtk_check_button_new_with_mnemonic (_("Limit Content Highlighting"));
   gtk_widget_show (limitContentsCheckResults);
   gtk_box_pack_start (GTK_BOX (vbox45), limitContentsCheckResults, FALSE, FALSE, 0);
-  gtk_widget_set_sensitive (limitContentsCheckResults, FALSE);
+  gtk_widget_set_sensitive (limitContentsCheckResults, TRUE);/* luc A janv 2018 changed to TRUE in order to activate */
   gtk_tooltips_set_tip (tooltips, limitContentsCheckResults, _("Specify the maximum number of content matches within each file to show. Does not limit the number of files to search."), NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (limitContentsCheckResults), TRUE);
 
   limit_contents_hbox = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (limit_contents_hbox);
   gtk_box_pack_start (GTK_BOX (vbox45), limit_contents_hbox, TRUE, TRUE, 0);
-  gtk_widget_set_sensitive (limit_contents_hbox, FALSE);
+  gtk_widget_set_sensitive (limit_contents_hbox, TRUE);/* luc A janv 2018 changed to TRUE in order to activate */
 
-  label1025 = gtk_label_new (_("Maximum Hits:"));
+  label1025 = gtk_label_new (_("Highlights per line :"));
   gtk_widget_show (label1025);
   gtk_box_pack_start (GTK_BOX (limit_contents_hbox), label1025, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label1025), 5, 0);
@@ -1211,7 +1210,7 @@ create_window1 (void)
   maxContentHitsSpinResults_adj = gtk_adjustment_new (1, 1, 99999, 1, 5, 5);
   maxContentHitsSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (maxContentHitsSpinResults_adj), 1, 0);
   gtk_widget_show (maxContentHitsSpinResults);
-  gtk_box_pack_start (GTK_BOX (limit_contents_hbox), maxContentHitsSpinResults, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (limit_contents_hbox), maxContentHitsSpinResults, TRUE, TRUE, 2);
 
   label1008 = gtk_label_new (_("<b>Results Options</b>"));
   gtk_widget_show (label1008);
@@ -1223,20 +1222,13 @@ create_window1 (void)
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (searchNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (searchNotebook), 2), label2);
   GTK_WIDGET_SET_FLAGS (label2, GTK_CAN_FOCUS);
 
-  vseparator8 = gtk_vseparator_new ();
-  gtk_widget_show (vseparator8);
-  gtk_box_pack_start (GTK_BOX (hbox68), vseparator8, FALSE, TRUE, 5);
+ 
 
   vbox2 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox2);
-  gtk_box_pack_start (GTK_BOX (hbox68), vbox2, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox68), vbox2, FALSE, TRUE, 4);
 
-/* added by Luc A. to breath the interface - 29 dec 2017 */
-  GtkWidget *vseparator8b;
-vseparator8b = gtk_vseparator_new ();
-  gtk_widget_show (vseparator8b);
-  gtk_box_pack_start (GTK_BOX (hbox68), vseparator8b, FALSE, TRUE, 5);
-/* end Luc A. */
+
   expertUserCheck = gtk_check_button_new_with_mnemonic (_("Expert Mode"));
   gtk_box_pack_start (GTK_BOX (vbox2), expertUserCheck, TRUE, FALSE, 5);
   gtk_tooltips_set_tip (tooltips, expertUserCheck, _("Switch search from basic to advanced mode."), NULL);
@@ -1278,7 +1270,7 @@ vseparator8b = gtk_vseparator_new ();
 /* added by Luc A., 29 dec 2017, also to breath the UI */
   GtkWidget *hseparator10b = gtk_hseparator_new ();
   gtk_widget_show (hseparator10b);
-  gtk_box_pack_start (GTK_BOX (vbox1), hseparator10b, FALSE, TRUE, 5);
+  gtk_box_pack_start (GTK_BOX (vbox1), hseparator10b, FALSE, TRUE, 4);
 /* end Luc A. */
   resultsHPane = gtk_hpaned_new ();
   gtk_widget_show (resultsHPane);
@@ -1292,7 +1284,7 @@ vseparator8b = gtk_vseparator_new ();
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (resultsScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   treeview1 = gtk_tree_view_new ();
 /* modifyed by Luc A., 27 dec 2017 - be careful, it's deprecated under GTK3 ! */
-gtk_tree_view_set_rules_hint        (treeview1, TRUE);
+gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview1), TRUE);
 /* end modif Luc A. */
   gtk_widget_show (treeview1);
   gtk_container_add (GTK_CONTAINER (resultsScroll), treeview1);
@@ -1310,6 +1302,7 @@ gtk_tree_view_set_rules_hint        (treeview1, TRUE);
   gtk_text_view_set_editable (GTK_TEXT_VIEW (textview1), FALSE);
   gtk_text_view_set_overwrite (GTK_TEXT_VIEW (textview1), TRUE);
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (textview1), GTK_WRAP_WORD);
+ gtk_text_view_set_justification (GTK_TEXT_VIEW (textview1), GTK_JUSTIFY_LEFT);
   gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (textview1), FALSE);
   gtk_text_view_set_pixels_inside_wrap (GTK_TEXT_VIEW (textview1), 5);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (textview1), 5);
@@ -1327,7 +1320,7 @@ gtk_tree_view_set_rules_hint        (treeview1, TRUE);
 
   treeview2 = gtk_tree_view_new ();
 /* modifyed by Luc A., 27 dec 2017 - be careful, it's deprecated under GTK3 ! */
-gtk_tree_view_set_rules_hint        (treeview2,TRUE);
+gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
 /* end modif Luc A. */
   gtk_widget_show (treeview2);
   gtk_container_add (GTK_CONTAINER (scrolledwindow15), treeview2);
@@ -1351,7 +1344,7 @@ gtk_tree_view_set_rules_hint        (treeview2,TRUE);
 
   hbox41 = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox41);
-  gtk_box_pack_start (GTK_BOX (vbox1), hbox41, FALSE, FALSE, 4);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox41, FALSE, FALSE, 2);
 
   statusbar1 = gtk_statusbar_new ();
   gtk_widget_show (statusbar1);
@@ -1552,6 +1545,15 @@ gtk_tree_view_set_rules_hint        (treeview2,TRUE);
   g_signal_connect ((gpointer) lessThanCheck, "toggled",
                     G_CALLBACK (on_lessThanCheck_toggled),
                     NULL);
+/* Luc A - janv 2018 */
+  g_signal_connect ((gpointer) LessThanSize, "changed",
+                    G_CALLBACK (on_LessThanSize_focus_out_event),
+                    NULL);
+  g_signal_connect ((gpointer) MoreThanSize, "changed",
+                    G_CALLBACK (on_MoreThanSize_focus_out_event),
+                    NULL);
+/* end Luc A */
+
   g_signal_connect ((gpointer) beforeCheck, "toggled",
                     G_CALLBACK (on_beforeCheck_toggled),
                     NULL);
@@ -1676,7 +1678,7 @@ gtk_tree_view_set_rules_hint        (treeview2,TRUE);
   GLADE_HOOKUP_OBJECT (window1, menuitem7, "menuitem7");
   GLADE_HOOKUP_OBJECT (window1, menuitem7_menu, "menuitem7_menu");
   GLADE_HOOKUP_OBJECT (window1, contents1, "contents1");
-  GLADE_HOOKUP_OBJECT (window1, support1, "support1");
+ // GLADE_HOOKUP_OBJECT (window1, support1, "support1");
   GLADE_HOOKUP_OBJECT (window1, online_release_notes1, "online_release_notes1");
   GLADE_HOOKUP_OBJECT (window1, forums1, "forums1");
   GLADE_HOOKUP_OBJECT (window1, separator1, "separator1");
@@ -1736,7 +1738,7 @@ gtk_tree_view_set_rules_hint        (treeview2,TRUE);
   GLADE_HOOKUP_OBJECT (window1, image9, "image9");
   GLADE_HOOKUP_OBJECT (window1, label253, "label253");
   GLADE_HOOKUP_OBJECT (window1, folderDepthSpin, "folderDepthSpin");
-  GLADE_HOOKUP_OBJECT (window1, searchModifierTable, "searchModifierTable");
+//  GLADE_HOOKUP_OBJECT (window1, searchModifierTable, "searchModifierTable");
   GLADE_HOOKUP_OBJECT (window1, moreThanEntry, "moreThanEntry");
   GLADE_HOOKUP_OBJECT (window1, lessThanEntry, "lessThanEntry");
   GLADE_HOOKUP_OBJECT (window1, label17, "label17");
@@ -1814,7 +1816,15 @@ gtk_tree_view_set_rules_hint        (treeview2,TRUE);
   GLADE_HOOKUP_OBJECT (window1, hbox41, "hbox41");
   GLADE_HOOKUP_OBJECT (window1, statusbar1, "statusbar1");
   GLADE_HOOKUP_OBJECT (window1, progressbar1, "progressbar1");
+/* Luc A - janv 2018 */
+  GLADE_HOOKUP_OBJECT (window1, MoreThanSize, "MoreThanSize");
+  GLADE_HOOKUP_OBJECT (window1, LessThanSize, "LessThanSize");
+  GLADE_HOOKUP_OBJECT (window1, hboxSizeModifier, "hboxSizeModifier");
+  GLADE_HOOKUP_OBJECT (window1, hboxDateModifier, "hboxDateModifier");
+
+
   GLADE_HOOKUP_OBJECT_NO_REF (window1, tooltips, "tooltips");
+
 
   gtk_widget_grab_focus (window1);
   gtk_window_add_accel_group (GTK_WINDOW (window1), accel_group);
@@ -1967,7 +1977,7 @@ create_highlightColourDialog (void)
   GtkWidget *help_button1;
   GtkWidget *color_selection1;
 
-  highlightColourDialog = gtk_color_selection_dialog_new (_("Select Colour"));
+  highlightColourDialog = gtk_color_selection_dialog_new (_("Select highlighting Colour"));
   gtk_container_set_border_width (GTK_CONTAINER (highlightColourDialog), 5);
   gtk_window_set_resizable (GTK_WINDOW (highlightColourDialog), FALSE);
   gtk_window_set_destroy_with_parent (GTK_WINDOW (highlightColourDialog), TRUE);
@@ -2076,13 +2086,29 @@ create_clearSearchHistoryDialog (void)
   gtk_widget_show (dialog_vbox2);
 
   vbox19 = gtk_vbox_new (FALSE, 4);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox19), 4);
   gtk_widget_show (vbox19);
   gtk_box_pack_start (GTK_BOX (dialog_vbox2), vbox19, TRUE, TRUE, 0);
+/* Mac style Icon + some tips for user - Luc A feb 2018 */
+  GtkWidget *hboxUserConfidence = gtk_hbox_new(FALSE, 4);
+  gtk_widget_show(hboxUserConfidence);
+  gtk_box_pack_start (GTK_BOX (vbox19), hboxUserConfidence, TRUE, TRUE, 0);
+  label226 = gtk_label_new (_("<b>Select which data to delete:</b>\nWith this dialog, you can control how your entries will be cleared."));
+  gtk_widget_show (label226);
+  gtk_label_set_use_markup (GTK_LABEL (label226), TRUE); 
+  GtkWidget    *iconUserConfidence = gtk_image_new_from_icon_name ("edit-clear", GTK_ICON_SIZE_DIALOG);
+    gtk_widget_show(iconUserConfidence);
+    gtk_misc_set_padding(GTK_MISC(iconUserConfidence), 0, 2);
+    gtk_box_pack_start(GTK_BOX(hboxUserConfidence), iconUserConfidence, FALSE, FALSE, 2);
+    gtk_misc_set_padding(GTK_MISC(label226), 2, 2);
+    gtk_container_add(GTK_CONTAINER(hboxUserConfidence), label226); 
+/* end luc A */
 
   frame8 = gtk_frame_new (NULL);
   gtk_widget_show (frame8);
+  gtk_container_set_border_width (GTK_CONTAINER (frame8), 4);
   gtk_box_pack_start (GTK_BOX (vbox19), frame8, TRUE, TRUE, 0);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame8), GTK_SHADOW_NONE);
+  gtk_frame_set_shadow_type (GTK_FRAME (frame8), GTK_SHADOW_OUT);
 
   alignment15 = gtk_alignment_new (0.5, 0.5, 1, 1);
   gtk_widget_show (alignment15);
@@ -2117,10 +2143,7 @@ create_clearSearchHistoryDialog (void)
   gtk_tooltips_set_tip (tooltips, resetSizeModifiedCheck, _("Reset the size and modified search criteria."), NULL);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (resetSizeModifiedCheck), TRUE);
 
-  label226 = gtk_label_new (_("<b>Select which data to delete:</b>"));
-  gtk_widget_show (label226);
-  gtk_frame_set_label_widget (GTK_FRAME (frame8), label226);
-  gtk_label_set_use_markup (GTK_LABEL (label226), TRUE);
+ 
 
   label225 = gtk_label_new (_("<b>Warning</b>: Once cleared, history cannot be recovered!"));
   gtk_widget_show (label225);
@@ -2129,6 +2152,11 @@ create_clearSearchHistoryDialog (void)
   gtk_label_set_justify (GTK_LABEL (label225), GTK_JUSTIFY_CENTER);
   gtk_label_set_line_wrap (GTK_LABEL (label225), TRUE);
   gtk_misc_set_padding (GTK_MISC (label225), 5, 5);
+
+  GtkWidget *hseparator1 = gtk_hseparator_new ();
+  gtk_widget_show (hseparator1);
+  gtk_box_pack_start (GTK_BOX (vbox19), hseparator1, TRUE, TRUE, 0);
+
 
   dialog_action_area2 = GTK_DIALOG (clearSearchHistoryDialog)->action_area;
   gtk_widget_show (dialog_action_area2);
@@ -2172,10 +2200,10 @@ create_testRegExDialog (void)
   GtkWidget *testRegExDialog;
   GtkWidget *dialog_vbox3;
   GtkWidget *vbox21;
-  GtkWidget *hbox27;
+//  GtkWidget *hbox27;
   GtkWidget *label227;
   GtkWidget *testEntry;
-  GtkWidget *hbox28;
+//  GtkWidget *hbox28;
   GtkWidget *label229;
   GtkWidget *scrolledwindow6;
   GtkWidget *SampleTextView;
@@ -2199,40 +2227,59 @@ create_testRegExDialog (void)
   dialog_vbox3 = GTK_DIALOG (testRegExDialog)->vbox;
   gtk_widget_show (dialog_vbox3);
 
-  vbox21 = gtk_vbox_new (FALSE, 2);
+  vbox21 = gtk_vbox_new (FALSE, 4);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox21), 4);
   gtk_widget_show (vbox21);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox3), vbox21, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox3), vbox21, TRUE, TRUE, 4);
 
-  hbox27 = gtk_hbox_new (FALSE, 4);
-  gtk_widget_show (hbox27);
-  gtk_box_pack_start (GTK_BOX (vbox21), hbox27, FALSE, FALSE, 0);
+/* Mac style - Luc A feb 2018 */
+   GtkWidget *hbox27 = gtk_hbox_new (FALSE, 4);
+   gtk_widget_show (hbox27);
+   gtk_box_pack_start (GTK_BOX (vbox21), hbox27, FALSE, FALSE, 0);
+   GtkWidget *labelHeaderTest = gtk_label_new (_("<b>Test Regular Expressions (RegEx):</b>\n<i>With this dialog, you can test a RegEx before using it.\nFeel free to type a RegEx and put an example of text to test it.</i>"));
+  gtk_widget_show (labelHeaderTest);
+  gtk_label_set_use_markup (GTK_LABEL (labelHeaderTest), TRUE); 
+  GtkWidget    *iconHeaderTest = gtk_image_new_from_icon_name ("applications-debugging", GTK_ICON_SIZE_DIALOG);
+    gtk_widget_show(iconHeaderTest);
+    gtk_misc_set_padding(GTK_MISC(iconHeaderTest), 0, 2);
+    gtk_box_pack_start(GTK_BOX(hbox27), iconHeaderTest, FALSE, FALSE, 2);
+    gtk_misc_set_padding(GTK_MISC(labelHeaderTest), 2, 2);
+    gtk_container_add(GTK_CONTAINER(hbox27), labelHeaderTest); 
+    GtkWidget *hseparatorHeaderTest = gtk_hseparator_new ();
+    gtk_widget_show(hseparatorHeaderTest);
+   gtk_box_pack_start (GTK_BOX (vbox21), hseparatorHeaderTest, FALSE, FALSE, 0);
+ 
 
-  label227 = gtk_label_new (_("Test Expression:"));
+  label227 = gtk_label_new (_("<b>Test Expression</b>:"));
+  gtk_label_set_use_markup (GTK_LABEL (label227), TRUE);
   gtk_misc_set_padding (GTK_MISC (label227), 4, 4);
   gtk_widget_show (label227);
-  gtk_box_pack_start (GTK_BOX (hbox27), label227, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox21), label227, FALSE, FALSE, 0);
 
   testEntry = gtk_entry_new ();
   gtk_widget_show (testEntry);
-  gtk_box_pack_start (GTK_BOX (hbox27), testEntry, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox21), testEntry, TRUE, TRUE, 4);
   gtk_entry_set_text (GTK_ENTRY (testEntry), _("sample"));
   gtk_entry_set_invisible_char (GTK_ENTRY (testEntry), 9679);
   gtk_entry_set_activates_default (GTK_ENTRY (testEntry), TRUE);
 
-  hbox28 = gtk_hbox_new (FALSE, 4);
-  gtk_widget_show (hbox28);
-  gtk_box_pack_start (GTK_BOX (vbox21), hbox28, TRUE, TRUE, 0);
+//  hbox28 = gtk_hbox_new (FALSE, 4);
+//  gtk_widget_show (hbox28);
+//  gtk_box_pack_start (GTK_BOX (vbox21), hbox28, TRUE, TRUE, 4);
 
-  label229 = gtk_label_new (_("Sample Text:"));
+  label229 = gtk_label_new (_("<b>Sample Text:</b>"));
+  gtk_label_set_use_markup (GTK_LABEL (label229), TRUE);
   gtk_misc_set_padding (GTK_MISC (label229), 4, 4);
   gtk_widget_show (label229);
-  gtk_box_pack_start (GTK_BOX (hbox28), label229, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox21), label229, FALSE, FALSE, 0);
+
 
   scrolledwindow6 = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (scrolledwindow6);
-  gtk_box_pack_start (GTK_BOX (hbox28), scrolledwindow6, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox21), scrolledwindow6, TRUE, TRUE, 4);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow6), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow6), GTK_SHADOW_IN);
+  gtk_widget_set_size_request (GTK_WIDGET(scrolledwindow6), -1, 80);
 
   SampleTextView = gtk_text_view_new ();
   gtk_widget_show (SampleTextView);
@@ -2241,7 +2288,7 @@ create_testRegExDialog (void)
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (SampleTextView), GTK_WRAP_WORD);
   gtk_text_buffer_set_text (gtk_text_view_get_buffer (GTK_TEXT_VIEW (SampleTextView)), _("<Copy and paste your sample text here>"), -1);
 
-  label228 = gtk_label_new (_("To see the results of your regular expression click apply. Once done, simply close the window. Searches are case sensitive.\n\n<b>Note:</b> this tool will only highlight the first match found."));
+  label228 = gtk_label_new (_("To see the results of your regular expression click apply. Once done, simply close the window. Searches are case sensitive.\n\n<b>Note:</b> this tool will highlight <i>each</i> match(es) found."));
 /* added by Luc A. 30 dec 2017 - be careful, deprecated since Gtk 3.12 */
  gtk_misc_set_padding (GTK_MISC (label228), 4, 4);
 /* end luc A. */
@@ -2259,14 +2306,15 @@ create_testRegExDialog (void)
   gtk_widget_show (hbox29);
   gtk_box_pack_start (GTK_BOX (vbox21), hbox29, FALSE, FALSE, 0);
 
-  label230 = gtk_label_new (_("Status:"));
+  label230 = gtk_label_new (_("<b>Status:</b>"));
+  gtk_label_set_use_markup (GTK_LABEL (label230), TRUE);
   gtk_misc_set_padding (GTK_MISC (label230), 4, 4);
   gtk_widget_show (label230);
   gtk_box_pack_start (GTK_BOX (hbox29), label230, FALSE, FALSE, 0);
 
   testResultStatus = gtk_entry_new ();
   gtk_widget_show (testResultStatus);
-  gtk_box_pack_start (GTK_BOX (hbox29), testResultStatus, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox29), testResultStatus, TRUE, TRUE, 4);
   gtk_editable_set_editable (GTK_EDITABLE (testResultStatus), FALSE);
   gtk_entry_set_invisible_char (GTK_ENTRY (testResultStatus), 9679);
 
@@ -2295,10 +2343,10 @@ create_testRegExDialog (void)
   GLADE_HOOKUP_OBJECT_NO_REF (testRegExDialog, testRegExDialog, "testRegExDialog");
   GLADE_HOOKUP_OBJECT_NO_REF (testRegExDialog, dialog_vbox3, "dialog_vbox3");
   GLADE_HOOKUP_OBJECT (testRegExDialog, vbox21, "vbox21");
-  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox27, "hbox27");
+//  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox27, "hbox27");
   GLADE_HOOKUP_OBJECT (testRegExDialog, label227, "label227");
   GLADE_HOOKUP_OBJECT (testRegExDialog, testEntry, "testEntry");
-  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox28, "hbox28");
+//  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox28, "hbox28");
   GLADE_HOOKUP_OBJECT (testRegExDialog, label229, "label229");
   GLADE_HOOKUP_OBJECT (testRegExDialog, scrolledwindow6, "scrolledwindow6");
   GLADE_HOOKUP_OBJECT (testRegExDialog, SampleTextView, "SampleTextView");
@@ -2375,29 +2423,31 @@ create_expWizard (void)
   gtk_widget_show (dialog_vbox4);
 
   vbox23 = gtk_vbox_new (FALSE, 4);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox23), 4);
   gtk_widget_show (vbox23);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox4), vbox23, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox4), vbox23, TRUE, TRUE, 4);
 
   hbox30 = gtk_hbox_new (FALSE, 4);
   gtk_widget_show (hbox30);
-  gtk_box_pack_start (GTK_BOX (vbox23), hbox30, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox23), hbox30, FALSE, FALSE, 4);
 
-  label234 = gtk_label_new (_("Text begins:"));
+  label234 = gtk_label_new (_("<b>Text begins:</b>"));
+  gtk_label_set_use_markup (GTK_LABEL (label234), TRUE);
   gtk_widget_show (label234);
-  gtk_box_pack_start (GTK_BOX (hbox30), label234, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox30), label234, FALSE, FALSE, 4);
 
-  startType = gtk_combo_box_entry_new_text ();
+  startType = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (startType);
   gtk_box_pack_start (GTK_BOX (hbox30), startType, TRUE, TRUE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Don't know"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Any character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("The character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Any one of these chars"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Any char except these"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("The phrase"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Space(s)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Any numeric character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startType), _("Any text character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Don't know"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Any character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("The character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Any one of these chars"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Any char except these"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("The phrase"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Space(s)"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Any numeric character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startType), _("Any text character"));
 
   startEntry = gtk_entry_new ();
   gtk_widget_show (startEntry);
@@ -2407,16 +2457,16 @@ create_expWizard (void)
 
   label235 = gtk_label_new (_("that occurs"));
   gtk_widget_show (label235);
-  gtk_box_pack_start (GTK_BOX (hbox30), label235, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox30), label235, FALSE, FALSE, 4);
 
-  startOccurance = gtk_combo_box_entry_new_text ();
+  startOccurance = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (startOccurance);
-  gtk_box_pack_start (GTK_BOX (hbox30), startOccurance, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox30), startOccurance, TRUE, TRUE, 4);
   gtk_widget_set_sensitive (startOccurance, FALSE);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startOccurance), _("Once"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startOccurance), _("One or more times"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startOccurance), _("Zero or more times"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (startOccurance), _("Possibly once"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startOccurance), _("Once"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startOccurance), _("One or more times"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startOccurance), _("Zero or more times"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (startOccurance), _("Possibly once"));
 
   frame9 = gtk_frame_new (NULL);
   gtk_widget_show (frame9);
@@ -2429,24 +2479,24 @@ create_expWizard (void)
 
   vbox25 = gtk_vbox_new (FALSE, 4);
   gtk_widget_show (vbox25);
-  gtk_box_pack_start (GTK_BOX (hbox33), vbox25, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox33), vbox25, TRUE, TRUE, 10);
 
   hbox34 = gtk_hbox_new (FALSE, 4);
   gtk_widget_show (hbox34);
   gtk_box_pack_start (GTK_BOX (vbox25), hbox34, FALSE, FALSE, 0);
 
-  midType = gtk_combo_box_entry_new_text ();
+  midType = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (midType);
   gtk_box_pack_start (GTK_BOX (hbox34), midType, TRUE, TRUE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Don't know"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Any character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("The character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Any one of these chars"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Any char except these"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("The phrase"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Space(s)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Any numeric character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midType), _("Any text character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Don't know"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Any character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("The character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Any one of these chars"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Any char except these"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("The phrase"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Space(s)"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Any numeric character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midType), _("Any text character"));
 
   midEntry = gtk_entry_new ();
   gtk_widget_show (midEntry);
@@ -2458,14 +2508,14 @@ create_expWizard (void)
   gtk_widget_show (label245);
   gtk_box_pack_start (GTK_BOX (hbox34), label245, FALSE, FALSE, 0);
 
-  midOccurance = gtk_combo_box_entry_new_text ();
+  midOccurance = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (midOccurance);
   gtk_box_pack_start (GTK_BOX (hbox34), midOccurance, TRUE, TRUE, 0);
   gtk_widget_set_sensitive (midOccurance, FALSE);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midOccurance), _("Once"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midOccurance), _("One or more times"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midOccurance), _("Zero or more times"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (midOccurance), _("Possibly once"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midOccurance), _("Once"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midOccurance), _("One or more times"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midOccurance), _("Zero or more times"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (midOccurance), _("Possibly once"));
 
   midSelection = gtk_entry_new ();
   gtk_box_pack_start (GTK_BOX (hbox34), midSelection, TRUE, TRUE, 0);
@@ -2518,29 +2568,30 @@ create_expWizard (void)
 
   hbox32 = gtk_hbox_new (FALSE, 4);
   gtk_widget_show (hbox32);
-  gtk_box_pack_start (GTK_BOX (vbox23), hbox32, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox23), hbox32, FALSE, FALSE, 4);
   /* added by Luc A. - 30 dec 2017 */
   GtkWidget *hseparator1ExpWiazrd = gtk_hseparator_new ();
   gtk_widget_show (hseparator1ExpWiazrd);
   gtk_box_pack_start (GTK_BOX (vbox23), hseparator1ExpWiazrd, TRUE, TRUE, 0);
   /* end Luc A. */
 
-  label239 = gtk_label_new (_("Text ends:"));
+  label239 = gtk_label_new (_("<b>Text ends:</b>"));
+  gtk_label_set_use_markup (GTK_LABEL (label239), TRUE);
   gtk_widget_show (label239);
-  gtk_box_pack_start (GTK_BOX (hbox32), label239, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox32), label239, FALSE, FALSE, 4);
 
-  endType = gtk_combo_box_entry_new_text ();
+  endType = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (endType);
   gtk_box_pack_start (GTK_BOX (hbox32), endType, TRUE, TRUE, 0);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Don't know"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Any character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("The character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Any one of these chars"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Any char except these"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("The phrase"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Space(s)"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Any numeric character"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endType), _("Any text character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Don't know"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Any character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("The character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Any one of these chars"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Any char except these"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("The phrase"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Space(s)"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Any numeric character"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endType), _("Any text character"));
 
   endEntry = gtk_entry_new ();
   gtk_widget_show (endEntry);
@@ -2552,14 +2603,14 @@ create_expWizard (void)
   gtk_widget_show (label240);
   gtk_box_pack_start (GTK_BOX (hbox32), label240, FALSE, FALSE, 0);
 
-  endOccurance = gtk_combo_box_entry_new_text ();
+  endOccurance = gtk_combo_box_text_new_with_entry ();
   gtk_widget_show (endOccurance);
   gtk_box_pack_start (GTK_BOX (hbox32), endOccurance, TRUE, TRUE, 0);
   gtk_widget_set_sensitive (endOccurance, FALSE);
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endOccurance), _("Once"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endOccurance), _("One or more times"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endOccurance), _("Zero or more times"));
-  gtk_combo_box_append_text (GTK_COMBO_BOX (endOccurance), _("Possibly once"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endOccurance), _("Once"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endOccurance), _("One or more times"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endOccurance), _("Zero or more times"));
+  gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (endOccurance), _("Possibly once"));
 
   frame10 = gtk_frame_new (NULL);
   gtk_widget_show (frame10);
@@ -2790,11 +2841,13 @@ create_configDialog (void)
   gtk_window_set_type_hint (GTK_WINDOW (configDialog), GDK_WINDOW_TYPE_HINT_DIALOG);
 
   dialog_vbox5 = GTK_DIALOG (configDialog)->vbox;
+  gtk_box_set_spacing (GTK_BOX(dialog_vbox5), 2);
   gtk_widget_show (dialog_vbox5);
 
   configNotebook = gtk_notebook_new ();
+  gtk_container_set_border_width (GTK_CONTAINER (configNotebook), 4);
   gtk_widget_show (configNotebook);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox5), configNotebook, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox5), configNotebook, TRUE, TRUE, 4);
 
   vbox26 = gtk_vbox_new (FALSE, 2);
   gtk_widget_show (vbox26);
@@ -2828,9 +2881,21 @@ create_configDialog (void)
   gtk_widget_set_sensitive (configMatchBinary, FALSE);
   gtk_tooltips_set_tip (tooltips, configMatchBinary, _("Check this to allow"), NULL);
 
+
   label246 = gtk_label_new (_("Global Settings"));
   gtk_widget_show (label246);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 0), label246);
+
+/* Display Icon in the tab - thanks to old developpers  here ;  http://vim.1045645.n5.nabble.com/Patch-Nicer-notebook-tabs-with-GTK2-td1206288.html */
+    GtkWidget   *tab_boxGlobalSettings = gtk_vbox_new(FALSE, 4);
+    gtk_widget_show(tab_boxGlobalSettings);
+    GtkWidget    *iconGlobalSettings = gtk_image_new_from_icon_name ("gconf-editor", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    gtk_widget_show(iconGlobalSettings);
+    gtk_misc_set_padding(GTK_MISC(iconGlobalSettings), 0, 2);
+    gtk_box_pack_start(GTK_BOX(tab_boxGlobalSettings), iconGlobalSettings, FALSE, FALSE, 2);
+    gtk_misc_set_padding(GTK_MISC(label246), 2, 2);
+    gtk_container_add(GTK_CONTAINER(tab_boxGlobalSettings), label246); 
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 0),       tab_boxGlobalSettings);
+
 
   vbox29 = gtk_vbox_new (FALSE, 2);
   gtk_widget_show (vbox29);
@@ -2838,7 +2903,7 @@ create_configDialog (void)
 
   table6 = gtk_table_new (4, 3, FALSE);
   gtk_widget_show (table6);
-  gtk_box_pack_start (GTK_BOX (vbox29), table6, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox29), table6, TRUE, TRUE, 4);
 
   label249 = gtk_label_new (_("Default text editor:"));
   gtk_widget_show (label249);
@@ -2897,7 +2962,7 @@ create_configDialog (void)
                     (GtkAttachOptions) (GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_tooltips_set_tip (tooltips, configWebBrowserAttributes, _("Text editor attributes: %f=filename, %d=directory"), NULL);
-  gtk_entry_set_text (GTK_ENTRY (configWebBrowserAttributes), _("-new-tab %f"));
+  gtk_entry_set_text (GTK_ENTRY (configWebBrowserAttributes), _("%f"));
   gtk_entry_set_invisible_char (GTK_ENTRY (configWebBrowserAttributes), 9679);
 
   configTextEditor = gtk_entry_new ();
@@ -2937,63 +3002,94 @@ create_configDialog (void)
   gtk_box_pack_start (GTK_BOX (hbox55), label994, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label994), 5, 0);
 
-  autoFindExe = gtk_button_new_with_mnemonic (_("Auto search..."));
+ // autoFindExe = gtk_button_new_with_mnemonic (_("Auto search..."));
+ // gtk_widget_show (autoFindExe);
+ // gtk_box_pack_start (GTK_BOX (hbox55), autoFindExe, FALSE, FALSE, 0);
+
+/* création complète bouton comptatible Gtk 3 janv 2018 */
+  autoFindExe = gtk_button_new();
   gtk_widget_show (autoFindExe);
-  gtk_box_pack_start (GTK_BOX (hbox55), autoFindExe, FALSE, FALSE, 0);
+  GtkWidget *hboxautoFindExe = gtk_vbox_new(FALSE, 2);
+  gtk_widget_show (hboxautoFindExe);
+  gtk_container_add (GTK_CONTAINER (autoFindExe), hboxautoFindExe);
+  gtk_box_pack_start (GTK_BOX (hbox55), autoFindExe, TRUE, FALSE, 0);
+ /* image to button compatible with Gtk 3.0 Luc A janv 2018 */
+    GtkWidget *autoFindExeImage = gtk_image_new();
+    gtk_image_set_from_icon_name (GTK_IMAGE(autoFindExeImage),
+                              "edit-find",
+                              GTK_ICON_SIZE_BUTTON);
+    gtk_widget_show (autoFindExeImage);
+    gtk_box_pack_start (GTK_BOX (hboxautoFindExe), autoFindExeImage, FALSE, FALSE, 0);
+    GtkWidget *autoFindExeLabel = gtk_label_new(_("Auto search..."));
+    gtk_widget_show (autoFindExeLabel);
+    gtk_box_pack_start (GTK_BOX (hboxautoFindExe), autoFindExeLabel, FALSE, FALSE, 0);
 
-  label993 = gtk_label_new (_("System Calls"));
+  label993 = gtk_label_new (_("Default Applications"));
   gtk_widget_show (label993);
+    GtkWidget   *tab_boxApplicationsSettings = gtk_vbox_new(FALSE, 4);
+    gtk_widget_show(tab_boxApplicationsSettings);
+    GtkWidget    *iconApplicationsSettings = gtk_image_new_from_icon_name ("system-run", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    gtk_widget_show(iconApplicationsSettings);
+    gtk_misc_set_padding(GTK_MISC(iconApplicationsSettings), 0, 2);
+    gtk_box_pack_start(GTK_BOX(tab_boxApplicationsSettings), iconApplicationsSettings, FALSE, FALSE, 2);
+    gtk_misc_set_padding(GTK_MISC(label993), 2, 2);
+    gtk_container_add(GTK_CONTAINER(tab_boxApplicationsSettings), label993); 
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 1),       tab_boxApplicationsSettings);
+
+/*
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 1), label993);
+*/
+ GtkWidget *hbox27 = gtk_hbox_new (FALSE, 2);
+  gtk_widget_show (hbox27);
+  gtk_container_add (GTK_CONTAINER (configNotebook), hbox27);
 
-  vbox27 = gtk_vbox_new (FALSE, 2);
+  vbox27 = gtk_vbox_new (TRUE, 2);
   gtk_widget_show (vbox27);
-  gtk_container_add (GTK_CONTAINER (configNotebook), vbox27);
+  gtk_box_pack_start (GTK_BOX (hbox27), vbox27, FALSE, FALSE, 2);
 
-  hbox50 = gtk_hbox_new (FALSE, 4);
-  gtk_widget_show (hbox50);
-  gtk_box_pack_start (GTK_BOX (vbox27), hbox50, FALSE, FALSE, 0);
+  GtkWidget *vbox271 = gtk_vbox_new (TRUE, 2);
+  gtk_widget_show (vbox271);
+  gtk_box_pack_start (GTK_BOX (hbox27), vbox271, FALSE, FALSE, 2);
+
+
+ 
 
   label264 = gtk_label_new (_("End of row separator:"));
   gtk_widget_show (label264);
-  gtk_box_pack_start (GTK_BOX (hbox50), label264, FALSE, FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (vbox27), label264, FALSE, FALSE, 3);
 
   configResultEOL = gtk_entry_new ();
   gtk_widget_show (configResultEOL);
-  gtk_box_pack_start (GTK_BOX (hbox50), configResultEOL, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox271), configResultEOL, FALSE, TRUE, 0);
   gtk_tooltips_set_tip (tooltips, configResultEOL, _("Use ASCII or C style construct e.g. \\n"), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (configResultEOL), 2);
   gtk_entry_set_text (GTK_ENTRY (configResultEOL), _("\\n"));
   gtk_entry_set_invisible_char (GTK_ENTRY (configResultEOL), 8226);
   gtk_entry_set_width_chars (GTK_ENTRY (configResultEOL), 2);
 
-  hbox51 = gtk_hbox_new (FALSE, 4);
-  gtk_widget_show (hbox51);
-  gtk_box_pack_start (GTK_BOX (vbox27), hbox51, FALSE, FALSE, 0);
+  
 
   label262 = gtk_label_new (_("Value/field separator:"));
   gtk_widget_show (label262);
-  gtk_box_pack_start (GTK_BOX (hbox51), label262, FALSE, FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (vbox27), label262, FALSE, FALSE, 3);
 
   configResultEOF = gtk_entry_new ();
   gtk_widget_show (configResultEOF);
-  gtk_box_pack_start (GTK_BOX (hbox51), configResultEOF, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox271), configResultEOF, FALSE, TRUE, 0);
   gtk_tooltips_set_tip (tooltips, configResultEOF, _("Use ASCII or C style construct e.g. , \\t ;"), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (configResultEOF), 2);
   gtk_entry_set_text (GTK_ENTRY (configResultEOF), _(","));
   gtk_entry_set_invisible_char (GTK_ENTRY (configResultEOF), 8226);
   gtk_entry_set_width_chars (GTK_ENTRY (configResultEOF), 2);
 
-  hbox56 = gtk_hbox_new (FALSE, 4);
-  gtk_widget_show (hbox56);
-  gtk_box_pack_start (GTK_BOX (vbox27), hbox56, FALSE, FALSE, 0);
-
+  
   label1006 = gtk_label_new (_("Text delimiter:"));
   gtk_widget_show (label1006);
-  gtk_box_pack_start (GTK_BOX (hbox56), label1006, FALSE, FALSE, 3);
+  gtk_box_pack_start (GTK_BOX (vbox27), label1006, FALSE, FALSE, 3);
 
   configResultDelimiter = gtk_entry_new ();
   gtk_widget_show (configResultDelimiter);
-  gtk_box_pack_start (GTK_BOX (hbox56), configResultDelimiter, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox271), configResultDelimiter, FALSE, TRUE, 0);
   gtk_tooltips_set_tip (tooltips, configResultDelimiter, _("Use ASCII characters e.g. \" # $ '"), NULL);
   gtk_entry_set_max_length (GTK_ENTRY (configResultDelimiter), 2);
   gtk_entry_set_text (GTK_ENTRY (configResultDelimiter), _("\\\""));
@@ -3002,7 +3098,19 @@ create_configDialog (void)
 
   label991 = gtk_label_new (_("Csv Export"));
   gtk_widget_show (label991);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 2), label991);
+
+    GtkWidget   *tab_boxCSVSettings = gtk_vbox_new(FALSE, 4);
+    gtk_widget_show(tab_boxCSVSettings);
+    GtkWidget    *iconCSVSettings = gtk_image_new_from_icon_name ("document-export", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    gtk_widget_show(iconCSVSettings);
+    gtk_misc_set_padding(GTK_MISC(iconCSVSettings), 0, 2);
+    gtk_box_pack_start(GTK_BOX(tab_boxCSVSettings), iconCSVSettings, FALSE, FALSE, 2);
+    gtk_misc_set_padding(GTK_MISC(label991), 2, 2);
+    gtk_container_add(GTK_CONTAINER(tab_boxCSVSettings), label991); 
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 2),       tab_boxCSVSettings);
+
+
+//  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 2), label991);
 
   vbox28 = gtk_vbox_new (FALSE, 2);
   gtk_widget_show (vbox28);
@@ -3010,18 +3118,63 @@ create_configDialog (void)
 
   hbox52 = gtk_hbox_new (FALSE, 4);
   gtk_widget_show (hbox52);
-  gtk_box_pack_start (GTK_BOX (vbox28), hbox52, FALSE, FALSE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox28), hbox52, FALSE, FALSE, 4);
 
   label274 = gtk_label_new (_("Remove all saved settings (restart required to complete):"));
   gtk_widget_show (label274);
   gtk_box_pack_start (GTK_BOX (hbox52), label274, FALSE, FALSE, 0);
   gtk_misc_set_alignment (GTK_MISC (label274), 0, 0.5);
 
-  configResetAll = gtk_button_new_with_mnemonic (_("Reset all"));
+ /* création complète bouton comptatible Gtk 3 janv 2018 */
+  configResetAll = gtk_button_new();
   gtk_widget_show (configResetAll);
-  gtk_box_pack_start (GTK_BOX (hbox52), configResetAll, FALSE, FALSE, 0);
+  GtkWidget *hboxconfigResetAll = gtk_hbox_new(FALSE, 2);
+  gtk_widget_show (hboxconfigResetAll);
+  gtk_container_add (GTK_CONTAINER (configResetAll), hboxconfigResetAll);
+  gtk_box_pack_start (GTK_BOX (hbox52), configResetAll, TRUE, FALSE, 0);
+ /* image to button compatible with Gtk 3.0 Luc A janv 2018 */
+    GtkWidget *configResetAllImage = gtk_image_new();
+    gtk_image_set_from_icon_name (GTK_IMAGE(configResetAllImage),
+                              "system-run",
+                              GTK_ICON_SIZE_BUTTON);
+    gtk_widget_show (configResetAllImage);
+    gtk_box_pack_start (GTK_BOX (hboxconfigResetAll), configResetAllImage, FALSE, FALSE, 0);
+    GtkWidget *configResetAllLabel = gtk_label_new(_("Reset all"));
+    gtk_widget_show (configResetAllLabel);
+    gtk_box_pack_start (GTK_BOX (hboxconfigResetAll), configResetAllLabel, FALSE, FALSE, 0);
+/* end button à la mano Gtk 3 */
+  GtkWidget *hSeperatorConfigReset = gtk_hseparator_new ();
+  gtk_widget_show (hSeperatorConfigReset);
+  gtk_box_pack_start (GTK_BOX (vbox28), hSeperatorConfigReset, FALSE, TRUE, 5);
+  
+  hbox54 = gtk_hbox_new (FALSE, 4);
+  gtk_widget_show (hbox54);
+  gtk_box_pack_start (GTK_BOX (vbox28), hbox54, FALSE, FALSE, 0);
 
-  hbox53 = gtk_hbox_new (FALSE, 4);
+  label992 = gtk_label_new (_("Save settings immediately (normally occurs on exit):"));
+  gtk_widget_show (label992);
+  gtk_box_pack_start (GTK_BOX (hbox54), label992, FALSE, FALSE, 0);
+  gtk_misc_set_alignment (GTK_MISC (label992), 0, 0.5);
+
+  configSaveNow = gtk_button_new();
+  gtk_widget_show (configSaveNow);
+  GtkWidget *hboxconfigSaveNow = gtk_hbox_new(FALSE, 2);
+  gtk_widget_show (hboxconfigSaveNow);
+  gtk_container_add (GTK_CONTAINER (configSaveNow), hboxconfigSaveNow);
+ /* image to button compatible with Gtk 3.0 Luc A janv 2018 */
+    GtkWidget *configSaveNowImage = gtk_image_new();
+    gtk_image_set_from_icon_name (GTK_IMAGE(configSaveNowImage),
+                              "document-save",
+                              GTK_ICON_SIZE_BUTTON);
+    gtk_widget_show (configSaveNowImage);
+    gtk_box_pack_start (GTK_BOX (hboxconfigSaveNow), configSaveNowImage, FALSE, FALSE, 0);
+    GtkWidget *configSaveNowLabel = gtk_label_new(_("Save now"));
+    gtk_widget_show (configSaveNowLabel);
+    gtk_box_pack_start (GTK_BOX (hboxconfigSaveNow), configSaveNowLabel, FALSE, FALSE, 0);
+
+  gtk_box_pack_start (GTK_BOX (hbox54), configSaveNow, TRUE, FALSE, 0);
+
+hbox53 = gtk_hbox_new (FALSE, 4);
   gtk_widget_show (hbox53);
   gtk_box_pack_start (GTK_BOX (vbox28), hbox53, FALSE, FALSE, 0);
 
@@ -3032,27 +3185,26 @@ create_configDialog (void)
 
   configFileLocation = gtk_entry_new ();
   gtk_widget_show (configFileLocation);
-  gtk_box_pack_start (GTK_BOX (hbox53), configFileLocation, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (hbox53), configFileLocation, TRUE, TRUE, 4);
   gtk_tooltips_set_tip (tooltips, configFileLocation, _("Location of your current searchmonkey configuration settings file."), NULL);
   gtk_editable_set_editable (GTK_EDITABLE (configFileLocation), FALSE);
   gtk_entry_set_invisible_char (GTK_ENTRY (configFileLocation), 8226);
 
-  hbox54 = gtk_hbox_new (FALSE, 4);
-  gtk_widget_show (hbox54);
-  gtk_box_pack_start (GTK_BOX (vbox28), hbox54, FALSE, FALSE, 0);
 
-  label992 = gtk_label_new (_("Save settings immediately (normally occurs on exit):"));
-  gtk_widget_show (label992);
-  gtk_box_pack_start (GTK_BOX (hbox54), label992, FALSE, FALSE, 0);
-  gtk_misc_set_alignment (GTK_MISC (label992), 0, 0.5);
-
-  configSaveNow = gtk_button_new_with_mnemonic (_("Save now"));
-  gtk_widget_show (configSaveNow);
-  gtk_box_pack_start (GTK_BOX (hbox54), configSaveNow, FALSE, FALSE, 0);
 
   label273 = gtk_label_new (_("System"));
   gtk_widget_show (label273);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 3), label273);
+ 
+   GtkWidget   *tab_boxSystemSettings = gtk_vbox_new(FALSE, 4);
+    gtk_widget_show(tab_boxSystemSettings);
+    GtkWidget    *iconSystemSettings = gtk_image_new_from_icon_name ("system-upgrade", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    gtk_widget_show(iconSystemSettings);
+    gtk_misc_set_padding(GTK_MISC(iconSystemSettings), 0, 2);
+    gtk_box_pack_start(GTK_BOX(tab_boxSystemSettings), iconSystemSettings, FALSE, FALSE, 2);
+    gtk_misc_set_padding(GTK_MISC(label273), 2, 2);
+    gtk_container_add(GTK_CONTAINER(tab_boxSystemSettings), label273); 
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 3),       tab_boxSystemSettings);
+// gtk_notebook_set_tab_label (GTK_NOTEBOOK (configNotebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (configNotebook), 3), label273);
 
   dialog_action_area5 = GTK_DIALOG (configDialog)->action_area;
   gtk_widget_show (dialog_action_area5);
@@ -3243,15 +3395,16 @@ create_importCriteria (void)
   dialog_vbox7 = GTK_DIALOG (importCriteria)->vbox;
   gtk_widget_show (dialog_vbox7);
 
-  vbox30 = gtk_vbox_new (FALSE, 0);
+  vbox30 = gtk_vbox_new (FALSE, 4);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox30), 4);
   gtk_widget_show (vbox30);
   gtk_box_pack_start (GTK_BOX (dialog_vbox7), vbox30, TRUE, TRUE, 0);
 
   notebook3 = gtk_notebook_new ();
   gtk_widget_show (notebook3);
-  gtk_box_pack_start (GTK_BOX (vbox30), notebook3, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox30), notebook3, TRUE, TRUE, 4);
 
-  vbox31 = gtk_vbox_new (FALSE, 0);
+  vbox31 = gtk_vbox_new (FALSE, 4);
   gtk_widget_show (vbox31);
   gtk_container_add (GTK_CONTAINER (notebook3), vbox31);
 
@@ -3270,7 +3423,7 @@ create_importCriteria (void)
 
   frame13 = gtk_frame_new (NULL);
   gtk_widget_show (frame13);
-  gtk_box_pack_start (GTK_BOX (vbox33), frame13, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox33), frame13, FALSE, TRUE, 2);
   gtk_frame_set_shadow_type (GTK_FRAME (frame13), GTK_SHADOW_NONE);
 
   alignment28 = gtk_alignment_new (0.5, 0.5, 1, 1);
@@ -3303,7 +3456,7 @@ create_importCriteria (void)
 
   frame12 = gtk_frame_new (NULL);
   gtk_widget_show (frame12);
-  gtk_box_pack_start (GTK_BOX (vbox33), frame12, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox33), frame12, FALSE, TRUE, 2);
   gtk_frame_set_shadow_type (GTK_FRAME (frame12), GTK_SHADOW_NONE);
 
   alignment27 = gtk_alignment_new (0.5, 0.5, 1, 1);
@@ -3422,17 +3575,19 @@ create_exportCriteria (void)
   gtk_window_set_destroy_with_parent (GTK_WINDOW (exportCriteria), TRUE);
   gtk_window_set_icon_name (GTK_WINDOW (exportCriteria), "gtk-save-as");
   gtk_window_set_type_hint (GTK_WINDOW (exportCriteria), GDK_WINDOW_TYPE_HINT_DIALOG);
+gtk_window_set_default_size(GTK_WINDOW(exportCriteria), 500, 360);
 
   vbox34 = GTK_DIALOG (exportCriteria)->vbox;
   gtk_widget_show (vbox34);
 
   vbox35 = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox35), 4);
   gtk_widget_show (vbox35);
-  gtk_box_pack_start (GTK_BOX (vbox34), vbox35, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox34), vbox35, TRUE, TRUE, 2);
 
   notebook4 = gtk_notebook_new ();
   gtk_widget_show (notebook4);
-  gtk_box_pack_start (GTK_BOX (vbox35), notebook4, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox35), notebook4, TRUE, TRUE, 4);
 
   vbox36 = gtk_vbox_new (FALSE, 0);
   gtk_widget_show (vbox36);
@@ -3440,19 +3595,20 @@ create_exportCriteria (void)
 
   filechooserwidgetExport = gtk_file_chooser_widget_new (GTK_FILE_CHOOSER_ACTION_SAVE);
   gtk_widget_show (filechooserwidgetExport);
-  gtk_box_pack_start (GTK_BOX (vbox36), filechooserwidgetExport, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox36), filechooserwidgetExport, TRUE, TRUE, 2);
 
   label999 = gtk_label_new (_("File Selection"));
   gtk_widget_show (label999);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook4), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook4), 0), label999);
 
   vbox37 = gtk_vbox_new (FALSE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox37), 4);
   gtk_widget_show (vbox37);
   gtk_container_add (GTK_CONTAINER (notebook4), vbox37);
 
   frame14 = gtk_frame_new (NULL);
   gtk_widget_show (frame14);
-  gtk_box_pack_start (GTK_BOX (vbox37), frame14, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox37), frame14, FALSE, TRUE, 2);
   gtk_frame_set_shadow_type (GTK_FRAME (frame14), GTK_SHADOW_NONE);
 
   alignment29 = gtk_alignment_new (0.5, 0.5, 1, 1);
@@ -3485,7 +3641,7 @@ create_exportCriteria (void)
 
   frame15 = gtk_frame_new (NULL);
   gtk_widget_show (frame15);
-  gtk_box_pack_start (GTK_BOX (vbox37), frame15, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox37), frame15, FALSE, TRUE, 2);
   gtk_frame_set_shadow_type (GTK_FRAME (frame15), GTK_SHADOW_NONE);
 
   alignment30 = gtk_alignment_new (0.5, 0.5, 1, 1);

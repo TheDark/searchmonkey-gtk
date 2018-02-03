@@ -549,4 +549,12 @@ void
 on_autoComplete_response               (GtkDialog       *dialog,
                                         gint             response_id,
                                         gpointer         user_data);
+gboolean
+on_LessThanSize_focus_out_event         (GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data);
+gboolean
+on_MoreThanSize_focus_out_event         (GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data);
 

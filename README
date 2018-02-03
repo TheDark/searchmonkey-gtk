@@ -1,43 +1,29 @@
-searchMonkey
+searchmonkey
 ============
 
 For full installation instructions see:
 http://searchmonkey.sf.net/index.php/Searchmonkey_Installation
 
-Dependencies
-============
-
-The main dependencies for Searchmonkey are:-
- > C++ Development Tools
- > gtk2 Development Libraries
-
-For example, on CentOS these can be installed as follows:-
- # yum groupinstall "Development Tools"
- # yum install gtk2-devel
-
-Building
-========
 
 For most systems simply run:
  $ ./configure
-
-If there are any errors detected by the configure script, then fix and re-run configure. Once all of the missing dependencies are fixed, continue with:
  $ make
-
 If there are no errors reported by configure/make, as super user:
  # make install
 
-If you are using a Gnome based distro e.g. RedHat, Suse, Ubuntu, etc
+If you are using a Gnome based distro e.g. Fedora or Suse.
  # make install-gnome
 will create a launcher icon.
 
 To uninstall, as super user:
  # make uninstall
-
-Note - the source code can then be removed completely, if required.
+The source code can then be removed completely, if required.
 
 Enjoy!
-Adam
+Adam - Searchmonkey founder
+
+Hosted by Sourceforge:
+https://www.sf.net/projects/searchmonkey
 
 Homepage:
 http:/searchmonkey.embeddediq.com

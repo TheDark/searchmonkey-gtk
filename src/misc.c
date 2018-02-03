@@ -16,6 +16,35 @@
 #include <regex.h>
 
 
+/********************************************************************************************
+  convert a regex byte position in a string to
+  a gtk gchar compatible position - 
+  Luc A janv 2018
+  entry1 = offset means the offset computed by regex function, with multubytes chars
+  entre2 = contents = the string returned by regex
+  output = the "true" gchar position compatible with Gtk   
+*******************************************************************************************/
+gint convertRegexGtk(size_t offset, const gchar *contents)
+{
+ gint count = 0;
+ gint len =0;
+ gint i=0;
+ size_t max = offset;
+
+ while(max>0)
+   {
+      len = mblen(contents, max);
+      if (len<1) break;
+      //printf(">>> %c  <<<<", contents[i]);
+      i++;
+      contents+=len; 
+      max-=len;
+   }
+ count = i;
+ return count;
+}
+
+
 /*
  * callback/internal helper: returns the text stored within supplied columnNumber
  * Return string must be free'd.
@@ -237,7 +266,7 @@ void copySettings(GtkWidget *widget, gboolean expertMode)
 	source = 1;
 	target = 0;
     }
-    tmpString = gtk_combo_box_get_active_text(GTK_COMBO_BOX(filename[source]));
+    tmpString = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(filename[source]));
     if (getExtendedRegexMode(widget)) {
       tmpFlags |= REG_EXTENDED;
     }
@@ -251,14 +280,14 @@ void copySettings(GtkWidget *widget, gboolean expertMode)
     
     gtk_toggle_button_set_active(containingTextCheck[target],gtk_toggle_button_get_active(containingTextCheck[source]));
     
-    tmpString = gtk_combo_box_get_active_text(GTK_COMBO_BOX(containingText[source]));
+    tmpString = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(containingText[source]));
     if (test_regexp(tmpString, tmpFlags, _("Error! Invalid Containing Text regular expression"))) {
       addUniqueRow(containingText[target], tmpString);
       addUniqueRow(containingText[source], tmpString);
     }
     g_free(tmpString);
 
-    tmpString = gtk_combo_box_get_active_text(GTK_COMBO_BOX(lookin[source]));
+    tmpString = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookin[source]));
     if (validate_folder(tmpString)) {
       addUniqueRow(lookin[target], tmpString);
       addUniqueRow(lookin[source], tmpString);
@@ -284,7 +313,8 @@ void setExpertSearchMode (GtkWidget *widget, gboolean expertMode)
 gboolean getExpertSearchMode (GtkWidget *widget)
 {
   GtkWidget *searchNotebook = lookup_widget(widget, "searchNotebook");
-  if (gtk_notebook_get_current_page(GTK_NOTEBOOK(searchNotebook)) == 1) {
+  /* modified by Luc A - if the current page == option, then all options are deactivated !!! FIXED janv 2018 */
+  if (gtk_notebook_get_current_page(GTK_NOTEBOOK(searchNotebook)) != 0) {
     return TRUE;
   } else {
     return FALSE;

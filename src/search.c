@@ -8,6 +8,14 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <regex.h>
+/* Luc A since janv 2018 in order to parse Office files */
+
+#include <errno.h>
+#include <assert.h>
+#include <zip.h>
+#include <poppler.h>
+#include <string.h>
+/* end Luc A */
 
 #include "interface.h" /* glade requirement */
 #include "support.h" /* glade requirement */
@@ -75,6 +83,384 @@ static t_symstruct lookuptable[] = {
 // please update in search.h the #define MAX_FORMAT_LIST according to the size of this table - Luc A 1 janv 2018
 #define NKEYS ( sizeof (lookuptable)/ sizeof(t_symstruct) )
 
+
+
+/*****************************
+ function to obtain infos 
+ about a PDF file
+ We us many poppler funcs
+ to obtain the infos at the
+ same time
+ the program passes the file,
+ wich will be converted to
+ URI format
+****************************/
+gchar *PDFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+    GError* err = NULL;
+    gchar *uri_path;
+    gchar *tmpfileToExtract = NULL;
+    gchar *text_of_page = NULL;
+    PopplerDocument *doc;
+    PopplerPage *page;
+    gint i, j;
+    gint pdf_npages; /* integer used to store total amount of pages of the pdf file */
+    FILE *outputFile;    
+
+  /* first step : converting from path format to URI format */
+    uri_path = g_filename_to_uri(path_to_file, NULL,NULL);
+
+    doc = poppler_document_new_from_file(uri_path, NULL, &err);
+    if (!doc) 
+     {
+        printf("%s\n", err->message);
+        g_error_free(err);
+        return NULL;
+     }
+
+    pdf_npages = poppler_document_get_n_pages(doc);
+
+    printf("* This PDF has %d pages *\n", pdf_npages);
+
+    page = poppler_document_get_page(doc, 0);/* #0 = first page */
+    if(!page) 
+	{
+         printf("* Could not open first page of document *\n");
+         g_object_unref(doc);
+         return NULL;
+    	}
+  outputFile = fopen(path_to_tmp_file,"w");
+
+  /* display text from pages */
+  for(i=0;i<pdf_npages;i++)
+   {
+    page = poppler_document_get_page(doc, i);
+    text_of_page = poppler_page_get_text (page);
+
+    for(j=0; j<strlen(text_of_page);j++)
+      fputc((unsigned char)text_of_page[j], outputFile);
+    g_free(text_of_page);
+    fputc('\n', outputFile);
+    g_object_unref(page);
+   }
+
+ tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
+ fclose(outputFile);
+
+ return tmpfileToExtract;
+}
+
+
+/* OPenDocument Text ODT files : read a supposed docx file, unzip it, check if contains the stuff for a ODT writer file 
+ * entry1 = path to the supposed ODT file
+ * entry 2 = path to a filename, text coded located in system TEMPDIR
+* return ; path to the content or NULL if not a true Doc-x file
+*  NOTE : chars inside the doc-x are already coded in UTF-8 or extended ASCII with accented chars
+
+* please NOTE : the text must be escaped for those chars : https://stackoverflow.com/questions/1091945/what-characters-do-i-need-to-escape-in-xml-documents
+
+"   &quot;
+'   &apos;
+<   &lt;
+>   &gt;
+&   &amp
+
+for example, to keep " in the resulting text, we must search and replace every &quot; found
+ ***/
+gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+ gint checkFile = 0;
+ gint err, i;
+ gint nto=0; /* number of files in zip archive */
+ gint exist_document_xml = -1;
+ gchar buf[1024];
+ gchar *pBufferRead;
+ gchar *tmpfileToExtract = NULL;
+ FILE *outputFile;
+ struct zip *archive;
+ struct zip_file *fpz=NULL;
+ struct zip_stat sbzip;
+ gchar *str, c;/* for dynamic string allocation */
+ gint j=1; 
+ /* opens the doc-x file supposed to be zipped */
+  err=0;
+  archive=zip_open(path_to_file,ZIP_CHECKCONS,&err);
+  if(err != 0 || !archive)
+        {
+          zip_error_to_str(buf, sizeof buf, err, errno);
+          fprintf(stderr,"«%s» %d in function «%s» ,err=%d\n«%s»\n",__FILE__,__LINE__,__FUNCTION__,err,buf);
+          return NULL;
+        }
+ 
+  nto = zip_get_num_entries(archive, ZIP_FL_UNCHANGED); 
+  // printf("l'archive contient:%d fichiers\n", nto);
+
+  exist_document_xml = zip_name_locate(archive, "content.xml" ,0);
+  if(exist_document_xml>-1)
+     printf("XML ODT document present in position:%d\n", exist_document_xml);
+  else
+   {  
+     printf("* Error ! %s isn't an ODT file ! *\n", path_to_file);
+     return NULL;
+   }
+  /* now we must open document.xml with this index number*/
+  fpz = zip_fopen_index(archive, exist_document_xml , 0); 
+  assert (fpz!=NULL);/* exit if somewhat wrong is happend */
+
+  /* we must know the size in bytes of document.xml */
+   if(zip_stat_index( archive, exist_document_xml, 0, &sbzip) == -1)
+           {
+              strcpy(buf,zip_strerror(archive));
+              fprintf(stderr,"«%s» %d in function «%s»\n«%s»\n",__FILE__,__LINE__,__FUNCTION__,buf);
+              zip_fclose(fpz);
+              zip_close(archive);
+              return NULL;
+           }
+
+  /* copy document.xml to system TEMPDIR */
+  pBufferRead = g_malloc(sbzip.size*sizeof(gchar)+sizeof(gchar)); 
+  assert(pBufferRead != NULL);
+  /* read all datas in buffer p and extract the document.xml file from doc-x, in memory */
+  if(zip_fread(fpz, pBufferRead , sbzip.size) != sbzip.size)
+           {
+             fprintf(stderr,"«%s» %d in function «%s»\n«read error ...»\n",__FILE__,__LINE__,__FUNCTION__);
+             g_free(pBufferRead);
+             zip_fclose(fpz);
+             zip_close(archive);
+             return NULL;
+           }/* erreur */
+  
+ /* in the TEMPDIR directory ! */
+  outputFile = fopen(path_to_tmp_file,"w");
+ 
+ /* parse and convert to pure text the document.xml */
+
+ str = (gchar*)g_malloc(sizeof(gchar));
+ 
+ i=0;
+ while(i<sbzip.size)
+   {
+    if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"<", sizeof(gchar))  == 0)
+        {
+           do
+            {
+             /* is it an end of paragraph ? If yes, we add a \n char to the buffer */
+             if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"</text:p>",9* sizeof(gchar))  ==  0 )
+                {
+                  str = (gchar*)realloc(str, j * sizeof(gchar));
+                  str[j-1] = '\n';
+                  j++;
+                  i = i+9*sizeof(gchar); 
+                }
+             else
+                i = i+sizeof(gchar);             
+            }
+           while ( g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],">", sizeof(gchar))  !=0);
+         i= i+sizeof(gchar); 
+        }/* if */
+       else 
+           /* we have now to escape 5 special chars */
+          {
+              if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"&apos;",6* sizeof(gchar))  ==  0 )
+                 {
+                    str = (gchar*)realloc(str, j * sizeof(gchar));
+                    str[j-1] = '\'';
+                    j++;
+                    i = i+6*sizeof(gchar); 
+                 }
+              else
+                  if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"&quot;",6* sizeof(gchar))  ==  0 )
+                    {
+                       str = (gchar*)realloc(str, j * sizeof(gchar));
+                       str[j-1] = '"';
+                       j++;
+                       i = i+6*sizeof(gchar); 
+                    }
+                   else
+                     if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"&lt;",4* sizeof(gchar))  ==  0 )
+                       {
+                          str = (gchar*)realloc(str, j * sizeof(gchar));
+                          str[j-1] = '<';
+                          j++;
+                          i = i+4*sizeof(gchar); 
+                       }
+                      else
+                        if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"&gt;",4* sizeof(gchar))  ==  0 )
+                          {
+                             str = (gchar*)realloc(str, j * sizeof(gchar));
+                             str[j-1] = '>';
+                             j++;
+                             i = i+4*sizeof(gchar); 
+                         }
+                        else
+                          if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"&amp;",5* sizeof(gchar))  ==  0 )
+                             {
+                                str = (gchar*)realloc(str, j * sizeof(gchar));
+                                str[j-1] = '&';
+                                j++;
+                                i = i+5*sizeof(gchar); 
+                             }
+                             else
+                                {
+                                  c = (gchar)pBufferRead[i]; // printf("%c", c);
+                                  str = (gchar*)realloc(str, j * sizeof(gchar));
+                                  str[j-1] = c; 
+                                  j++;  // fwrite(&c , sizeof(gchar), 1, outputFile);
+                                  i= i+sizeof(gchar);              
+                                }
+          }/* else */
+   }/* wend */
+// printf("j=%d strlen =%d \n", j, strlen(str));
+//  str[j-1] = '\0'; // at the end append null character to mark end of string
+
+
+  fwrite(str , sizeof(gchar), strlen(str), outputFile);
+
+ /* close the parsed file and clean datas*/
+  tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
+  fclose(outputFile); 
+  if(str!=NULL)
+     {    
+        g_free(str);
+        str = NULL;
+     }
+  if (pBufferRead != NULL)
+     g_free (pBufferRead) ; /* discharge the datas of document.xml from memory */
+  zip_fclose(fpz);/* close access to file in archive */
+  zip_close(archive); /* close the doc-x file itself */
+ return tmpfileToExtract;
+}
+
+
+
+
+/* Doc-X files : read a supposed docx file, unzip it, check if contains the stuff for a Doc-X word file 
+ * entry1 = path to the supposed doc-x file
+ * entry 2 = path to a filename, text coded located in system TEMPDIR
+* return ; path to the Word content or NULL if not a true Doc-x file
+*  NOTE : chars inside the doc-x are already coded in UTF-8 or extended ASCII with accented chars
+ ***/
+gchar *DocXCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+ gint checkFile = 0;
+ gint err, i;
+ gint nto=0; /* number of files in zip archive */
+ gint exist_document_xml = -1;
+ gchar buf[1024];
+ gchar *pBufferRead = NULL;
+ gchar *tmpfileToExtract = NULL;
+ FILE *outputFile;
+ struct zip *archive;
+ struct zip_file *fpz=NULL;
+ struct zip_stat sbzip;
+ gchar *str, c;/* for dynamic string allocation */
+ glong j=1; /* security, because raw file content may be longer in bytes than $FFFF (if I apply my old knowledge from 8 bits ;-) */
+
+ /* opens the doc-x file supposed to be zipped */
+  err=0;https://fr.wikibooks.org/wiki/Programmation_C/Types_de_base
+  archive=zip_open(path_to_file,ZIP_CHECKCONS,&err);
+  if(err != 0 || !archive)
+        {
+          zip_error_to_str(buf, sizeof buf, err, errno);
+          fprintf(stderr,"«%s» %d in function «%s» ,err=%d\n«%s»\n",__FILE__,__LINE__,__FUNCTION__,err,buf);
+          return NULL;
+        }
+ 
+  nto = zip_get_num_entries(archive, ZIP_FL_UNCHANGED); 
+  
+  /* checking if this is really a Word archive : in this cas, the doc-x mus contain a subdirectory /word containg document.xml file  like this "word/document.xml"*/
+  exist_document_xml = zip_name_locate(archive, "word/document.xml" ,0);
+  if(exist_document_xml>-1)
+     printf("XML Word document present in position:%d\n", exist_document_xml);
+  else
+   {  
+     printf("* Error ! %s isn't a Doc-X file ! *\n", path_to_file);
+     return NULL;
+   }
+  /* now we must open document.xml with this index number*/
+  fpz = zip_fopen_index(archive, exist_document_xml , 0); 
+  assert (fpz!=NULL);/* exit if somewhat wrong is happend */
+
+  /* we must know the size in bytes of document.xml */
+   if(zip_stat_index( archive, exist_document_xml, 0, &sbzip) == -1)
+           {
+              strcpy(buf,zip_strerror(archive));
+              fprintf(stderr,"«%s» %d in function «%s»\n«%s»\n",__FILE__,__LINE__,__FUNCTION__,buf);
+              zip_fclose(fpz);
+              zip_close(archive);
+              return NULL;
+           }
+
+  /* copy document.xml to system TEMPDIR */
+  pBufferRead = g_malloc(sbzip.size*sizeof(gchar)+1); 
+  assert(pBufferRead != NULL);
+  /* read all datas in buffer p and extract the document.xml file from doc-x, in memory */
+  if(zip_fread(fpz, pBufferRead , sbzip.size) != sbzip.size)
+           {
+             fprintf(stderr,"«%s» %d in function «%s»\n«read error ...»\n",__FILE__,__LINE__,__FUNCTION__);
+             g_free(pBufferRead);
+             zip_fclose(fpz);
+             zip_close(archive);
+             return NULL;
+           }/* erreur */
+
+  outputFile = fopen(path_to_tmp_file,"w");
+ 
+ /* parse and convert to pure text the document.xml */
+
+ str = (gchar*)g_malloc(sizeof(gchar));
+
+ i=0;
+ while(i<sbzip.size)
+   {
+    if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"<", sizeof(gchar))  == 0)
+        {
+           do
+            {
+             /* is it an end of paragraph ? If yes, we add a \n char to the buffer */
+             if(g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],"</w:t>",6* sizeof(gchar))  ==  0 )
+                {
+                  str = (gchar*)realloc(str, j * sizeof(gchar));
+                  str[j-1] = '\n';
+                  j++;
+                  i = i+6*sizeof(gchar); 
+                }
+             else
+                i = i+sizeof(gchar);             
+            }
+           while ( g_ascii_strncasecmp ((gchar*)  &pBufferRead[i],">", sizeof(gchar))  !=0);
+         i= i+sizeof(gchar); 
+        }/* if */
+       else 
+          {
+              c = (gchar)pBufferRead[i]; // printf("%c", c);
+              str = (gchar*)realloc(str, j * sizeof(gchar));
+              str[j-1] = c; 
+              j++;  
+              i= i+sizeof(gchar);              
+          }/* else */
+   }/* wend */
+
+ 
+  fwrite(str , sizeof(gchar), strlen(str), outputFile);
+
+ /* close the parsed file and clean datas*/
+
+  tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);// pourquoi plantage ici ????
+
+
+  fclose(outputFile); 
+
+  if(str!=NULL) /* il y a un pb sur str dans certains cas ! */
+     g_free(str);
+  if(pBufferRead!=NULL)
+     g_free (pBufferRead) ; /* discharge the datas of document.xml from memory */
+  zip_fclose(fpz);/* close access to file in archive */
+  zip_close(archive); /* close the doc-x file itself */
+ return tmpfileToExtract;
+}
+
+
 /*
 /* function to convert a gchar extension type file in gint to switch 
 /* Luc A - 1 janv 2018 from URL = https://stackoverflow.com/questions/4014827/best-way-to-switch-on-a-string-in-c #22 post
@@ -98,17 +484,7 @@ gint keyfromstring(gchar *key2)
  return FORMAT_OTHERS;
 }
 
-/* 
-/* a function to select the good icon name, given a numeric code in entry
-/ Luc A - 1 janv 2018
-/
-*/
-gchar *get_icon_name(gint code)
-{
- gchar tmpStr = NULL;
 
- return tmpStr;
-}
 
 /****************************************************
  function to get an icon from installation folder
@@ -126,14 +502,14 @@ GdkPixbuf *get_icon_for_display(gchar *stype)
   gchar *str_icon_file = NULL;
   gint i;
 
-  /* we muust insure that stype is in low case, and we remove the 5 last chars */
+  /* we must insure that stype is in low case, and we remove the 5 last chars */
 
  //  str_lowcase = g_ascii_strdown (stype, -1);
    i = keyfromstring(stype);/* the g_ascii_strn() function is case independant */
  //  g_free(str_lowcase);
    str_icon_file = g_strconcat(PACKAGE_DATA_DIR, "/pixmaps/", PACKAGE, "/", 
                                lookuptable[i].icon_file_name, NULL);
-   icon = gdk_pixbuf_new_from_file(str_icon_file, &error);// warning : change path in final work !!!!
+   icon = gdk_pixbuf_new_from_file(str_icon_file, &error);
   
    if (error)
     {
@@ -160,13 +536,35 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxHitsSpinResults")));
   const gint tmpContentLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxContentHitsSpinResults")));
   const gint tmpLines = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "showLinesSpinResults")));
+/* Luc A - janv 2018 */
+  gint kb_multiplier_more_than = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"MoreThanSize")));
+  gint kb_multiplier_less_than = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"LessThanSize")));
 
-  gdouble tmpDouble;
+  gdouble tmpDouble, tmpMultiplierLess, tmpMultiplierMore;
+  gint i;
   GDate date;
   GtkWidget *dialog;
   gchar buffer[MAX_FILENAME_STRING + 1];
   struct tm tptr;
   gchar *endChar;
+
+  /* convert the current Unit to Kb */
+  if(kb_multiplier_more_than<0)
+      kb_multiplier_more_than = 0;
+  if(kb_multiplier_less_than<0)
+      kb_multiplier_less_than = 0;
+  tmpMultiplierLess = 1;
+  tmpMultiplierMore = 1;
+  for(i=0;i<kb_multiplier_more_than;i++)
+     {
+       tmpMultiplierMore = tmpMultiplierMore*1024;
+     }
+  for(i=0;i<kb_multiplier_less_than;i++)
+     {
+       tmpMultiplierLess = tmpMultiplierLess*1024;
+     }
+
+//printf("kbmu less %d kb mul more %d état actuel multi less %10.1f more %10.1f\n",  kb_multiplier_less_than,  kb_multiplier_more_than, tmpMultiplierLess, tmpMultiplierMore);
 
   if (getExpertSearchMode(widget) == FALSE) {
     mSearchControl->numExtraLines = 0;
@@ -175,6 +573,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   }
 /* Read extra lines spin box */
   mSearchControl->numExtraLines = tmpLines;
+
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "showLinesCheckResults")))) {
     mSearchControl->flags |= SEARCH_EXTRA_LINES;
   }
@@ -212,7 +611,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
       }
       g_ascii_formatd (buffer, MAX_FILENAME_STRING, "%1.1f", tmpDouble);
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "moreThanEntry")), buffer);
-      mSearchControl->moreThan = (gsize)(1024 * tmpDouble);
+      mSearchControl->moreThan = (gsize)(tmpMultiplierMore*1024 * tmpDouble);/* modif Luc A janv 2018 */
       mSearchControl->flags |= SEARCH_MORETHAN_SET;
   }
   if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "lessThanCheck")))) &&
@@ -230,7 +629,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
       }
       g_ascii_formatd (buffer, MAX_FILENAME_STRING, "%1.1f", tmpDouble);
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "lessThanEntry")), buffer);
-      mSearchControl->lessThan = (gsize)(1024 * tmpDouble);
+      mSearchControl->lessThan = (gsize)(tmpMultiplierLess*1024 * tmpDouble);
       mSearchControl->flags |= SEARCH_LESSTHAN_SET;
   }
 
@@ -287,12 +686,12 @@ void getSearchCriteria(GtkWidget *widget, searchControl *mSearchControl)
 
   /* Grab the filename, containing, and look-in entries */
   if (getExpertSearchMode(widget)) { /* If expert mode */
-    mSearchControl->textSearchRegEx = (gchar *)gtk_combo_box_get_active_text(GTK_COMBO_BOX(lookup_widget(widget, "containingText")));
-    mSearchControl->fileSearchRegEx = (gchar *)gtk_combo_box_get_active_text(GTK_COMBO_BOX(lookup_widget(widget, "fileName")));
+    mSearchControl->textSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "containingText")));
+    mSearchControl->fileSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "fileName")));
     mSearchControl->startingFolder = comboBoxReadCleanFolderName(GTK_COMBO_BOX(lookup_widget(widget, "lookIn")));
   } else { /* in basic mode */
-    mSearchControl->textSearchRegEx = (gchar *)gtk_combo_box_get_active_text(GTK_COMBO_BOX(lookup_widget(widget, "containingText2")));
-    mSearchControl->fileSearchRegEx = (gchar *)gtk_combo_box_get_active_text(GTK_COMBO_BOX(lookup_widget(widget, "fileName2")));
+    mSearchControl->textSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "containingText2")));
+    mSearchControl->fileSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "fileName2")));
     mSearchControl->startingFolder = comboBoxReadCleanFolderName(GTK_COMBO_BOX(lookup_widget(widget, "lookIn2")));
   }  
 }
@@ -377,6 +776,7 @@ void start_search_thread(GtkWidget *widget)
   GtkTreeView *listView;
   GtkListStore *sortedModel;
 
+  
   /* Clear results prior to resetting data */
   if (getResultsViewHorizontal(widget)) {
     listView = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
@@ -448,6 +848,8 @@ void start_search_thread(GtkWidget *widget)
     addUniqueRow(lookup_widget(widget, "lookIn2"), mSearchControl->startingFolder);
   }
 
+  /* modifiy windows' title according to research criteria */
+  gtk_window_set_title (GTK_WINDOW(window1), g_strdup_printf(_("Searchmonkey : search in %s/"), mSearchControl->startingFolder));/* Luc A - janv 2018 */
   /* create the search thread */
   g_thread_create (walkDirectories, window1, FALSE, NULL); 
   //  threadId = g_thread_create (walkDirectories, window1, FALSE, NULL); 
@@ -467,6 +869,8 @@ void stop_search_thread(GtkWidget *widget)
   g_static_mutex_lock(&mutex_Control);
   mSearchControl->cancelSearch = TRUE;
   g_static_mutex_unlock(&mutex_Control);
+ /* modifiy windows' title according to research criteria */
+  gtk_window_set_title (GTK_WINDOW(window1), _("Aborting research-Searchmonkey"));/* Luc A - janv 2018 - the order if VOLONTARY inverted to keep attention */
 }
 
 
@@ -713,7 +1117,7 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
         g_ptr_array_add(curDirStack, tString);
         g_ptr_array_add(scanDirStack, g_dir_open(tString, 0, &dirOpenError));
         if (GET_LAST_PTR(scanDirStack) == NULL) {
-          g_print(_("%s\n"), dirOpenError->message, tString);
+          g_print(_("%s %s\n"), dirOpenError->message, tString);
           g_clear_error(&dirOpenError);
           DEL_LAST_PTR(curDirStack);
           DEL_LAST_PTR(scanDirStack);
@@ -786,6 +1190,7 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
 }
 
 
+
 /*
  * POSIX threaded: phase two of main search loop.
  * This function searches for contents within each of the files found in phase one.
@@ -807,14 +1212,21 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gchar pbarNudgeCountText[6]; /* Stores "100%" worst case.. */
   gboolean stopSearch;
   gint spinButtonValue = 0;
+  gchar *tmpExtractedFile = NULL; /* the gchar* to switch the filenames if it's an Office File */
+  gboolean fDeepSearch = FALSE; /* special flag armed when we search inside complex files like Docx, ODT, PDF ... in order to keep the "true" filename for status bar */
+  gboolean fIsOffice=FALSE; /* flag if we found an office style file */
 
-  if (mSearchData->fullNameArray->len > 100) {
-    pbarNudge = ((gdouble)mSearchData->fullNameArray->len / 100);  /* Every pbarNudge - increment 1/100 */
-    pbarIncrement = (gdouble)pbarNudge / (gdouble)mSearchData->fullNameArray->len;
-  } else {
-    pbarNudge = 1; /* For every file, increment 1/MAX*/
-    pbarIncrement = 1 / (gboolean)mSearchData->fullNameArray->len;
-  }
+  
+  if (mSearchData->fullNameArray->len > 100) 
+    {
+     pbarNudge = ((gdouble)mSearchData->fullNameArray->len / 100);  /* Every pbarNudge - increment 1/100 */
+     pbarIncrement = (gdouble)pbarNudge / (gdouble)mSearchData->fullNameArray->len;
+    } 
+    else 
+      {
+        pbarNudge = 1; /* For every file, increment 1/MAX*/
+        pbarIncrement = 1 / (gboolean)mSearchData->fullNameArray->len;
+      }/* endif */
   
   /* Update the status bar */
   g_snprintf(status->constantString, MAX_FILENAME_STRING, _("Phase 2 starting..."));
@@ -832,36 +1244,96 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gdk_threads_leave ();
 
   /* Loop through all files, and get all of the matches from each */
-  for (i=0; i<(mSearchData->fullNameArray->len); i++) {
-    if (((mSearchControl->flags & LIMIT_RESULTS_SET) != 0) && (matchCount == mSearchControl->limitResults)) {
-      break;
-    }
+  for (i=0; i<(mSearchData->fullNameArray->len); i++) 
+    {
+      if (((mSearchControl->flags & LIMIT_RESULTS_SET) != 0) && (matchCount == mSearchControl->limitResults)) 
+        {
+         // printf("* phase 2 : je sors de la boucle à maxcount =%d *\n", matchCount);
+         break;
+        }/* endif */
 
-    /* Increment progress bar whenever pbarNudge files have been searched */
-    if (((i+1) % pbarNudge) == 0) {
-      g_sprintf(pbarNudgeCountText, "%.0f%%", pbarNudgeCount * 100);
-      gdk_threads_enter ();
-      gtk_progress_bar_set_fraction(pbar, pbarNudgeCount);
-      gtk_progress_bar_set_text(pbar, pbarNudgeCountText);
-      gdk_threads_leave ();
-      pbarNudgeCount += pbarIncrement;
-    }
+      /* Increment progress bar whenever pbarNudge files have been searched */
+      if (((i+1) % pbarNudge) == 0) 
+       {
+        g_sprintf(pbarNudgeCountText, "%.0f%%", pbarNudgeCount * 100);
+        gdk_threads_enter ();
+        gtk_progress_bar_set_fraction(pbar, pbarNudgeCount);
+        gtk_progress_bar_set_text(pbar, pbarNudgeCountText);
+        gdk_threads_leave ();
+        pbarNudgeCount += pbarIncrement;
+       }/* endif */
     
-    tmpFileName = g_ptr_array_index(mSearchData->fullNameArray, i);
+    tmpFileName = g_strdup_printf("%s", g_ptr_array_index(mSearchData->fullNameArray, i) );/* modifyed Luc A janv 2018 */
+    /* We must check the type-file in order to manage non pure text files like Office files 
+       Luc A. 7 janv 2018 */
+ //   printf("* Phase 2 : je teste le fichier :%s\n", tmpFileName);
 
+// !!!! pnser à mettre une fonction qui renvoit un code et après faire un switch(code) 
+
+   /* DOCX from MSWord 2007 and newer ? */
+    if( g_ascii_strncasecmp (&tmpFileName[strlen(tmpFileName)-4],"docx", 4)  == 0  )
+     {
+       tmpExtractedFile = DocXCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+     }
+   /* OPenDocument Text ? */
+   if( g_ascii_strncasecmp (&tmpFileName[strlen(tmpFileName)-3],"odt", 3)  == 0  )
+     {
+       /* thus we must change the location of tmpFileName : 
+         we unzip the original, and get a new location (in TMPDIR) 
+         to a plain text file extracted from the ODT */
+       tmpExtractedFile = ODTCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           // printf("No problemo ODT :%s \n", tmpExtractedFile);
+           /* now, we swap the current 'searchmonkey' mode for filename to the parsed pure text produced by the above function 
+            It's for this reason that I've changed Adam's code, where Adam only swapped pointers */
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+     }
+  /* Acrobat PDF  ? */
+   if( g_ascii_strncasecmp (&tmpFileName[strlen(tmpFileName)-3],"pdf", 3)  == 0  )
+     {
+      // printf("* Phase 2 : fichier pdf ou ~pdf extension :%s<\n", &tmpFileName[strlen(tmpFileName)-3]);
+
+       tmpExtractedFile = PDFCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          //if(tmpFileName!=NULL)
+            // g_free(tmpFileName);
+          // tmpFileName = g_strdup_printf("%s", tmpExtractedFile);
+          // g_free(tmpExtractedFile);
+          }
+     }
   /* Update the status bar */
     gdk_threads_enter ();
     g_snprintf(status->constantString, MAX_FILENAME_STRING, _("Phase 2 searching %s"), tmpFileName);
+    if(fDeepSearch==TRUE)
+      {
+           if(tmpFileName!=NULL)
+             g_free(tmpFileName);
+           tmpFileName = g_strdup_printf("%s", tmpExtractedFile);
+           g_free(tmpExtractedFile);
+           fDeepSearch = FALSE;
+      }
     gtk_statusbar_pop(statusbar, STATUSBAR_CONTEXT_ID(statusbar));
     gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
                        status->constantString);
     gdk_threads_leave ();
     
     /* Open file (if valid) */
+    /* i's a wrapper for Glib's g_file_get_contents() */
+    /* in 'contents" string variable we have the content read from file */
     if (g_file_get_contents2(tmpFileName, &contents, &length, NULL)) {
-
-      /* Try to get a match */
-      if (getAllMatches(mSearchData, contents, length, &search)) {
+      /* Try to get a match line 954*/
+      if (getAllMatches(mSearchData, contents, length, &search, fIsOffice)) {
         
         /* get full filename pointer */
         newMatch = GET_LAST_PTR(mSearchData->textMatchArray);
@@ -878,13 +1350,14 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
         dereferenceAbsolutes(mSearchData, contents, length, spinButtonValue);
 
         /* Display the matched string */
-        displayMatch(mSearchControl, mSearchData);
+        displayMatch(mSearchControl, mSearchData);/* function is line 1765*/
         
         /* Increment the match counter */
         matchCount++;
       }
+      if(tmpFileName!=NULL)
+          g_free(tmpFileName);
       g_free(contents); /* Clear file contents from memory */
-
       g_static_mutex_lock(&mutex_Control);
       stopSearch = mSearchControl->cancelSearch;
       g_static_mutex_unlock(&mutex_Control);
@@ -892,7 +1365,7 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
         break;
       }
     }
-  }
+  }/* for next i */
 
   /* Update statusbar/progress bar when done */
   updateStatusFilesFound(matchCount, status, mSearchControl);
@@ -937,12 +1410,14 @@ gboolean symLinkReplace(gchar **pFullFileName, gchar **pFileName)
 /*
  * POSIX threaded: phase two helper function.
  * Searches through complete text looking for regular expression matches.
+ * contents = gchar buffer with all text in the file open 
  * Returns TRUE if >1 match found.
  */
-gboolean getAllMatches(searchData *mSearchData, gchar *contents, gsize length, regex_t *search /*, gint index*/ )
+gboolean getAllMatches(searchData *mSearchData, gchar *contents, gsize length, regex_t *search, gboolean fOffice /*, gint index*/ )
 {
   regmatch_t subMatches[MAX_SUB_MATCHES];
   gint tmpConOffset = 0;
+  
   gchar *tmpCon;
   lineMatch *newLineMatch = NULL;
   textMatch *newTextMatch = NULL;
@@ -961,7 +1436,9 @@ gboolean getAllMatches(searchData *mSearchData, gchar *contents, gsize length, r
       newTextMatch->matchCount = 0;
       g_ptr_array_add(mSearchData->textMatchArray, newTextMatch);
     }
+
     newLineMatch = g_malloc(sizeof(lineMatch));
+    newLineMatch->fOfficeFile = fOffice;
     newLineMatch->pLine = NULL;
     newLineMatch->lineCount = 0;
     newLineMatch->lineLen = -1;
@@ -991,6 +1468,7 @@ gboolean getAllMatches(searchData *mSearchData, gchar *contents, gsize length, r
 /*
  * POSIX threaded: phase two helper function.
  * Converts regular expression output into actual string/line matches within the text.
+ * numlines = number of extralines besides the matches
  */
 void dereferenceAbsolutes(searchData *mSearchData, gchar *contents, gsize length, gint numLines)
 {
@@ -1033,8 +1511,8 @@ void dereferenceAbsolutes(searchData *mSearchData, gchar *contents, gsize length
       if (needLineEndNumber) {
         newLineMatch->lineLen = lineOffset;
         if (lineStartPtr == NULL) {
-          g_print ("%s: Error line %d, %d:%d", GET_LAST_PTR(mSearchData->fullNameArray),
-                   lineCount, newLineMatch->offsetStart, newLineMatch->offsetStart);
+          g_print ("%s: Error line %d, %d:%d", (gchar*)GET_LAST_PTR(mSearchData->fullNameArray),
+                  (gint) lineCount,(gint) newLineMatch->offsetStart,(gint) newLineMatch->offsetStart);
         }
 
 	displayStartPtr = lineStartPtr;
@@ -1051,9 +1529,10 @@ void dereferenceAbsolutes(searchData *mSearchData, gchar *contents, gsize length
 	else {
 	  i++; /*Since here the first line hasn't been counted */
 	}
-	newLineMatch->lineCountBefore = i;
+	newLineMatch->lineCountBefore = i;/* number of 'real' lines available besides matches, i<=numlines */
+// printf("* numlines = %d, mis %d lignes autour *\n", numLines, i);
 
-	displayEndPtr = lineStartPtr + newLineMatch->lineLen - 1;
+	displayEndPtr = lineStartPtr + newLineMatch->lineLen - 1;/* to be converted to a true # of bytes !!! */
 	i = 0;
 	while ((displayEndPtr <= (contents + length - 1)) && (i < numLines)) {
 	  displayEndPtr++;
@@ -1114,12 +1593,14 @@ void getLength(searchData *mSearchData, textMatch *newMatch)
 {
   gchar *tmpString = NULL;
 
+
+// printf("taille newmatch %10.2f\n", (float)newMatch->fileSize);
   if (newMatch->fileSize < 1024) {
     tmpString = g_strdup_printf(_("%d bytes"), newMatch->fileSize );
   } else if (newMatch->fileSize < (1024 * 1024)) {
     tmpString = g_strdup_printf (_("%1.1f KB"), ((float)newMatch->fileSize / 1024));
   } else {
-    tmpString = g_strdup_printf (_("%1.1f MB"), ((float)newMatch->fileSize / 1024));
+    tmpString = g_strdup_printf (_("%1.1f MB"), ((float)newMatch->fileSize / (1024*1024)));
   }
   newMatch->pFileSize = (g_string_chunk_insert_const(mSearchData->fileSizeChunk, tmpString));
   g_free(tmpString);
@@ -1214,9 +1695,9 @@ void updateStatusFilesFound(const gsize matchCount, statusbarData *status, searc
   /* Update statusbar with new data */
   gdk_threads_enter();
   if (matchCount == 1) {
-    g_snprintf(status->constantString, MAX_FILENAME_STRING, _("%d file found"), matchCount);
+    g_snprintf(status->constantString, MAX_FILENAME_STRING, _("%d file found"), (gint) matchCount);
   } else {
-    g_snprintf(status->constantString, MAX_FILENAME_STRING, _("%d files found"), matchCount);
+    g_snprintf(status->constantString, MAX_FILENAME_STRING, _("%d files found"),(gint) matchCount);
   }
   if ((mSearchControl->flags & SEARCH_INVERT_FILES) != 0) {
     g_strlcat(status->constantString, _(" [inv]"), MAX_FILENAME_STRING);
@@ -1286,7 +1767,7 @@ void displayMatch(searchControl *mSearchControl, searchData *mSearchData)
 {
   GdkPixbuf    *pixbuf;
   textMatch *newMatch  = GET_LAST_PTR(mSearchData->textMatchArray);
-  gchar *tmpStr = g_strdup_printf ("%d", newMatch->matchCount);
+  gchar *tmpStr = g_strdup_printf ("%d", (gint) newMatch->matchCount);
 
   pixbuf = get_icon_for_display(newMatch->pFileType);
   gdk_threads_enter ();
@@ -1311,7 +1792,7 @@ void displayMatch(searchControl *mSearchControl, searchData *mSearchData)
   gdk_threads_leave ();
   g_free(tmpStr);
   if (pixbuf!=NULL)
-      g_object_unref(G_OBJECT(pixbuf));/* once loaded, the GdjPixbuf mus be derefenced, cf : https://en.wikibooks.org/wiki/GTK%2B_By_Example/Tree_View/Tree_Models#Retrieving_Row_Data */
+      g_object_unref(G_OBJECT(pixbuf));/* once loaded, the GdkPixbuf must be derefenced, cf : https://en.wikibooks.org/wiki/GTK%2B_By_Example/Tree_View/Tree_Models#Retrieving_Row_Data */
   return;
 }
 
