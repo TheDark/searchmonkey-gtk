@@ -30,7 +30,7 @@ AC_PROG_CXX
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 
-pkg_modules="zlib gtk+-2.0 gthread-2.0"
+pkg_modules="libzip gtk+-2.0 gthread-2.0"
 PKG_CHECK_MODULES(PACKAGE, [$pkg_modules])
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)

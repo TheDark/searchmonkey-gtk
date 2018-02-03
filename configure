@@ -7701,7 +7701,7 @@ _ACEOF
 fi
 
 
-pkg_modules="zlib gtk+-2.0 gthread-2.0"
+pkg_modules="libzip gtk+-2.0 gthread-2.0"
 
 
 
