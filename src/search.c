@@ -187,7 +187,7 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   archive=zip_open(path_to_file,ZIP_CHECKCONS,&err);
   if(err != 0 || !archive)
         {
-          zip_error_to_str(buf, sizeof buf, err, errno);
+          zip_error_to_str(buf, sizeof(buf), err, errno);
           fprintf(stderr,"«%s» %d in function «%s» ,err=%d\n«%s»\n",__FILE__,__LINE__,__FUNCTION__,err,buf);
           return NULL;
         }
@@ -197,7 +197,7 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 
   exist_document_xml = zip_name_locate(archive, "content.xml" ,0);
   if(exist_document_xml>-1)
-     printf("XML ODT document present in position:%d\n", exist_document_xml);
+     printf("* XML ODT document present in position:%d *\n", exist_document_xml);
   else
    {  
      printf("* Error ! %s isn't an ODT file ! *\n", path_to_file);
@@ -361,7 +361,7 @@ gchar *DocXCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   archive=zip_open(path_to_file,ZIP_CHECKCONS,&err);
   if(err != 0 || !archive)
         {
-          zip_error_to_str(buf, sizeof buf, err, errno);
+          zip_error_to_str(buf, sizeof(buf), err, errno);
           fprintf(stderr,"«%s» %d in function «%s» ,err=%d\n«%s»\n",__FILE__,__LINE__,__FUNCTION__,err,buf);
           return NULL;
         }
@@ -371,7 +371,7 @@ gchar *DocXCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   /* checking if this is really a Word archive : in this cas, the doc-x mus contain a subdirectory /word containg document.xml file  like this "word/document.xml"*/
   exist_document_xml = zip_name_locate(archive, "word/document.xml" ,0);
   if(exist_document_xml>-1)
-     printf("XML Word document present in position:%d\n", exist_document_xml);
+     printf("* XML Word document present in position:%d *\n", exist_document_xml);
   else
    {  
      printf("* Error ! %s isn't a Doc-X file ! *\n", path_to_file);
@@ -540,15 +540,21 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   gint kb_multiplier_more_than = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"MoreThanSize")));
   gint kb_multiplier_less_than = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"LessThanSize")));
 
-  gdouble tmpDouble, tmpMultiplierLess, tmpMultiplierMore;
+  gdouble tmpDouble, tmpMultiplierLess, tmpMultiplierMore, tmpMoreThan =0, tmpLessThan=0;
   gint i;
-  GDate date;
-  GtkWidget *dialog;
+  GDate DateAfter, DateBefore;
   gchar buffer[MAX_FILENAME_STRING + 1];
   struct tm tptr;
   gchar *endChar;
 
-  /* convert the current Unit to Kb */
+   
+  /* get current size values */
+  if(moreThan!=NULL )
+     tmpMoreThan = strtod(moreThan, &endChar);
+  if(lessThan!=NULL)
+     tmpLessThan = strtod(lessThan, &endChar);
+
+  /* convert the current size Unit to Kb */
   if(kb_multiplier_more_than<0)
       kb_multiplier_more_than = 0;
   if(kb_multiplier_less_than<0)
@@ -558,12 +564,15 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   for(i=0;i<kb_multiplier_more_than;i++)
      {
        tmpMultiplierMore = tmpMultiplierMore*1024;
+       tmpMoreThan = tmpMoreThan*1024;
      }
   for(i=0;i<kb_multiplier_less_than;i++)
      {
        tmpMultiplierLess = tmpMultiplierLess*1024;
+       tmpLessThan = tmpLessThan*1024;
      }
 
+// printf("valeurs entries taille- more than :%f.0 less than %f.0 \n", tmpMoreThan, tmpLessThan);
 //printf("kbmu less %d kb mul more %d état actuel multi less %10.1f more %10.1f\n",  kb_multiplier_less_than,  kb_multiplier_more_than, tmpMultiplierLess, tmpMultiplierMore);
 
   if (getExpertSearchMode(widget) == FALSE) {
@@ -597,34 +606,32 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   }
 /* Read file min/max size strings */
   if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "moreThanCheck")))) &&
-      (moreThan != NULL)) {
+      (moreThan != NULL)) 
+    {
       tmpDouble = strtod(moreThan, &endChar);
-      if (tmpDouble <= 0) {
-          dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-                                           GTK_DIALOG_DESTROY_WITH_PARENT,
-                                           GTK_MESSAGE_ERROR,
-                                           GTK_BUTTONS_CLOSE,
-                                           _("Error! MoreThan file size must be positive value"));
-          gtk_dialog_run (GTK_DIALOG (dialog));
-          gtk_widget_destroy (dialog);
+      if (tmpDouble <= 0) 
+        {
+           miscErrorDialog(widget, _("<b>Error!</b>\n\nMoreThan file size must be <i>positive</i> value\nSo this criteria will not be used.\n\nPlease, check your entry and the units."));
           return;
-      }
+        }
+      if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "lessThanCheck")))) && (tmpMoreThan >=tmpLessThan)) {
+           miscErrorDialog(widget, _("<b>Error!</b>\n\nMoreThan file size must be <i>stricly inferior</i> to LessThan file size.So this criteria will not be used.\n\nPlease, check your entry and the units."));      
+          return;
+         }
       g_ascii_formatd (buffer, MAX_FILENAME_STRING, "%1.1f", tmpDouble);
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "moreThanEntry")), buffer);
       mSearchControl->moreThan = (gsize)(tmpMultiplierMore*1024 * tmpDouble);/* modif Luc A janv 2018 */
       mSearchControl->flags |= SEARCH_MORETHAN_SET;
-  }
+    }
   if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "lessThanCheck")))) &&
       (lessThan != NULL)) {
       tmpDouble = strtod (lessThan, &endChar);
       if (tmpDouble <= 0) {
-          dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-                                           GTK_DIALOG_DESTROY_WITH_PARENT,
-                                           GTK_MESSAGE_ERROR,
-                                           GTK_BUTTONS_CLOSE,
-                                           _("Error! LessThan file size must be positive value"));
-          gtk_dialog_run (GTK_DIALOG (dialog));
-          gtk_widget_destroy (dialog);
+           miscErrorDialog(widget, _("<b>Error!</b>\n\nLessThan file size must be <i>positive</i> value\nSo this criteria will not be used.\n\nPlease, check your entry and the units."));
+          return;
+      }
+     if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "moreThanCheck")))) && (tmpMoreThan >=tmpLessThan)) {
+           miscErrorDialog(widget, _("<b>Error!</b>\n\nMoreThan file size must be <i>stricly inferior</i> to LessThan file size.So this criteria will not be used.\n\nPlease, check your entry and the units."));
           return;
       }
       g_ascii_formatd (buffer, MAX_FILENAME_STRING, "%1.1f", tmpDouble);
@@ -634,46 +641,48 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   }
 
   /* Read date strings */
+     
+
   if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "afterCheck")))) &&
       ((after != NULL) && (after != '\0'))) {
-    g_date_set_parse(&date, after);
-    if (!g_date_valid(&date)) {
-      dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-                                       GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       _("Error! Invalid 'After' date - format as dd/mm/yyyy or dd mmm yy."));
-      gtk_dialog_run (GTK_DIALOG (dialog));
-      gtk_widget_destroy (dialog);
+    g_date_set_parse(&DateAfter, after);
+    if (!g_date_valid(&DateAfter)) {
+      miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'After' date - format as dd/mm/yyyy or dd mmm yy."));
       return;
     }
-    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &date) > 0) {
+    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &DateAfter) > 0) {
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "afterEntry")), buffer);
     }
-    setTimeFromDate(&tptr, &date);
+    setTimeFromDate(&tptr, &DateAfter);
     mSearchControl->after = mktime(&tptr); 
     mSearchControl->flags |= SEARCH_AFTER_SET;
   }
   if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "beforeCheck")))) &&
       ((before != NULL) && (before != '\0'))) {
-    g_date_set_parse(&date, before);
-    if (!g_date_valid(&date)) {
-      dialog = gtk_message_dialog_new (GTK_WINDOW(widget),
-                                       GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       _("Error! Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."));
-      gtk_dialog_run (GTK_DIALOG (dialog));
-      gtk_widget_destroy (dialog);
+    g_date_set_parse(&DateBefore, before);
+    if (!g_date_valid(&DateBefore)) {
+      miscErrorDialog(widget, _("<b>Error!</b>\n\nInvalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."));
       return;
     }
-    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &date) > 0) {
+    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &DateBefore) > 0) {
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "beforeEntry")), buffer);
     }
-    setTimeFromDate(&tptr, &date);
+    setTimeFromDate(&tptr, &DateBefore);
     mSearchControl->before = mktime(&tptr);
     mSearchControl->flags |= SEARCH_BEFORE_SET;
   }
+ if((g_date_valid(&DateAfter)) && (g_date_valid(&DateBefore) )  )
+  {
+     if( (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "beforeCheck")))) && (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "afterCheck")))))
+      {
+        gint cmp_date = g_date_compare (&DateAfter,&DateBefore);/* returns 1 if the first is wrong, i.e. after last, 0 if equal */
+        if(cmp_date>=0)
+           {
+              miscErrorDialog(widget, _("<b>Error!</b>\n\nDates mismatch ! 'Before than' date must be <i>more recent</i> than 'After than' date.\n<b>Search can't proceed correctly !</b>\nPlease check the dates."));
+      return;
+           }
+      }
+  } 
 }
 
 /*
@@ -998,7 +1007,7 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   if (mSearchControl->fileSearchIsRegEx) {
     regcomp(&searchRegEx, mSearchControl->fileSearchRegEx, mSearchControl->fileSearchFlags);
   } else {
-    if (mSearchControl->fileSearchFlags & REG_ICASE == 0) {
+    if ((mSearchControl->fileSearchFlags & REG_ICASE )== 0) {
       searchGlob = g_pattern_spec_new(mSearchControl->fileSearchRegEx);
     } else {
       searchGlob = g_pattern_spec_new(g_utf8_strdown(mSearchControl->fileSearchRegEx, -1));
@@ -1263,7 +1272,7 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
         pbarNudgeCount += pbarIncrement;
        }/* endif */
     
-    tmpFileName = g_strdup_printf("%s", g_ptr_array_index(mSearchData->fullNameArray, i) );/* modifyed Luc A janv 2018 */
+    tmpFileName = g_strdup_printf("%s", (gchar*)g_ptr_array_index(mSearchData->fullNameArray, i) );/* modifyed Luc A janv 2018 */
     /* We must check the type-file in order to manage non pure text files like Office files 
        Luc A. 7 janv 2018 */
  //   printf("* Phase 2 : je teste le fichier :%s\n", tmpFileName);

@@ -37,12 +37,7 @@ int main (int argc, char *argv[])
   gboolean fTparameter = FALSE;
   gboolean fFparameter = FALSE;
   
-  /* Initiate threads */
-  if(!g_thread_supported()) /* Luc A janv 2018 ; useless if gtk >=2.32*/
-     g_thread_init (NULL);/* deprecated since 2.32 */
-  gdk_threads_init ();/* deprecated since gtk 3.6 */
-  gdk_threads_enter ();/* id */
-  
+   
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -52,6 +47,12 @@ int main (int argc, char *argv[])
   /* Handle GTK command line options and the locale settings */
   gtk_set_locale ();
   gtk_init (&argc, &argv);
+
+ /* Initiate threads */
+  if(!g_thread_supported()) /* Luc A janv 2018 ; useless if gtk >=2.32*/
+     g_thread_init (NULL);/* deprecated since 2.32 */
+  gdk_threads_init ();/* deprecated since gtk 3.6 */
+  gdk_threads_enter ();/* id */
 
   /* Create main window, and load (create) ini config file */
   add_pixmap_directory (PACKAGE_DATA_DIR "/pixmaps/" PACKAGE); /* New location for all pixmaps */

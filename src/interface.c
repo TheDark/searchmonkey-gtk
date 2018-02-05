@@ -3863,7 +3863,7 @@ create_aboutSearchmonkey (void)
   gtk_misc_set_padding (GTK_MISC (aboutVersion), 0, 5);
   gtk_label_set_single_line_mode (GTK_LABEL (aboutVersion), TRUE);
 
-  label1022 = gtk_label_new (_("<i>Regular expression power search utility written in GTK+ and licensed under Lesser GPL.</i>"));
+  label1022 = gtk_label_new (_("<i>Regular expression power search utility written in GTK+ and licensed under GPL v.3</i>"));
   gtk_widget_show (label1022);
   gtk_box_pack_start (GTK_BOX (vbox49), label1022, FALSE, FALSE, 0);
   gtk_label_set_use_markup (GTK_LABEL (label1022), TRUE);
