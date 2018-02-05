@@ -429,7 +429,7 @@ GString *convertRegex2(const gchar *input, gboolean change)
 {
   GString *output = g_string_sized_new(DEFAULT_GSTRING_SIZE); /* Create output */
   gint index = 0;
-  gint flags = 0; /* Using enumerations defined in header */
+  guint flags = 0; /* Using enumerations defined in header */
 
   do {
     switch (input[index]) {

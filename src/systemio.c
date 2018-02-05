@@ -212,7 +212,7 @@ void saveResults(GtkWidget *widget)
         errMsg = gtk_message_dialog_new(GTK_WINDOW(dialog),
                                         (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
                                         GTK_MESSAGE_ERROR,
-                                        GTK_BUTTONS_OK,
+                                        GTK_BUTTONS_OK,"%s",
                                         error->message);
         gtk_dialog_run(GTK_DIALOG(errMsg));
         gtk_widget_destroy(errMsg);
@@ -295,7 +295,7 @@ void importCriteria(GtkWidget *widget)
         warnDialog = gtk_message_dialog_new(GTK_WINDOW(import),
                                             (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
                                             GTK_MESSAGE_ERROR,
-                                            GTK_BUTTONS_OK,
+                                            GTK_BUTTONS_OK,"%s",
                                             error->message);
         gtk_dialog_run(GTK_DIALOG(warnDialog));
         g_error_free(error);
@@ -401,7 +401,7 @@ void exportCriteria(GtkWidget *widget)
         warnDialog = gtk_message_dialog_new(GTK_WINDOW(export),
                                             (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
                                             GTK_MESSAGE_ERROR,
-                                            GTK_BUTTONS_OK,
+                                            GTK_BUTTONS_OK,"%s",
                                             error->message);
         g_error_free(error);
         error = NULL;
@@ -777,8 +777,9 @@ void deleteFile(GtkWidget *widget)
                                      (GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
                                      GTK_MESSAGE_INFO,
                                      GTK_BUTTONS_OK,
-                                     _("Cannot delete file as name was not selected."),
-                                     NULL);
+                                     "%s",
+                                     _("Cannot delete file as name was not selected.")
+                                     );
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy(dialog);
     return;
@@ -840,8 +841,9 @@ void copyFile(GtkWidget *widget)
                                      (GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL),
                                      GTK_MESSAGE_INFO,
                                      GTK_BUTTONS_OK,
-                                     _("Cannot copy full file name as name was not selected."),
-                                     NULL);
+                                     "%s",
+                                     _("Cannot copy full file name as name was not selected.")
+                                     );
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy(dialog);
   }  
@@ -911,7 +913,6 @@ printf("contenu nettoyé:%s\n",retContents);
       *length = bytes_written;
     }
   }
-printf("*** notyet ****\n");
   return retVal;
 #endif /* NOTYET */
 }

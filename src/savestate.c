@@ -1173,7 +1173,7 @@ void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
   gint setActive;
 
   /* Retrieve active row */
-  setActive = (gint *)g_malloc(sizeof(gint));
+  setActive = (intptr_t)g_malloc(sizeof(gint));
   keyname = g_strconcat(name, "-active", NULL);
 
   if (g_key_file_has_key(keyString, group, keyname, NULL)) {
@@ -1518,7 +1518,7 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   GtkTextIter txtIter, tmpIter;
   GtkTextIter tmpStartIter, tmpEndIter;
   GtkTextIter start, end;
-  gsize count, tmpCount;
+  gsize count=0, tmpCount;
   guint matchIndex;
   gint i = 0; 
   gint lineCount = 2; /* Heading, plus options (i.e. 2-lines) */
@@ -1531,15 +1531,17 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   gint tmpStartOffset, tmpEndOffset;
   gchar *tmptext = NULL;
   gint count_hits = 0; /* counter INSIDE a line in order to manage the max display hits option for results - Luc A janv 2018 */
+  gboolean fLimitHitsHighlighting = FALSE;
   gint max_count_hits = (gint) gtk_spin_button_get_value( 
                                       GTK_SPIN_BUTTON(g_object_get_data(G_OBJECT(mainWindowApp), 
                                        "maxContentHitsSpinResults")));
   g_assert(tmpStr != NULL);
   g_assert(selection != NULL);
 
-// printf("max count hits = %d \n", max_count_hits);
 
-
+  fLimitHitsHighlighting = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON((g_object_get_data(G_OBJECT(mainWindowApp), 
+                                       "limitContentsCheckResults"))));
+ 
 if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 {
 // printf("//// salut je suis dans savstat ////\n");
@@ -1601,10 +1603,10 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 
       //g_static_mutex_lock(&mutex_Data);
       /* count = number of text hits inside the current text == all the file buffer*/
-      if (mSearchControl->flags & SEARCH_EXTRA_LINES) {
+      if ((mSearchControl->flags & SEARCH_EXTRA_LINES)!=0) {
 	for (i=0; i<count; i++) {
-          g_assert((i+matchIndex) <= mSearchData->lineMatchArray->len);
-	  newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray, (i + matchIndex));
+          g_assert((guint)(i+matchIndex) <= (guint)mSearchData->lineMatchArray->len);
+	  newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray,(guint)(i + matchIndex));
 	  g_assert(newTextMatch != NULL);
 	  
 	  if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
@@ -1623,7 +1625,7 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 	    lineCount -= (prevTextMatch->lineCountAfter + 1);
 	  }
 	  /* Luc A janv 2018 */
-          if(count_hits<max_count_hits)
+          if(((count_hits<max_count_hits)&&(fLimitHitsHighlighting==TRUE) )|| (fLimitHitsHighlighting==FALSE))
            {
              /* display block : only if we have not reached the limit to hits's display - Luc A Janv 2018 */
 	       gtk_text_buffer_get_iter_at_line (buffer, &tmpIter, lineCount);

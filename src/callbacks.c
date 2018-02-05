@@ -560,7 +560,8 @@ on_treeview1_button_press_event        (GtkWidget       *widget,
 
   GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
 
-
+  if(selection==NULL)
+     return FALSE;
   /* Capture right button click */
   if ((event->button == 3) && (event->type == GDK_BUTTON_PRESS) && (gtk_tree_selection_count_selected_rows(selection)==1 ) ) 
    {
@@ -741,7 +742,7 @@ on_expWizard_response                  (GtkDialog       *dialog,
                                         gint             response_id,
                                         gpointer         user_data)
 {
-    gint typeRegex = (gint)g_object_get_data(G_OBJECT(dialog), "regexType");
+    gint typeRegex = (intptr_t)g_object_get_data(G_OBJECT(dialog), "regexType");
     GtkEntry *output = GTK_ENTRY(lookup_widget(GTK_WIDGET(dialog), "resultExp"));/* resulExp = name of GtkEntry for the final RegEx formula */
     gchar *finalRegex;
     GtkComboBox *retCombo;/* contains a pointer on main Window, for GtkCombo for files OR GtkCombo for containing text */
@@ -1098,7 +1099,7 @@ void
 on_expWizard_realize                   (GtkWidget       *widget,
                                         gpointer         user_data)
 {
-  gint widgetType = (gint)g_object_get_data(G_OBJECT(widget), "regexType");
+  gint widgetType = (intptr_t)g_object_get_data(G_OBJECT(widget), "regexType");
 
   if (widgetType == FILE_REGEX_TYPE) {
     gtk_window_set_title (GTK_WINDOW (fileRegexWizard), _("File Expression Wizard"));
@@ -1559,7 +1560,7 @@ on_LessThanSize_focus_out_event         (GtkWidget       *widget,
 {
   gchar * regexp;
   guint flags;
-  printf("combo Less changée \n");  
+  // printf("combo Less changée \n");  
   return FALSE;
 }
 
@@ -1571,7 +1572,7 @@ on_MoreThanSize_focus_out_event         (GtkWidget       *widget,
 {
   gchar * regexp;
   guint flags;
-  printf("combo More changée \n");
+  // printf("combo More changée \n");
   return FALSE;
 }
 

@@ -7,6 +7,7 @@
 
 extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
 
+void miscErrorDialog(GtkWidget *widget, const gchar* msg);
 gint convertRegexGtk(size_t offset, const gchar *contents);
 gchar *getFullFileName(GtkTreeView *treeView, gint columnNumber);
 void initComboBox2(GtkWidget *comboBox);

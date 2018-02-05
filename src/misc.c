@@ -15,7 +15,21 @@
 #include "misc.h"
 #include <regex.h>
 
+/****************************************************
+  display an erreor/warning dialog
+****************************************************/
+void miscErrorDialog(GtkWidget *widget, const gchar* msg)
+{ 
+GtkWidget *dialog;
 
+   dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW(widget),
+                                           GTK_DIALOG_DESTROY_WITH_PARENT,
+                                           GTK_MESSAGE_ERROR,
+                                           GTK_BUTTONS_CLOSE,
+                                           msg);
+   gtk_dialog_run (GTK_DIALOG (dialog));
+   gtk_widget_destroy (dialog);
+}
 /********************************************************************************************
   convert a regex byte position in a string to
   a gtk gchar compatible position - 
@@ -323,7 +337,13 @@ gboolean getExpertSearchMode (GtkWidget *widget)
 
 void sel (GtkTreeModel *model, GtkTreePath *path,GtkTreeIter *iter, gpointer data)
 {
-  gtk_tree_selection_select_path((GtkTreeSelection *)data, path);
+ GtkTreeSelection *tmpTreeSelection = NULL;
+
+ tmpTreeSelection = (GtkTreeSelection *)data;
+
+if((tmpTreeSelection!=NULL) && (model!=NULL)  && (path!=NULL))
+    gtk_tree_selection_select_path(tmpTreeSelection, path);
+
 }
 
 /*
@@ -334,15 +354,20 @@ void setResultsViewHorizontal(GtkWidget *widget, gboolean horizontal)
   GtkTreeSelection *treeview1 = gtk_tree_view_get_selection(GTK_TREE_VIEW(lookup_widget(widget, "treeview1")));
   GtkTreeSelection *treeview2 = gtk_tree_view_get_selection(GTK_TREE_VIEW(lookup_widget(widget, "treeview2")));
 
-  if (horizontal) {
-    gtk_widget_show(lookup_widget(widget, "resultsHPane"));
-    gtk_widget_hide(lookup_widget(widget, "resultsVPane"));
-    gtk_tree_selection_selected_foreach(treeview2, &sel, treeview1);
-  } else { /* Vertical - default */
-    gtk_widget_hide(lookup_widget(widget, "resultsHPane"));
-    gtk_widget_show(lookup_widget(widget, "resultsVPane"));
-    gtk_tree_selection_selected_foreach(treeview1, &sel, treeview2);
-  }
+  if((treeview1!=NULL)&&(treeview2!=NULL))
+   {
+      /* we must chek if selection != NULL - Luc A feb 2018 */
+
+     if (horizontal) {
+       gtk_widget_show(lookup_widget(widget, "resultsHPane"));
+       gtk_widget_hide(lookup_widget(widget, "resultsVPane"));
+       gtk_tree_selection_selected_foreach(treeview2, &sel, treeview1);
+    } else { /* Vertical - default */
+            gtk_widget_hide(lookup_widget(widget, "resultsHPane"));
+            gtk_widget_show(lookup_widget(widget, "resultsVPane"));
+            gtk_tree_selection_selected_foreach(treeview1, &sel, treeview2);
+           }
+   }/* if treeview!=NULL*/
 }
 
 
@@ -453,7 +478,7 @@ gboolean test_regexp(gchar *regexp, guint flags, gchar *error)
     dialog = gtk_message_dialog_new (GTK_WINDOW(window1),
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_MESSAGE_ERROR,
-                                     GTK_BUTTONS_CLOSE,
+                                     GTK_BUTTONS_CLOSE,"%s",
                                      msg);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
