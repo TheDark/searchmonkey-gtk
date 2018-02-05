@@ -647,7 +647,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
       ((after != NULL) && (after != '\0'))) {
     g_date_set_parse(&DateAfter, after);
     if (!g_date_valid(&DateAfter)) {
-      miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'After' date - format as dd/mm/yyyy or dd mmm yy."));
+      miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'After'date - format as dd/mm/yyyy or dd mmm yy."));
       return;
     }
     if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &DateAfter) > 0) {
