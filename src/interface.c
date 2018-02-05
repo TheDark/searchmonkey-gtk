@@ -2239,7 +2239,7 @@ create_testRegExDialog (void)
    GtkWidget *labelHeaderTest = gtk_label_new (_("<b>Test Regular Expressions (RegEx):</b>\n<i>With this dialog, you can test a RegEx before using it.\nFeel free to type a RegEx and put an example of text to test it.</i>"));
   gtk_widget_show (labelHeaderTest);
   gtk_label_set_use_markup (GTK_LABEL (labelHeaderTest), TRUE); 
-  GtkWidget    *iconHeaderTest = gtk_image_new_from_icon_name ("applications-debugging", GTK_ICON_SIZE_DIALOG);
+  GtkWidget    *iconHeaderTest = gtk_image_new_from_icon_name ("applications-development", GTK_ICON_SIZE_DIALOG);
     gtk_widget_show(iconHeaderTest);
     gtk_misc_set_padding(GTK_MISC(iconHeaderTest), 0, 2);
     gtk_box_pack_start(GTK_BOX(hbox27), iconHeaderTest, FALSE, FALSE, 2);
