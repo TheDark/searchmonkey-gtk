@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-02 16:50+0100\n"
-"PO-Revision-Date: 2018-02-03 12:56+0100\n"
+"PO-Revision-Date: 2018-02-06 10:28+0100\n"
 "Last-Translator: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language-Team: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language: FR\n"
@@ -169,11 +169,11 @@ msgstr "<b>Pour les fichiers</b>"
 
 #: interface.c:3452
 msgid "<b>Import Location</b>"
-msgstr "<b>Destination de l' importation</b>"
+msgstr "<b>Contenu de l'importation</b>"
 
 #: interface.c:3485
 msgid "<b>Import Type</b>"
-msgstr "<b>Type d'importation</b>"
+msgstr "<b>Organisation des données à importer</b>"
 
 #: interface.c:2642
 msgid "<b>Resulting expression</b>"
@@ -202,7 +202,7 @@ msgstr "<b>Statut : </b> "
 
 #: interface.c:2253
 msgid "<b>Test Expression</b>:"
-msgstr "<b>Formule d'expression régulière à tester :</b>"
+msgstr "<b>Formule d'Expression Régulière à tester :</b>"
 
 #: interface.c:2239
 msgid ""
@@ -340,7 +340,7 @@ msgstr "Rechercher automatiquement ..."
 
 #: interface.c:517
 msgid "Auto-size columns"
-msgstr "Ajuster automatiquement les colonnes"
+msgstr "_Ajuster automatiquement les colonnes"
 
 #: interface.c:791
 msgid "Basic"
@@ -380,7 +380,7 @@ msgstr "Cocher afin de l'autoriser"
 
 #: interface.c:484
 msgid "Clear History..."
-msgstr "Effacer l'historique"
+msgstr "_Effacer l'historique"
 
 #: interface.c:2077
 msgid "Clear Search History"
@@ -400,7 +400,7 @@ msgstr "Effacer tous les motifs dans liste déroulante \"contenant le texte\""
 
 #: interface.c:2128
 msgid "Clear containing text"
-msgstr "Effacer le texte contenu dans le fichier"
+msgstr "Effacer le(s)  texte(s) recherché(s)"
 
 #: interface.c:2122
 msgid "Clear file names"
@@ -408,7 +408,7 @@ msgstr "Effacer les noms de fichiers"
 
 #: interface.c:2134
 msgid "Clear look in history"
-msgstr "Effacer l'historique d'affichage"
+msgstr "Effacer l'historique des emplacements explorés"
 
 #: interface.c:2837
 msgid "Configuration"
@@ -430,7 +430,7 @@ msgstr "Les entrées saisies dans le champ 'Contenant :'"
 #: interface.c:3445
 msgid "Containing Text import"
 msgstr ""
-"formule d'Expression régulière pour rechercher un texte spécifique dans un "
+"formule d'Expression Régulière pour rechercher un texte spécifique dans un "
 "fichier"
 
 #: interface.c:825
@@ -440,7 +440,7 @@ msgstr "Contenant :"
 #: callbacks.c:1108
 msgid "Context Expression Wizard"
 msgstr ""
-"Assistant de construction d'expression régulière pour le texte recherché "
+"Assistant de construction d'Expression Régulière pour rechercher du texte "
 "dans un fichier"
 
 #: interface.c:2636
@@ -538,7 +538,7 @@ msgstr "Éditer ce fichier"
 
 #: interface.c:349
 msgid "Edit File"
-msgstr "Éditer le fichier sélectionné"
+msgstr "Édit_er le fichier sélectionné"
 
 #: interface.c:724
 msgid "Enable contents search to find files with matching content too."
@@ -597,7 +597,7 @@ msgstr "Erreur ! Le critère  'supérieur à...' doit être un nombre positif"
 
 #: systemio.c:296 systemio.c:405
 msgid "Error! No valid file selected."
-msgstr "Erreur ! Aucun fichier valide sélectionné."
+msgstr "Erreur ! Pas de fichier valide sélectionné."
 
 #: systemio.c:373
 msgid "Error! Unable to find first combo entry. Is drop down list blank?"
@@ -623,7 +623,7 @@ msgstr "Mode expert"
 
 #: interface.c:3572
 msgid "Export Criteria"
-msgstr "Critères d'exportation"
+msgstr "Exporter des critères de recherche"
 
 #: interface.c:635
 msgid "Export Expression..."
@@ -635,7 +635,7 @@ msgstr "Assistant  ... "
 
 #: interface.c:2416
 msgid "Expression Wizard"
-msgstr "Assistant d'expression régulière"
+msgstr "Assistant d'Expression Régulière"
 
 #: interface.c:2864
 msgid ""
@@ -652,7 +652,7 @@ msgstr "Suppléments"
 #: callbacks.c:1106
 msgid "File Expression Wizard"
 msgstr ""
-"Assistant de construction d'expression régulière pour rechercher des fichiers"
+"Assistant de construction d'Expression Régulière pour rechercher des fichiers"
 
 #: interface.c:3623
 msgid "File Name Export criteria"
@@ -661,11 +661,11 @@ msgstr "Les entrées du champ 'fichiers'"
 #: interface.c:3438
 msgid "File Name import"
 msgstr ""
-"Formule d'expression régulière pour rechercher des fichiers spécifiques."
+"Formule d'Expression Régulière pour rechercher des fichiers spécifiques."
 
 #: interface.c:3416 interface.c:3600
 msgid "File Selection"
-msgstr "Sélection de fichiers"
+msgstr "Sélectionner le fichier"
 
 #: interface.c:2955
 #, c-format
@@ -746,7 +746,7 @@ msgstr "Style de fichiers Grep(1-entrée, OU chaque ligne)"
 
 #: interface.c:2655
 msgid "Help with the Regular Expression Builder"
-msgstr "Aide avec le constructeur d'expressions régulières"
+msgstr "Aide avec le constructeur d'Expressions Régulières"
 
 #: interface.c:1205
 msgid "Highlights per line :"
@@ -754,7 +754,7 @@ msgstr "Surlignages par ligne : "
 
 #: interface.c:395
 msgid "Horizontal results"
-msgstr "Résultats disposés horizontalement"
+msgstr "Présenter les résultats _horizontalement"
 
 #: interface.c:1172
 msgid ""
@@ -780,7 +780,7 @@ msgstr ""
 
 #: interface.c:3388
 msgid "Import Criteria"
-msgstr "Critères d'importation"
+msgstr "Importer des critères de recherche"
 
 #: interface.c:628
 msgid "Import Expression..."
@@ -957,7 +957,7 @@ msgstr "Une fois ou plus"
 
 #: interface.c:357
 msgid "Open Folder"
-msgstr "Parcourir le dossier sélectionné"
+msgstr "_Parcourir le dossier sélectionné"
 
 #: interface.c:619
 msgid "Open a new search window."
@@ -973,7 +973,7 @@ msgstr "Cliquez sur ce bouton pour choisir le dossier à explorer ..."
 
 #: interface.c:1220 interface.c:3490 interface.c:3675
 msgid "Options"
-msgstr "Options de recherche"
+msgstr "Options "
 
 #: savestate.c:1746
 msgid "Options: "
@@ -1147,7 +1147,7 @@ msgstr "Tout réinitialiser "
 
 #: interface.c:2140
 msgid "Reset size/modified options"
-msgstr "Réinitialise les options de taille et date de modification"
+msgstr "Réinitialiser les options de taille et date de modification"
 
 #: interface.c:2143
 msgid "Reset the size and modified search criteria."
@@ -1156,7 +1156,7 @@ msgstr ""
 
 #: interface.c:902
 msgid "Restrict depth:"
-msgstr "Limite profondeur sous-dossiers :"
+msgstr "Limiter profondeur sous-dossiers :"
 
 #: systemio.c:604
 #, c-format
@@ -1164,8 +1164,10 @@ msgid ""
 "Run configuration to set default directory/folder browser:\n"
 "\"%s\""
 msgstr ""
-"Configurer le dossier par défaut pour le navigateur de fichiers :\n"
-"\"%s\""
+"Impossible de lancer un navigateur de fichiers pour ouvrir :\n"
+"\"%s\"\n"
+"Rendez-vous dans le menu configuration pour choisir un navigateur de "
+"fichiers par défaut."
 
 #: systemio.c:591
 #, c-format
@@ -1188,7 +1190,7 @@ msgstr ""
 
 #: interface.c:411
 msgid "S_ort by"
-msgstr "Trier _par"
+msgstr "_Trier par"
 
 #: interface.c:304
 msgid "Save R_esults to CSV..."
@@ -1283,7 +1285,7 @@ msgstr ""
 
 #: interface.c:385
 msgid "Show _Statusbar"
-msgstr "Montrer barre d'état"
+msgstr "Montrer _barre d'état"
 
 #: interface.c:380
 msgid "Show _Toolbar"
@@ -1358,7 +1360,7 @@ msgstr "Système"
 
 #: interface.c:2220
 msgid "Test Regular Expression"
-msgstr "Tester une expression régulière"
+msgstr "_Tester une expression régulière"
 
 #: interface.c:565
 msgid "Test Regular Expression..."
@@ -1447,7 +1449,7 @@ msgstr ""
 
 #: interface.c:512
 msgid "Use _Word Wrap"
-msgstr "Retours à la l_igne automatiques"
+msgstr "_Retours à la ligne automatiques"
 
 #: interface.c:2861
 msgid "Use extended regular expressions"
@@ -1552,7 +1554,7 @@ msgstr "Séparateur de champ/valeur :"
 
 #: interface.c:401
 msgid "Vertical results"
-msgstr "Résultats disposés verticalement"
+msgstr "Présenter les résultats _verticalement"
 
 #: interface.c:638
 msgid "Write some or all of the search criteria to disk."
@@ -1592,7 +1594,7 @@ msgstr "_Contenant :"
 
 #: interface.c:365 interface.c:1906
 msgid "_Copy (Filename)"
-msgstr "_Copier le fichier sélectionné"
+msgstr "_Copier le chemin vers le fichier sélectionné"
 
 #: interface.c:341
 msgid "_Delete (File)"
@@ -1719,7 +1721,7 @@ msgstr ""
 
 #: savestate.c:1789
 msgid "none"
-msgstr "aucun"
+msgstr "aucune"
 
 #: savestate.c:1783
 #, c-format
