@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: 0.8.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-06 10:43+0100\n"
-"PO-Revision-Date: 2018-02-02 17:38+0100\n"
+"PO-Revision-Date: 2018-02-06 15:03+0100\n"
 "Last-Translator: Stefan Zerkalica <zerkalica@gmail.com>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -131,19 +131,16 @@ msgid "%s-type"
 msgstr "%s-тип"
 
 #: callbacks.c:1018
-#, fuzzy
 msgid "(Entry)"
-msgstr "_(величина)"
+msgstr "(величина)"
 
 #: callbacks.c:1023
-#, fuzzy
 msgid "(Repeat)"
-msgstr "_(повторение)"
+msgstr "(повторение)"
 
 #: callbacks.c:1013
-#, fuzzy
 msgid "(Type)"
-msgstr "_(условие)"
+msgstr "(условие)"
 
 #: interface.c:3081
 msgid ","
@@ -174,26 +171,30 @@ msgid ""
 "<b>Search can't proceed correctly !</b>\n"
 "Please check the dates."
 msgstr ""
+"<b>ошибка !</b>\n"
+"\n"
+"Смешанные даты! Дата «раньше» должна быть <i>более новой</i>, чем дата "
+"«после».\n"
+"<b>Поиск не даст правильных результатов</b>\n"
+"Пожалуйста, проверьте даты."
 
 #: search.c:650
-#, fuzzy
 msgid ""
 "<b>Error!</b>\n"
 "\n"
 "Invalid 'After'date - format as dd/mm/yyyy or dd mmm yy."
 msgstr ""
-"Ошибка! Неправильное поле даты 'После'  - формат должен быть в виде mm/dd/"
-"yyyy или mmm dd yy."
+"<b>Ошибка!</b> Неправильное поле даты 'После'  - формат должен быть в виде "
+"mm/dd/yyyy или mmm dd yy."
 
 #: search.c:664
-#, fuzzy
 msgid ""
 "<b>Error!</b>\n"
 "\n"
 "Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."
 msgstr ""
-"Ошибка! Неправильное поле даты 'До'  - формат должен быть в виде mm/dd/yyyy "
-"или mmm dd yy."
+"<b>Ошибка!</b> Неправильное поле даты 'До'  - формат должен быть в виде mm/"
+"dd/yyyy или mmm dd yy."
 
 #: search.c:630
 msgid ""
@@ -204,6 +205,12 @@ msgid ""
 "\n"
 "Please, check your entry and the units."
 msgstr ""
+"<b>ошибка !</b>\n"
+"\n"
+"Размер файла «меньше» должен быть <i>положительным</i>.\n"
+"Поэтому этот критерий не будет использоваться.\n"
+"\n"
+"Проверьте значение и единицы измерения."
 
 #: search.c:614
 msgid ""
@@ -214,6 +221,12 @@ msgid ""
 "\n"
 "Please, check your entry and the units."
 msgstr ""
+"<b>Error!</b>\n"
+"\n"
+"Размер файла «больше» должен быть <i>положительным</i>.\n"
+"Поэтому этот критерий не будет использоваться.\n"
+"\n"
+"Проверьте значение и единицы измерения."
 
 #: search.c:618 search.c:634
 msgid ""
@@ -224,6 +237,12 @@ msgid ""
 "\n"
 "Please, check your entry and the units."
 msgstr ""
+"<b>ошибка !</b>\n"
+"\n"
+"«Более крупный» критерий должен быть строго ниже «меньшего» критерия.\n"
+"Поэтому этот критерий не будет использоваться.\n"
+"\n"
+"Проверьте значение и единицы измерения."
 
 #: interface.c:3637
 msgid "<b>Export Source</b>"
@@ -304,13 +323,12 @@ msgid "<b>Warning</b>: Once cleared, history cannot be recovered!"
 msgstr "<b>Внимание:</b> Очищенная история не восстанавливается"
 
 #: interface.c:3866
-#, fuzzy
 msgid ""
 "<i>Regular expression power search utility written in GTK+ and licensed "
 "under GPL v.3</i>"
 msgstr ""
 "<i>Утилита поиска по регулярным выражением, написана на GTK+ и лицензирована "
-"под Lesser GPL.</i>"
+"под GPL v.3.</i>"
 
 #: systemio.c:198
 #, c-format
