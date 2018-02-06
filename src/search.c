@@ -650,7 +650,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
       miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'After'date - format as dd/mm/yyyy or dd mmm yy."));
       return;
     }
-    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &DateAfter) > 0) {
+    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateAfter) > 0) {
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "afterEntry")), buffer);
     }
     setTimeFromDate(&tptr, &DateAfter);
@@ -664,7 +664,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
       miscErrorDialog(widget, _("<b>Error!</b>\n\nInvalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."));
       return;
     }
-    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%d %b %Y"), &DateBefore) > 0) {
+    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateBefore) > 0) {
       gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "beforeEntry")), buffer);
     }
     setTimeFromDate(&tptr, &DateBefore);
