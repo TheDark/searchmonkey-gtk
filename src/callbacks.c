@@ -1010,17 +1010,17 @@ on_midTreeView_realize                 (GtkWidget       *widget,
     g_object_unref (G_OBJECT (store));
 
     /* Create columns */
-    column = gtk_tree_view_column_new_with_attributes (_("_(Type)"), renderer,
+    column = gtk_tree_view_column_new_with_attributes (_("(Type)"), renderer,
                                                        "text", REGEX_TYPE_COLUMN,
                                                        NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
 
-    column = gtk_tree_view_column_new_with_attributes (_("_(Entry)"), renderer,
+    column = gtk_tree_view_column_new_with_attributes (_("(Entry)"), renderer,
                                                        "text", REGEX_ENTRY_COLUMN,
                                                        NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
 
-    column = gtk_tree_view_column_new_with_attributes (_("_(Repeat)"), renderer,
+    column = gtk_tree_view_column_new_with_attributes (_("(Repeat)"), renderer,
                                                        "text", REGEX_REPEAT_COLUMN,
                                                        NULL);
     gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);

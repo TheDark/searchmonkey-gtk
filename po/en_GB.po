@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-02 16:50+0100\n"
+"POT-Creation-Date: 2018-02-06 10:43+0100\n"
 "PO-Revision-Date: 2007-01-31 16:52+0000\n"
 "Last-Translator: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language-Team: Adam Cottrell <cottrela@users.sf.net>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: savestate.c:1683
+#: savestate.c:1660
 #, c-format
 msgid ""
 "\n"
 "Internal error %d! Unable to highlight line - offset beyond line-end.\n"
 msgstr ""
 
-#: main.c:67
+#: main.c:68
 msgid ""
 "\n"
 "No content searching performed for this file.\n"
@@ -33,44 +33,44 @@ msgid ""
 "entered prior to starting search.\n"
 msgstr ""
 
-#: savestate.c:1688
+#: savestate.c:1665
 #, c-format
 msgid "  Debug: %d) '%s'\n"
 msgstr ""
 
-#: savestate.c:1685
+#: savestate.c:1662
 #, c-format
 msgid "  Debug: fn='%s'\n"
 msgstr ""
 
-#: savestate.c:1686
+#: savestate.c:1663
 #, c-format
 msgid "  Debug: tc=%d + os=%d || oe=%d\n"
 msgstr ""
 
-#: savestate.c:70
+#: savestate.c:44
 #, c-format
 msgid " %s settings auto-generated - Do not edit!"
 msgstr ""
 
-#: search.c:1731
+#: search.c:1719
 msgid " [cancelled]"
 msgstr ""
 
-#: search.c:1724
+#: search.c:1712
 msgid " [inv]"
 msgstr ""
 
-#: savestate.c:209
+#: savestate.c:183
 msgid " [missing]"
 msgstr ""
 
-#: search.c:1622
+#: search.c:1610
 #, c-format
 msgid "%1.1f KB"
 msgstr ""
 
-#: search.c:1624
+#: search.c:1612
 #, c-format
 msgid "%1.1f MB"
 msgstr ""
@@ -80,21 +80,21 @@ msgstr ""
 msgid "%d"
 msgstr ""
 
-#: search.c:671 search.c:691
+#: search.c:653 search.c:667
 msgid "%d %b %Y"
 msgstr ""
 
-#: search.c:1620
+#: search.c:1608
 #, c-format
 msgid "%d bytes"
 msgstr ""
 
-#: search.c:1719
+#: search.c:1707
 #, c-format
 msgid "%d file found"
 msgstr ""
 
-#: search.c:1721
+#: search.c:1709
 #, c-format
 msgid "%d files found"
 msgstr ""
@@ -104,44 +104,110 @@ msgstr ""
 msgid "%f"
 msgstr ""
 
-#: search.c:1141
+#: search.c:1129
 #, c-format
 msgid "%s %s\n"
 msgstr ""
 
-#: systemio.c:1062
+#: systemio.c:1077
 #, c-format
 msgid "%s Error! Unable to duplicate string vector\n"
 msgstr ""
 
-#: systemio.c:1053
+#: systemio.c:1068
 #, c-format
 msgid "%s Error! Unable to split %s with %c\n"
 msgstr ""
 
-#: search.c:1651
+#: search.c:1639
 #, c-format
 msgid "%s-type"
+msgstr ""
+
+#: callbacks.c:1018
+msgid "(Entry)"
+msgstr ""
+
+#: callbacks.c:1023
+msgid "(Repeat)"
+msgstr ""
+
+#: callbacks.c:1013
+msgid "(Type)"
 msgstr ""
 
 #: interface.c:3081
 msgid ","
 msgstr ""
 
-#: savestate.c:1793
+#: savestate.c:1770
 msgid ".\n"
 msgstr ""
 
-#: callbacks.c:1149
+#: callbacks.c:1148
 msgid "0%"
 msgstr ""
 
-#: systemio.c:543
+#: systemio.c:557
 msgid "100%"
 msgstr ""
 
 #: interface.c:2289
 msgid "<Copy and paste your sample text here>"
+msgstr ""
+
+#: search.c:681
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"Dates mismatch ! 'Before than' date must be <i>more recent</i> than 'After "
+"than' date.\n"
+"<b>Search can't proceed correctly !</b>\n"
+"Please check the dates."
+msgstr ""
+
+#: search.c:650
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"Invalid 'After'date - format as dd/mm/yyyy or dd mmm yy."
+msgstr ""
+
+#: search.c:664
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."
+msgstr ""
+
+#: search.c:630
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"LessThan file size must be <i>positive</i> value\n"
+"So this criteria will not be used.\n"
+"\n"
+"Please, check your entry and the units."
+msgstr ""
+
+#: search.c:614
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"MoreThan file size must be <i>positive</i> value\n"
+"So this criteria will not be used.\n"
+"\n"
+"Please, check your entry and the units."
+msgstr ""
+
+#: search.c:618 search.c:634
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"MoreThan file size must be <i>stricly inferior</i> to LessThan file size.So "
+"this criteria will not be used.\n"
+"\n"
+"Please, check your entry and the units."
 msgstr ""
 
 #: interface.c:3637
@@ -220,16 +286,16 @@ msgstr ""
 #: interface.c:3866
 msgid ""
 "<i>Regular expression power search utility written in GTK+ and licensed "
-"under Lesser GPL.</i>"
+"under GPL v.3</i>"
 msgstr ""
 
-#: systemio.c:184
+#: systemio.c:198
 #, c-format
 msgid ""
 "A file named \"%s\" already exists. Are you sure you want to overwrite it?"
 msgstr ""
 
-#: search.c:894
+#: search.c:882
 msgid "Aborting research-Searchmonkey"
 msgstr ""
 
@@ -237,7 +303,7 @@ msgstr ""
 msgid "About searchmonkey"
 msgstr ""
 
-#: savestate.c:171
+#: savestate.c:145
 msgid "About to overwrite save configuration. Do you want to proceed?"
 msgstr ""
 
@@ -287,13 +353,13 @@ msgstr ""
 msgid "Any text character"
 msgstr ""
 
-#: callbacks.c:1177
+#: callbacks.c:1176
 msgid ""
 "Are you sure that you wish to delete the config file, and restart "
 "searchmonkey?"
 msgstr ""
 
-#: systemio.c:789
+#: systemio.c:804
 #, c-format
 msgid ""
 "Are you sure you want to delete:\n"
@@ -336,11 +402,11 @@ msgstr ""
 msgid "C_ancel"
 msgstr ""
 
-#: systemio.c:829
+#: systemio.c:845
 msgid "Cannot copy full file name as name was not selected."
 msgstr ""
 
-#: systemio.c:766
+#: systemio.c:781
 msgid "Cannot delete file as name was not selected."
 msgstr ""
 
@@ -384,7 +450,7 @@ msgstr ""
 msgid "Configuration"
 msgstr ""
 
-#: savestate.c:105
+#: savestate.c:79
 msgid ""
 "Configuration files are for a different version of Searchmonkey. This may "
 "cause errors. Delete old configuration files?"
@@ -402,7 +468,7 @@ msgstr ""
 msgid "Containing:"
 msgstr ""
 
-#: callbacks.c:1108
+#: callbacks.c:1107
 msgid "Context Expression Wizard"
 msgstr ""
 
@@ -467,7 +533,7 @@ msgstr ""
 msgid "Desktop search to replace find and grep."
 msgstr ""
 
-#: regexwizard.c:88
+#: regexwizard.c:100
 msgid "Did not match any."
 msgstr ""
 
@@ -505,65 +571,49 @@ msgstr ""
 msgid "End of row separator:"
 msgstr ""
 
-#: savestate.c:187
+#: savestate.c:161
 #, c-format
 msgid "Error saving %s: %s\n"
 msgstr ""
 
-#: search.c:666
-msgid "Error! Invalid 'After' date - format as dd/mm/yyyy or dd mmm yy."
-msgstr ""
-
-#: search.c:686
-msgid "Error! Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."
-msgstr ""
-
-#: callbacks.c:1612
+#: callbacks.c:1611
 msgid "Error! Invalid 'containing text' regular expression"
 msgstr ""
 
-#: callbacks.c:1588
+#: callbacks.c:1587
 msgid "Error! Invalid 'file name' regular expression"
 msgstr ""
 
-#: misc.c:255 search.c:857
+#: misc.c:298 search.c:845
 msgid "Error! Invalid Containing Text regular expression"
 msgstr ""
 
-#: misc.c:245 search.c:851
+#: misc.c:288 search.c:839
 msgid "Error! Invalid File Name regular expression"
 msgstr ""
 
-#: search.c:646
-msgid "Error! LessThan file size must be positive value"
-msgstr ""
-
-#: misc.c:455 search.c:832
+#: misc.c:509 search.c:820
 msgid "Error! Look In directory cannot be blank."
 msgstr ""
 
-#: misc.c:466 search.c:843
+#: misc.c:520 search.c:831
 msgid "Error! Look In directory is invalid."
 msgstr ""
 
-#: search.c:628
-msgid "Error! MoreThan file size must be positive value"
-msgstr ""
-
-#: systemio.c:296 systemio.c:405
+#: systemio.c:310 systemio.c:419
 msgid "Error! No valid file selected."
 msgstr ""
 
-#: systemio.c:373
+#: systemio.c:387
 msgid "Error! Unable to find first combo entry. Is drop down list blank?"
 msgstr ""
 
-#: callbacks.c:1183
+#: callbacks.c:1182
 #, c-format
 msgid "Error! Unable to remove config file %s.\n"
 msgstr ""
 
-#: systemio.c:349
+#: systemio.c:363
 msgid ""
 "Error! You must select at least one entry in order to save drop down list."
 msgstr ""
@@ -598,7 +648,7 @@ msgstr ""
 msgid "Extras"
 msgstr ""
 
-#: callbacks.c:1106
+#: callbacks.c:1105
 msgid "File Expression Wizard"
 msgstr ""
 
@@ -619,19 +669,19 @@ msgstr ""
 msgid "File explorer attributes: %f=filename, %d=directory"
 msgstr ""
 
-#: systemio.c:96
+#: systemio.c:110
 msgid "File name"
 msgstr ""
 
-#: systemio.c:98
+#: systemio.c:112
 msgid "File size"
 msgstr ""
 
-#: systemio.c:99
+#: systemio.c:113
 msgid "File type"
 msgstr ""
 
-#: systemio.c:275
+#: systemio.c:289
 msgid "File was empty/invalid."
 msgstr ""
 
@@ -667,12 +717,12 @@ msgstr ""
 msgid "Force single window mode"
 msgstr ""
 
-#: regexwizard.c:92
+#: regexwizard.c:104
 #, c-format
 msgid "Found %d matches."
 msgstr ""
 
-#: regexwizard.c:90
+#: regexwizard.c:102
 msgid "Found 1 match."
 msgstr ""
 
@@ -710,7 +760,7 @@ msgstr ""
 msgid "Ignore hidden files (Unix filesystems only)"
 msgstr ""
 
-#: systemio.c:442
+#: systemio.c:456
 #, c-format
 msgid ""
 "Illegal escape sequence: '\\%c'.\n"
@@ -729,14 +779,14 @@ msgstr ""
 msgid "Import a file identical to that generated by the export command."
 msgstr ""
 
-#: systemio.c:460
+#: systemio.c:474
 #, c-format
 msgid ""
 "Input string expands into non ASCII, or multi-byte key sequence: '%s'.\n"
 " Please try to use ASCII safe keys"
 msgstr ""
 
-#: callbacks.c:756
+#: callbacks.c:755
 msgid "Internal Error! Unable to find calling wizard type!"
 msgstr ""
 
@@ -772,7 +822,7 @@ msgstr ""
 msgid "Limit files found by selecting maximum tree-depth to search."
 msgstr ""
 
-#: savestate.c:1640 savestate.c:1704
+#: savestate.c:1617 savestate.c:1681
 #, c-format
 msgid "Line Number: %d\n"
 msgstr ""
@@ -785,7 +835,7 @@ msgstr ""
 msgid "List of file(s) corresponding to research criteria."
 msgstr ""
 
-#: savestate.c:628 savestate.c:1415 systemio.c:97
+#: savestate.c:602 savestate.c:1389 systemio.c:111
 msgid "Location"
 msgstr ""
 
@@ -805,7 +855,7 @@ msgstr ""
 msgid "Match strings within binary files too"
 msgstr ""
 
-#: savestate.c:664
+#: savestate.c:638
 msgid "Matches"
 msgstr ""
 
@@ -825,11 +875,11 @@ msgstr ""
 msgid "Minimum filesize in kBytes/mBytes/gBytes."
 msgstr ""
 
-#: savestate.c:655
+#: savestate.c:629
 msgid "Modified"
 msgstr ""
 
-#: systemio.c:100
+#: systemio.c:114
 msgid "Modified date"
 msgstr ""
 
@@ -849,18 +899,18 @@ msgstr ""
 msgid "More than:"
 msgstr ""
 
-#: systemio.c:472
+#: systemio.c:486
 #, c-format
 msgid ""
 "Multi-byte string entered: '%s'.\n"
 "Truncating extra character (%c)"
 msgstr ""
 
-#: main.c:69
+#: main.c:70
 msgid "N/A"
 msgstr ""
 
-#: savestate.c:619
+#: savestate.c:593
 msgid "Name"
 msgstr ""
 
@@ -868,7 +918,7 @@ msgstr ""
 msgid "New Instance"
 msgstr ""
 
-#: systemio.c:165
+#: systemio.c:179
 msgid "No results to save!"
 msgstr ""
 
@@ -900,7 +950,7 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: savestate.c:1746
+#: savestate.c:1723
 msgid "Options: "
 msgstr ""
 
@@ -908,7 +958,7 @@ msgstr ""
 msgid "P_rint Setup..."
 msgstr ""
 
-#: savestate.c:1638
+#: savestate.c:1615
 #, c-format
 msgid "Paragraph Number: %d\n"
 msgstr ""
@@ -930,17 +980,17 @@ msgid ""
 "Perform content searching immediately so that results are returned quicker."
 msgstr ""
 
-#: search.c:1038 search.c:1132
+#: search.c:1026 search.c:1120
 #, c-format
 msgid "Phase 1 searching %s"
 msgstr ""
 
-#: search.c:1338
+#: search.c:1326
 #, c-format
 msgid "Phase 2 searching %s"
 msgstr ""
 
-#: search.c:1253
+#: search.c:1241
 msgid "Phase 2 starting..."
 msgstr ""
 
@@ -959,7 +1009,7 @@ msgid ""
 "Once complete, press OK to store the executables."
 msgstr ""
 
-#: savestate.c:1684
+#: savestate.c:1661
 msgid "Please email all debug text to cottrela@users.sf.net.\n"
 msgstr ""
 
@@ -1010,7 +1060,7 @@ msgstr ""
 msgid "Prompt before saving state"
 msgstr ""
 
-#: savestate.c:798
+#: savestate.c:772
 msgid "Ready"
 msgstr ""
 
@@ -1042,21 +1092,21 @@ msgstr ""
 msgid "Restrict depth:"
 msgstr ""
 
-#: systemio.c:604
+#: systemio.c:618
 #, c-format
 msgid ""
 "Run configuration to set default directory/folder browser:\n"
 "\"%s\""
 msgstr ""
 
-#: systemio.c:591
+#: systemio.c:605
 #, c-format
 msgid ""
 "Run configuration to set default text editor:\n"
 "\"%s\""
 msgstr ""
 
-#: systemio.c:578
+#: systemio.c:592
 #, c-format
 msgid ""
 "Run configuration to set default web-browser:\n"
@@ -1119,7 +1169,7 @@ msgstr ""
 msgid "Searching for system files, please wait..."
 msgstr ""
 
-#: search.c:873
+#: search.c:861
 #, c-format
 msgid "Searchmonkey : search in %s/"
 msgstr ""
@@ -1160,7 +1210,7 @@ msgstr ""
 msgid "Show _Toolbar"
 msgstr ""
 
-#: savestate.c:637
+#: savestate.c:611
 msgid "Size"
 msgstr ""
 
@@ -1256,11 +1306,11 @@ msgstr ""
 msgid "Translated by"
 msgstr ""
 
-#: savestate.c:646
+#: savestate.c:620
 msgid "Type"
 msgstr ""
 
-#: search.c:1661
+#: search.c:1649
 msgid "Unknown"
 msgstr ""
 
@@ -1402,18 +1452,6 @@ msgstr ""
 msgid "\\n"
 msgstr ""
 
-#: callbacks.c:1019
-msgid "_(Entry)"
-msgstr ""
-
-#: callbacks.c:1024
-msgid "_(Repeat)"
-msgstr ""
-
-#: callbacks.c:1014
-msgid "_(Type)"
-msgstr ""
-
 #: interface.c:719
 msgid "_Containing:"
 msgstr ""
@@ -1502,16 +1540,16 @@ msgstr ""
 msgid "_View"
 msgstr ""
 
-#: savestate.c:1761
+#: savestate.c:1738
 msgid "case sensitive; "
 msgstr ""
 
-#: savestate.c:1770
+#: savestate.c:1747
 #, c-format
 msgid "display %d extra lines around match; "
 msgstr ""
 
-#: savestate.c:1767
+#: savestate.c:1744
 msgid "display 1 extra line around match; "
 msgstr ""
 
@@ -1523,11 +1561,11 @@ msgstr ""
 msgid "http://searchmonkey.embeddediq.com/index.php/support"
 msgstr ""
 
-#: callbacks.c:1213
+#: callbacks.c:1212
 msgid "http://searchmonkey.embeddediq.com/index.php/support/index"
 msgstr ""
 
-#: callbacks.c:763
+#: callbacks.c:762
 msgid ""
 "http://searchmonkey.sourceforge.net/index.php/Regular_expression_builder"
 msgstr ""
@@ -1536,26 +1574,26 @@ msgstr ""
 msgid "http://sourceforge.net/forum/?group_id=175143"
 msgstr ""
 
-#: callbacks.c:1163
+#: callbacks.c:1162
 msgid ""
 "https://sourceforge.net/projects/searchmonkey/files/gSearchmonkey%20GTK"
 "%20%28Gnome%29/0.8.2%20%5Bstable%5D/"
 msgstr ""
 
-#: savestate.c:1789
+#: savestate.c:1766
 msgid "none"
 msgstr ""
 
-#: savestate.c:1783
+#: savestate.c:1760
 #, c-format
 msgid "only showing first %d content matches; "
 msgstr ""
 
-#: savestate.c:1780
+#: savestate.c:1757
 msgid "only showing first content match; "
 msgstr ""
 
-#: savestate.c:1774
+#: savestate.c:1751
 msgid "only showing line numbers; "
 msgstr ""
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.8.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-02 16:50+0100\n"
+"POT-Creation-Date: 2018-02-06 10:43+0100\n"
 "PO-Revision-Date: 2018-02-02 17:38+0100\n"
 "Last-Translator: Stefan Zerkalica <zerkalica@gmail.com>\n"
 "Language-Team: Russian\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: savestate.c:1683
+#: savestate.c:1660
 #, c-format
 msgid ""
 "\n"
@@ -25,7 +25,7 @@ msgstr ""
 "\n"
 "Внутренняя ошибка %d! Невозможно выделить файл - смещение за концом строки.\n"
 
-#: main.c:67
+#: main.c:68
 msgid ""
 "\n"
 "No content searching performed for this file.\n"
@@ -39,44 +39,44 @@ msgstr ""
 "Пожалуйста убедитесь в том, что поиск по содержимому включен и что поисковое "
 "выражение было введено перед началом поиска.\n"
 
-#: savestate.c:1688
+#: savestate.c:1665
 #, c-format
 msgid "  Debug: %d) '%s'\n"
 msgstr " Отладка: %d) '%s'\n"
 
-#: savestate.c:1685
+#: savestate.c:1662
 #, c-format
 msgid "  Debug: fn='%s'\n"
 msgstr " Отладка: fn='%s'\n"
 
-#: savestate.c:1686
+#: savestate.c:1663
 #, c-format
 msgid "  Debug: tc=%d + os=%d || oe=%d\n"
 msgstr " Отладка: tc=%d + os=%d || oe=%d\n"
 
-#: savestate.c:70
+#: savestate.c:44
 #, c-format
 msgid " %s settings auto-generated - Do not edit!"
 msgstr "Автоматически созданы настройки для %s - Не редактировать!"
 
-#: search.c:1731
+#: search.c:1719
 msgid " [cancelled]"
 msgstr " [отменено]"
 
-#: search.c:1724
+#: search.c:1712
 msgid " [inv]"
 msgstr " [инв]"
 
-#: savestate.c:209
+#: savestate.c:183
 msgid " [missing]"
 msgstr " [нет]"
 
-#: search.c:1622
+#: search.c:1610
 #, c-format
 msgid "%1.1f KB"
 msgstr "%1.1f КБ"
 
-#: search.c:1624
+#: search.c:1612
 #, c-format
 msgid "%1.1f MB"
 msgstr "%1.1f МБ"
@@ -86,21 +86,21 @@ msgstr "%1.1f МБ"
 msgid "%d"
 msgstr "%d"
 
-#: search.c:671 search.c:691
+#: search.c:653 search.c:667
 msgid "%d %b %Y"
 msgstr "%b %d %Y"
 
-#: search.c:1620
+#: search.c:1608
 #, c-format
 msgid "%d bytes"
 msgstr "%d байт"
 
-#: search.c:1719
+#: search.c:1707
 #, c-format
 msgid "%d file found"
 msgstr "%d файл найден"
 
-#: search.c:1721
+#: search.c:1709
 #, c-format
 msgid "%d files found"
 msgstr "%d файлов найдено"
@@ -110,45 +110,120 @@ msgstr "%d файлов найдено"
 msgid "%f"
 msgstr "%f"
 
-#: search.c:1141
+#: search.c:1129
 #, c-format
 msgid "%s %s\n"
 msgstr "%s %s\n"
 
-#: systemio.c:1062
+#: systemio.c:1077
 #, c-format
 msgid "%s Error! Unable to duplicate string vector\n"
 msgstr "Ошибка %s! Невозможно клонировать строковый вектор\n"
 
-#: systemio.c:1053
+#: systemio.c:1068
 #, c-format
 msgid "%s Error! Unable to split %s with %c\n"
 msgstr "Ошибка %s! Невозможно соединить %s с %c\n"
 
-#: search.c:1651
+#: search.c:1639
 #, c-format
 msgid "%s-type"
 msgstr "%s-тип"
+
+#: callbacks.c:1018
+#, fuzzy
+msgid "(Entry)"
+msgstr "_(величина)"
+
+#: callbacks.c:1023
+#, fuzzy
+msgid "(Repeat)"
+msgstr "_(повторение)"
+
+#: callbacks.c:1013
+#, fuzzy
+msgid "(Type)"
+msgstr "_(условие)"
 
 #: interface.c:3081
 msgid ","
 msgstr ","
 
-#: savestate.c:1793
+#: savestate.c:1770
 msgid ".\n"
 msgstr ".\n"
 
-#: callbacks.c:1149
+#: callbacks.c:1148
 msgid "0%"
 msgstr "0%"
 
-#: systemio.c:543
+#: systemio.c:557
 msgid "100%"
 msgstr "100%"
 
 #: interface.c:2289
 msgid "<Copy and paste your sample text here>"
 msgstr "<Скопируйте и вставьте текст примера сюда>"
+
+#: search.c:681
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"Dates mismatch ! 'Before than' date must be <i>more recent</i> than 'After "
+"than' date.\n"
+"<b>Search can't proceed correctly !</b>\n"
+"Please check the dates."
+msgstr ""
+
+#: search.c:650
+#, fuzzy
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"Invalid 'After'date - format as dd/mm/yyyy or dd mmm yy."
+msgstr ""
+"Ошибка! Неправильное поле даты 'После'  - формат должен быть в виде mm/dd/"
+"yyyy или mmm dd yy."
+
+#: search.c:664
+#, fuzzy
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."
+msgstr ""
+"Ошибка! Неправильное поле даты 'До'  - формат должен быть в виде mm/dd/yyyy "
+"или mmm dd yy."
+
+#: search.c:630
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"LessThan file size must be <i>positive</i> value\n"
+"So this criteria will not be used.\n"
+"\n"
+"Please, check your entry and the units."
+msgstr ""
+
+#: search.c:614
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"MoreThan file size must be <i>positive</i> value\n"
+"So this criteria will not be used.\n"
+"\n"
+"Please, check your entry and the units."
+msgstr ""
+
+#: search.c:618 search.c:634
+msgid ""
+"<b>Error!</b>\n"
+"\n"
+"MoreThan file size must be <i>stricly inferior</i> to LessThan file size.So "
+"this criteria will not be used.\n"
+"\n"
+"Please, check your entry and the units."
+msgstr ""
 
 #: interface.c:3637
 msgid "<b>Export Source</b>"
@@ -229,20 +304,21 @@ msgid "<b>Warning</b>: Once cleared, history cannot be recovered!"
 msgstr "<b>Внимание:</b> Очищенная история не восстанавливается"
 
 #: interface.c:3866
+#, fuzzy
 msgid ""
 "<i>Regular expression power search utility written in GTK+ and licensed "
-"under Lesser GPL.</i>"
+"under GPL v.3</i>"
 msgstr ""
 "<i>Утилита поиска по регулярным выражением, написана на GTK+ и лицензирована "
 "под Lesser GPL.</i>"
 
-#: systemio.c:184
+#: systemio.c:198
 #, c-format
 msgid ""
 "A file named \"%s\" already exists. Are you sure you want to overwrite it?"
 msgstr "Файл с именем \"%s\" уже существует. Вы хотите его перезаписать ?"
 
-#: search.c:894
+#: search.c:882
 msgid "Aborting research-Searchmonkey"
 msgstr "Отменить поиск- Searchmonkey"
 
@@ -250,7 +326,7 @@ msgstr "Отменить поиск- Searchmonkey"
 msgid "About searchmonkey"
 msgstr "О searchmonkey"
 
-#: savestate.c:171
+#: savestate.c:145
 msgid "About to overwrite save configuration. Do you want to proceed?"
 msgstr "Перезаписать настройки, продолжать ?"
 
@@ -300,7 +376,7 @@ msgstr "Любой из этих символов"
 msgid "Any text character"
 msgstr "Любой символ текста"
 
-#: callbacks.c:1177
+#: callbacks.c:1176
 msgid ""
 "Are you sure that you wish to delete the config file, and restart "
 "searchmonkey?"
@@ -308,7 +384,7 @@ msgstr ""
 "Вы уверены, что хотите удалить файл конфигурации и перезапустить "
 "searchmonkey?"
 
-#: systemio.c:789
+#: systemio.c:804
 #, c-format
 msgid ""
 "Are you sure you want to delete:\n"
@@ -353,11 +429,11 @@ msgstr "Открыть файловую систему и выбрать пап�
 msgid "C_ancel"
 msgstr "_Отмена"
 
-#: systemio.c:829
+#: systemio.c:845
 msgid "Cannot copy full file name as name was not selected."
 msgstr "Невозможно скопировать полное имя файла. Имя не было выбрано."
 
-#: systemio.c:766
+#: systemio.c:781
 msgid "Cannot delete file as name was not selected."
 msgstr "Невозможно удать файл - не было выбрано имя."
 
@@ -401,7 +477,7 @@ msgstr "Очистить историю"
 msgid "Configuration"
 msgstr "Конфигурация"
 
-#: savestate.c:105
+#: savestate.c:79
 msgid ""
 "Configuration files are for a different version of Searchmonkey. This may "
 "cause errors. Delete old configuration files?"
@@ -421,7 +497,7 @@ msgstr " Импорт содержимого"
 msgid "Containing:"
 msgstr "Содержащие:"
 
-#: callbacks.c:1108
+#: callbacks.c:1107
 msgid "Context Expression Wizard"
 msgstr "Мастер выражений для содержимого"
 
@@ -486,7 +562,7 @@ msgstr "Удаляет существующую строку из  таблиц�
 msgid "Desktop search to replace find and grep."
 msgstr "Поиск для рабочего стола на замену find и grep."
 
-#: regexwizard.c:88
+#: regexwizard.c:100
 msgid "Did not match any."
 msgstr "Нет соответвий."
 
@@ -528,69 +604,49 @@ msgstr ""
 msgid "End of row separator:"
 msgstr "Конец разделителя строк:"
 
-#: savestate.c:187
+#: savestate.c:161
 #, c-format
 msgid "Error saving %s: %s\n"
 msgstr "Ошибка сохранения %s: %s\n"
 
-#: search.c:666
-msgid "Error! Invalid 'After' date - format as dd/mm/yyyy or dd mmm yy."
-msgstr ""
-"Ошибка! Неправильное поле даты 'После'  - формат должен быть в виде mm/dd/"
-"yyyy или mmm dd yy."
-
-#: search.c:686
-msgid "Error! Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."
-msgstr ""
-"Ошибка! Неправильное поле даты 'До'  - формат должен быть в виде mm/dd/yyyy "
-"или mmm dd yy."
-
-#: callbacks.c:1612
+#: callbacks.c:1611
 msgid "Error! Invalid 'containing text' regular expression"
 msgstr "Ошибка! Неправильное регулярное выражение для 'содержимого'"
 
-#: callbacks.c:1588
+#: callbacks.c:1587
 msgid "Error! Invalid 'file name' regular expression"
 msgstr "Ошибка! Неправильное регулярное выражение для 'имени файла'"
 
-#: misc.c:255 search.c:857
+#: misc.c:298 search.c:845
 msgid "Error! Invalid Containing Text regular expression"
 msgstr "Ошибка! Регулярное выражение для содержимого ошибочно."
 
-#: misc.c:245 search.c:851
+#: misc.c:288 search.c:839
 msgid "Error! Invalid File Name regular expression"
 msgstr "Ошибка! Регулярное выражение имени файла задано не верно."
 
-#: search.c:646
-msgid "Error! LessThan file size must be positive value"
-msgstr "Ошибка! Значение поля 'Меньше чем' должно быть положительным"
-
-#: misc.c:455 search.c:832
+#: misc.c:509 search.c:820
 msgid "Error! Look In directory cannot be blank."
 msgstr "Ошибка! Каталог поиска  не может быть пустым."
 
-#: misc.c:466 search.c:843
+#: misc.c:520 search.c:831
 msgid "Error! Look In directory is invalid."
 msgstr "Ошибка! Каталог поиска задан не верно."
 
-#: search.c:628
-msgid "Error! MoreThan file size must be positive value"
-msgstr "Ошибка! Значение поля 'Больше чем' должно быть положительным"
-
-#: systemio.c:296 systemio.c:405
+#: systemio.c:310 systemio.c:419
 msgid "Error! No valid file selected."
 msgstr "Ошибка! Не было выбрано правильных файлов."
 
-#: systemio.c:373
+#: systemio.c:387
 msgid "Error! Unable to find first combo entry. Is drop down list blank?"
 msgstr "Ошибка! Невозможно найти первую область. Выпадающий список пуст?"
 
-#: callbacks.c:1183
+#: callbacks.c:1182
 #, c-format
 msgid "Error! Unable to remove config file %s.\n"
 msgstr "Ошибка! Невозможно удалить файл конфигурации %s.\n"
 
-#: systemio.c:349
+#: systemio.c:363
 msgid ""
 "Error! You must select at least one entry in order to save drop down list."
 msgstr ""
@@ -629,7 +685,7 @@ msgstr ""
 msgid "Extras"
 msgstr "Дополнения"
 
-#: callbacks.c:1106
+#: callbacks.c:1105
 msgid "File Expression Wizard"
 msgstr "Мастер выражений для файла"
 
@@ -650,19 +706,19 @@ msgstr "Выбраный файл"
 msgid "File explorer attributes: %f=filename, %d=directory"
 msgstr "Атрибуты файлового менеджера: %f=имя файла, %d=папка"
 
-#: systemio.c:96
+#: systemio.c:110
 msgid "File name"
 msgstr "Имя файла"
 
-#: systemio.c:98
+#: systemio.c:112
 msgid "File size"
 msgstr "Размер файла"
 
-#: systemio.c:99
+#: systemio.c:113
 msgid "File type"
 msgstr "Тип файла"
 
-#: systemio.c:275
+#: systemio.c:289
 msgid "File was empty/invalid."
 msgstr "Файл был пустым/поврежденным."
 
@@ -699,12 +755,12 @@ msgstr "Спрашивать перед сохранением настроек.
 msgid "Force single window mode"
 msgstr "Форсировать однооконный режим"
 
-#: regexwizard.c:92
+#: regexwizard.c:104
 #, c-format
 msgid "Found %d matches."
 msgstr "Найдено %d соответвий."
 
-#: regexwizard.c:90
+#: regexwizard.c:102
 msgid "Found 1 match."
 msgstr "Найдено 1 соответвие."
 
@@ -744,7 +800,7 @@ msgstr ""
 msgid "Ignore hidden files (Unix filesystems only)"
 msgstr "Игнорировать скрытые файлы (только файловая система Unix)"
 
-#: systemio.c:442
+#: systemio.c:456
 #, c-format
 msgid ""
 "Illegal escape sequence: '\\%c'.\n"
@@ -765,7 +821,7 @@ msgstr "Импортировать выражение..."
 msgid "Import a file identical to that generated by the export command."
 msgstr "Импортировать файл, идентичный созданному командой экспорта"
 
-#: systemio.c:460
+#: systemio.c:474
 #, c-format
 msgid ""
 "Input string expands into non ASCII, or multi-byte key sequence: '%s'.\n"
@@ -774,7 +830,7 @@ msgstr ""
 "Строка ввода расширена в не ASCII или много-байтовое представление: '%s'.\n"
 " Пожалуйста используйте безопасные ASCII символы"
 
-#: callbacks.c:756
+#: callbacks.c:755
 msgid "Internal Error! Unable to find calling wizard type!"
 msgstr "Внутренняя ошибка! невозможно найти тип вызываемого мастера"
 
@@ -812,7 +868,7 @@ msgstr "Ограничить соотвествие файлов"
 msgid "Limit files found by selecting maximum tree-depth to search."
 msgstr "Ограничить кол-во найденых файлов максимальной глубиной дерева поиска."
 
-#: savestate.c:1640 savestate.c:1704
+#: savestate.c:1617 savestate.c:1681
 #, c-format
 msgid "Line Number: %d\n"
 msgstr "Строка номер: %d\n"
@@ -825,7 +881,7 @@ msgstr "Строка показано:"
 msgid "List of file(s) corresponding to research criteria."
 msgstr "Список файл(ов), соответствующих критериям поиска"
 
-#: savestate.c:628 savestate.c:1415 systemio.c:97
+#: savestate.c:602 savestate.c:1389 systemio.c:111
 msgid "Location"
 msgstr "Путь"
 
@@ -845,7 +901,7 @@ msgstr "Регистрозавимость"
 msgid "Match strings within binary files too"
 msgstr "Строки результатов у бинарных файлов"
 
-#: savestate.c:664
+#: savestate.c:638
 msgid "Matches"
 msgstr "Соответствий"
 
@@ -865,11 +921,11 @@ msgstr "Mb"
 msgid "Minimum filesize in kBytes/mBytes/gBytes."
 msgstr "Миинимальный размер файла в кБайтах/мб/гб"
 
-#: savestate.c:655
+#: savestate.c:629
 msgid "Modified"
 msgstr "Изменено"
 
-#: systemio.c:100
+#: systemio.c:114
 msgid "Modified date"
 msgstr "Дата модификации"
 
@@ -889,7 +945,7 @@ msgstr "Изменить"
 msgid "More than:"
 msgstr "Больше чем:"
 
-#: systemio.c:472
+#: systemio.c:486
 #, c-format
 msgid ""
 "Multi-byte string entered: '%s'.\n"
@@ -898,11 +954,11 @@ msgstr ""
 "Введена мультибайтовая строка: '%s'.\n"
 " Обрезаются экстра-символы (%c)"
 
-#: main.c:69
+#: main.c:70
 msgid "N/A"
 msgstr "Н/Д"
 
-#: savestate.c:619
+#: savestate.c:593
 msgid "Name"
 msgstr "Имя"
 
@@ -910,7 +966,7 @@ msgstr "Имя"
 msgid "New Instance"
 msgstr "Копия"
 
-#: systemio.c:165
+#: systemio.c:179
 msgid "No results to save!"
 msgstr "Нет результатов для сохранения!"
 
@@ -942,7 +998,7 @@ msgstr "Открывает диалог для указания каталога
 msgid "Options"
 msgstr "Настройки"
 
-#: savestate.c:1746
+#: savestate.c:1723
 msgid "Options: "
 msgstr "Настройки:"
 
@@ -950,7 +1006,7 @@ msgstr "Настройки:"
 msgid "P_rint Setup..."
 msgstr "Настройка _Печати"
 
-#: savestate.c:1638
+#: savestate.c:1615
 #, c-format
 msgid "Paragraph Number: %d\n"
 msgstr "номер абзаца: %d\n"
@@ -973,17 +1029,17 @@ msgid ""
 msgstr ""
 "Немедленно начинать поиск в содержимом, результаты появятся незамедлительно"
 
-#: search.c:1038 search.c:1132
+#: search.c:1026 search.c:1120
 #, c-format
 msgid "Phase 1 searching %s"
 msgstr "Фаза 1 поиск %s"
 
-#: search.c:1338
+#: search.c:1326
 #, c-format
 msgid "Phase 2 searching %s"
 msgstr "Фаза 2 поиск %s"
 
-#: search.c:1253
+#: search.c:1241
 msgid "Phase 2 starting..."
 msgstr "Фаза 2 запуск..."
 
@@ -1013,7 +1069,7 @@ msgstr ""
 "\n"
 "После завершения нажмите OK для сохраниения результатов."
 
-#: savestate.c:1684
+#: savestate.c:1661
 msgid "Please email all debug text to cottrela@users.sf.net.\n"
 msgstr "Пожалуйста, пошлите отладочный текст на емейл cottrela@users.sf.net\n"
 
@@ -1081,7 +1137,7 @@ msgstr "Спрашивать перед удалением файлов"
 msgid "Prompt before saving state"
 msgstr "Спрашивать перед сохранением"
 
-#: savestate.c:798
+#: savestate.c:772
 msgid "Ready"
 msgstr "Готов"
 
@@ -1113,7 +1169,7 @@ msgstr "Сбросить условия поиска размер и дату и
 msgid "Restrict depth:"
 msgstr "Ограничить глубину:"
 
-#: systemio.c:604
+#: systemio.c:618
 #, c-format
 msgid ""
 "Run configuration to set default directory/folder browser:\n"
@@ -1122,7 +1178,7 @@ msgstr ""
 "Настройте проводник по-умолчанию:\n"
 " \"%s\""
 
-#: systemio.c:591
+#: systemio.c:605
 #, c-format
 msgid ""
 "Run configuration to set default text editor:\n"
@@ -1131,7 +1187,7 @@ msgstr ""
 "Настройте текстовый редактор по-умолчанию:\n"
 " \"%s\""
 
-#: systemio.c:578
+#: systemio.c:592
 #, c-format
 msgid ""
 "Run configuration to set default web-browser:\n"
@@ -1196,7 +1252,7 @@ msgstr "Прогресс поиска."
 msgid "Searching for system files, please wait..."
 msgstr "Поиск системных файлов..."
 
-#: search.c:873
+#: search.c:861
 #, c-format
 msgid "Searchmonkey : search in %s/"
 msgstr "searchmonkey : искать в %s"
@@ -1237,7 +1293,7 @@ msgstr "Показать строку _статуса"
 msgid "Show _Toolbar"
 msgstr "Показать _Панель"
 
-#: savestate.c:637
+#: savestate.c:611
 msgid "Size"
 msgstr "Размер"
 
@@ -1344,11 +1400,11 @@ msgstr ""
 msgid "Translated by"
 msgstr "Переведено"
 
-#: savestate.c:646
+#: savestate.c:620
 msgid "Type"
 msgstr "Тип"
 
-#: search.c:1661
+#: search.c:1649
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -1501,18 +1557,6 @@ msgstr "\\\""
 msgid "\\n"
 msgstr "\\n"
 
-#: callbacks.c:1019
-msgid "_(Entry)"
-msgstr "_(величина)"
-
-#: callbacks.c:1024
-msgid "_(Repeat)"
-msgstr "_(повторение)"
-
-#: callbacks.c:1014
-msgid "_(Type)"
-msgstr "_(условие)"
-
 #: interface.c:719
 msgid "_Containing:"
 msgstr "_Содержащие:"
@@ -1601,16 +1645,16 @@ msgstr "_Руководство пользователя"
 msgid "_View"
 msgstr "_Просмотреть"
 
-#: savestate.c:1761
+#: savestate.c:1738
 msgid "case sensitive; "
 msgstr "регистрозависимый; "
 
-#: savestate.c:1770
+#: savestate.c:1747
 #, c-format
 msgid "display %d extra lines around match; "
 msgstr "показывать %d лишних строк вокруг соответвия; "
 
-#: savestate.c:1767
+#: savestate.c:1744
 msgid "display 1 extra line around match; "
 msgstr "показывать 1 лишнюю строку вокруг соответвия; "
 
@@ -1622,11 +1666,11 @@ msgstr "http://searchmonkey.embeddediq.com/index.php/contribute"
 msgid "http://searchmonkey.embeddediq.com/index.php/support"
 msgstr "http://searchmonkey.embeddediq.com/index.php/support"
 
-#: callbacks.c:1213
+#: callbacks.c:1212
 msgid "http://searchmonkey.embeddediq.com/index.php/support/index"
 msgstr "http://searchmonkey.embeddediq.com/index.php/support/index"
 
-#: callbacks.c:763
+#: callbacks.c:762
 msgid ""
 "http://searchmonkey.sourceforge.net/index.php/Regular_expression_builder"
 msgstr ""
@@ -1636,7 +1680,7 @@ msgstr ""
 msgid "http://sourceforge.net/forum/?group_id=175143"
 msgstr "http://sourceforge.net/forum/?group_id=175143"
 
-#: callbacks.c:1163
+#: callbacks.c:1162
 msgid ""
 "https://sourceforge.net/projects/searchmonkey/files/gSearchmonkey%20GTK"
 "%20%28Gnome%29/0.8.2%20%5Bstable%5D/"
@@ -1644,20 +1688,20 @@ msgstr ""
 "https://sourceforge.net/projects/searchmonkey/files/gSearchmonkey%20GTK"
 "%20%28Gnome%29/0.8.2%20%5Bstable%5D/"
 
-#: savestate.c:1789
+#: savestate.c:1766
 msgid "none"
 msgstr "ничего"
 
-#: savestate.c:1783
+#: savestate.c:1760
 #, c-format
 msgid "only showing first %d content matches; "
 msgstr "показывать только первые %d соответвий"
 
-#: savestate.c:1780
+#: savestate.c:1757
 msgid "only showing first content match; "
 msgstr "показывать только первое соответвие; "
 
-#: savestate.c:1774
+#: savestate.c:1751
 msgid "only showing line numbers; "
 msgstr "показывать только номера строк; "
 
@@ -1681,6 +1725,12 @@ msgstr "Благодарности searchmonkey"
 #: interface.c:2458 interface.c:2507 interface.c:2602
 msgid "that occurs"
 msgstr "и встречается"
+
+#~ msgid "Error! LessThan file size must be positive value"
+#~ msgstr "Ошибка! Значение поля 'Меньше чем' должно быть положительным"
+
+#~ msgid "Error! MoreThan file size must be positive value"
+#~ msgstr "Ошибка! Значение поля 'Больше чем' должно быть положительным"
 
 #~ msgid "-new-tab %f"
 #~ msgstr "-new-tab %f"
