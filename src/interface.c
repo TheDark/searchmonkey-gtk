@@ -996,7 +996,7 @@ create_window1 (void)
   gtk_widget_set_sensitive (afterCalendarBtn, FALSE);
   gtk_tooltips_set_tip (tooltips, afterCalendarBtn, _("Open calendar dialog to choose modified date."), NULL);
 
-  image93 = gtk_image_new_from_icon_name ("calendar", GTK_ICON_SIZE_BUTTON);
+  image93 = gtk_image_new_from_icon_name ("appointment-soon", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image93);
   gtk_container_add (GTK_CONTAINER (afterCalendarBtn), image93);
 beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
@@ -1020,7 +1020,7 @@ beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
   gtk_widget_set_sensitive (beforeCalendarBtn, FALSE);
   gtk_tooltips_set_tip (tooltips, beforeCalendarBtn, _("Open calendar dialog to choose modified date."), NULL);
 
-  image94 = gtk_image_new_from_icon_name ("calendar", GTK_ICON_SIZE_BUTTON);
+  image94 = gtk_image_new_from_icon_name ("appointment-soon", GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (image94);
   gtk_container_add (GTK_CONTAINER (beforeCalendarBtn), image94);
 
