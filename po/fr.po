@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-06 10:43+0100\n"
-"PO-Revision-Date: 2018-02-06 10:28+0100\n"
+"PO-Revision-Date: 2018-02-06 10:58+0100\n"
 "Last-Translator: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language-Team: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language: FR\n"
@@ -132,19 +132,16 @@ msgid "%s-type"
 msgstr "%s-type"
 
 #: callbacks.c:1018
-#, fuzzy
 msgid "(Entry)"
-msgstr "_(Valeur)"
+msgstr "(Valeur)"
 
 #: callbacks.c:1023
-#, fuzzy
 msgid "(Repeat)"
-msgstr "_(Répéter)"
+msgstr "(Répéter)"
 
 #: callbacks.c:1013
-#, fuzzy
 msgid "(Type)"
-msgstr "_(Condition)"
+msgstr "(Condition)"
 
 #: interface.c:3081
 msgid ","
@@ -175,22 +172,32 @@ msgid ""
 "<b>Search can't proceed correctly !</b>\n"
 "Please check the dates."
 msgstr ""
+"<b>Erreur !</b>\n"
+"\n"
+"Confusion dans les dates ! La date du champ 'Avant le' doit être <i>plus "
+"récente</i> que la date du champ 'Après le'.\n"
+"<b>La recherche n'a pu s'effectuer correctement</b>\n"
+"Veuillez vérifier les dates."
 
 #: search.c:650
-#, fuzzy
 msgid ""
 "<b>Error!</b>\n"
 "\n"
 "Invalid 'After'date - format as dd/mm/yyyy or dd mmm yy."
-msgstr "Error! Invalid 'After' date - format as mm/dd/yyyy or mmm dd yy."
+msgstr ""
+"<b>Erreur !</b>\n"
+"\n"
+"Le format du champ 'Après le' doit être sous la forme jj/mm/aa ou jj mm aa."
 
 #: search.c:664
-#, fuzzy
 msgid ""
 "<b>Error!</b>\n"
 "\n"
 "Invalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."
-msgstr "Error! Invalid 'Before' date - format as mm/dd/yyyy or dd mmm yy."
+msgstr ""
+"<b>Erreur !</b>\n"
+"\n"
+"Le format du champ 'Avant le' doit être sous la forme jj/mm/aa ou jj mm aa."
 
 #: search.c:630
 msgid ""
@@ -201,6 +208,12 @@ msgid ""
 "\n"
 "Please, check your entry and the units."
 msgstr ""
+"<b>Erreur !</b>\n"
+"\n"
+"La borne 'Inférieure à'  doit être une valeur <i>positive</i>\n"
+"Par conséquent ce critère ne sera pas utilisé\n"
+"\n"
+"SVP, vérifiez votre saisie et les unités."
 
 #: search.c:614
 msgid ""
@@ -211,6 +224,12 @@ msgid ""
 "\n"
 "Please, check your entry and the units."
 msgstr ""
+"<b>Erreur !</b>\n"
+"\n"
+"La borne 'Supérieure à'  doit être une valeur <i>positive</i>\n"
+"Par conséquent ce critère ne sera pas utilisé\n"
+"\n"
+"SVP, vérifiez votre saisie et les unités."
 
 #: search.c:618 search.c:634
 msgid ""
@@ -221,6 +240,12 @@ msgid ""
 "\n"
 "Please, check your entry and the units."
 msgstr ""
+"<b>Erreur !</b>\n"
+"\n"
+"La valeur du champ 'Supérieure à' doit être <i>strictement inférieure</i> à "
+"celle du champ 'Inférieure à'.\n"
+"Ce critère ne sera donc pas utilisé.\n"
+"SVP, vérifiez votre saisie et les unités."
 
 #: interface.c:3637
 msgid "<b>Export Source</b>"
@@ -304,13 +329,12 @@ msgid "<b>Warning</b>: Once cleared, history cannot be recovered!"
 msgstr "<b>Attention !</b> L' historique sera définitivement effacé !"
 
 #: interface.c:3866
-#, fuzzy
 msgid ""
 "<i>Regular expression power search utility written in GTK+ and licensed "
 "under GPL v.3</i>"
 msgstr ""
 "<i>Utilitaire de recherche performant basé sur les 'expressions régulières', "
-"écrit en GTK+ et sous licence Lesser GPL</i>"
+"écrit en GTK+ et sous licence GPL v.3</i>"
 
 #: systemio.c:198
 #, c-format
