@@ -2240,6 +2240,8 @@ create_testRegExDialog (void)
   gtk_widget_show (labelHeaderTest);
   gtk_label_set_use_markup (GTK_LABEL (labelHeaderTest), TRUE); 
   GtkWidget    *iconHeaderTest = gtk_image_new_from_icon_name ("applications-development", GTK_ICON_SIZE_DIALOG);
+//GtkWidget    *iconHeaderTest = gtk_image_new_from_file (g_strconcat(PACKAGE_DATA_DIR, "/pixmaps/", PACKAGE, "/", 
+  //                             "regex.png", NULL));
     gtk_widget_show(iconHeaderTest);
     gtk_misc_set_padding(GTK_MISC(iconHeaderTest), 0, 2);
     gtk_box_pack_start(GTK_BOX(hbox27), iconHeaderTest, FALSE, FALSE, 2);
@@ -2888,7 +2890,7 @@ create_configDialog (void)
 /* Display Icon in the tab - thanks to old developpers  here ;  http://vim.1045645.n5.nabble.com/Patch-Nicer-notebook-tabs-with-GTK2-td1206288.html */
     GtkWidget   *tab_boxGlobalSettings = gtk_vbox_new(FALSE, 4);
     gtk_widget_show(tab_boxGlobalSettings);
-    GtkWidget    *iconGlobalSettings = gtk_image_new_from_icon_name ("gconf-editor", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    GtkWidget    *iconGlobalSettings = gtk_image_new_from_icon_name ("applications-system", GTK_ICON_SIZE_LARGE_TOOLBAR);
     gtk_widget_show(iconGlobalSettings);
     gtk_misc_set_padding(GTK_MISC(iconGlobalSettings), 0, 2);
     gtk_box_pack_start(GTK_BOX(tab_boxGlobalSettings), iconGlobalSettings, FALSE, FALSE, 2);
@@ -3101,7 +3103,7 @@ create_configDialog (void)
 
     GtkWidget   *tab_boxCSVSettings = gtk_vbox_new(FALSE, 4);
     gtk_widget_show(tab_boxCSVSettings);
-    GtkWidget    *iconCSVSettings = gtk_image_new_from_icon_name ("document-export", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    GtkWidget    *iconCSVSettings = gtk_image_new_from_icon_name ("x-office-spreadsheet", GTK_ICON_SIZE_LARGE_TOOLBAR);
     gtk_widget_show(iconCSVSettings);
     gtk_misc_set_padding(GTK_MISC(iconCSVSettings), 0, 2);
     gtk_box_pack_start(GTK_BOX(tab_boxCSVSettings), iconCSVSettings, FALSE, FALSE, 2);
