@@ -816,7 +816,7 @@ create_window1 (void)
  /* widget button with Pango markups - Luc A Feb 2018 */
   gchar *sUtf8;
   GtkWidget *labelRegexWizardFile = gtk_label_new(NULL);
-  sUtf8 = g_locale_to_utf8(_("<span foreground=\"#670099\"><b>Reg</b></span><span foreground=\"#FF6600\"><b>Ex</b></span> Expression Builder..."),
+  sUtf8 = g_locale_to_utf8(_("<span face=\"Arial\" foreground=\"#670099\"><b>Reg</b></span><span face=\"Arial\" foreground=\"#FF6600\"><b>Ex</b></span> Expression Builder..."),
         -1, NULL, NULL, NULL);
   gtk_label_set_markup(GTK_LABEL(labelRegexWizardFile), sUtf8);
   g_free(sUtf8);
@@ -845,7 +845,7 @@ create_window1 (void)
                        _("Please, type here a word or a segment of a word researched in the file(s).\nDon't type spaces."), NULL);/* Luc A - 3 janv 2018 */
 /* pango label - Luc A feb 2018 */
   GtkWidget *labelRegexWizardContainingText = gtk_label_new(NULL);
-  sUtf8 = g_locale_to_utf8(_("<span foreground=\"#670099\"><b>Reg</b></span><span foreground=\"#FF6600\"><b>Ex</b></span> Expression Builder..."),
+  sUtf8 = g_locale_to_utf8(_("<span face=\"Arial\"foreground=\"#670099\"><b>Reg</b></span><span face=\"Arial\"foreground=\"#FF6600\"><b>Ex</b></span> Expression Builder..."),
         -1, NULL, NULL, NULL);
   gtk_label_set_markup(GTK_LABEL(labelRegexWizardContainingText), sUtf8);
   g_free(sUtf8);
