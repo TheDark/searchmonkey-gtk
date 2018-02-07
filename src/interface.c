@@ -813,7 +813,7 @@ create_window1 (void)
   GTK_WIDGET_SET_FLAGS (fileName, GTK_CAN_FOCUS);
   gtk_tooltips_set_tip (tooltips, fileName,
                        _("Please, type here the name or a segment of the name of the file(s).\nDon't type spaces."), NULL);/* Luc A - 3 janv 2018 */
-  regExpWizard1 = gtk_button_new_with_mnemonic (_("Expression Builder..."));
+  regExpWizard1 = gtk_button_new_with_mnemonic (_("RegEx Expression Builder..."));
   gtk_widget_show (regExpWizard1);
   gtk_box_pack_start (GTK_BOX (fileNameHbox), regExpWizard1, FALSE, FALSE, 5);
   gtk_tooltips_set_tip (tooltips, regExpWizard1, _("Use the wizard to create a file name regular expression..."), NULL);
@@ -833,7 +833,7 @@ create_window1 (void)
   GTK_WIDGET_SET_FLAGS (containingText, GTK_CAN_FOCUS);
   gtk_tooltips_set_tip (tooltips, containingText,
                        _("Please, type here a word or a segment of a word researched in the file(s).\nDon't type spaces."), NULL);/* Luc A - 3 janv 2018 */
-  regExpWizard2 = gtk_button_new_with_mnemonic (_("Expression Builder..."));
+  regExpWizard2 = gtk_button_new_with_mnemonic (_("RegEx Expression Builder..."));
   gtk_widget_show (regExpWizard2);
   gtk_box_pack_start (GTK_BOX (containingTextHbox), regExpWizard2, FALSE, FALSE, 5);
   gtk_tooltips_set_tip (tooltips, regExpWizard2, _("Use the wizard to create a containing text regular expression..."), NULL);
