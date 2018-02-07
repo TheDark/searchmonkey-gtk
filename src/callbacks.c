@@ -1515,9 +1515,20 @@ void
 on_dosExpressionRadioFile_clicked      (GtkButton       *button,
                                         gpointer         user_data)
 {
+  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(GTK_WIDGET(button), "statusbar1"));
+
+
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
     changeModel(GTK_WIDGET(button), "regex", "noregex");
   }
+  gtk_statusbar_pop(statusbar, STATUSBAR_CONTEXT_ID(statusbar));  
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(button, "dosExpressionRadioFile"))))
+    {        
+        gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
+                     _("research mode with jokers(DOS like)"));
+    }
+  else  gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
+                     _("research mode with RegEx")); 
 }
 
 
