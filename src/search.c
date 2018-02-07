@@ -1700,7 +1700,7 @@ void updateStatusFilesFound(const gsize matchCount, statusbarData *status, searc
 {
   GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(mSearchControl->widget, "statusbar1"));
   gboolean stopSearch;
-  
+
   /* Update statusbar with new data */
   gdk_threads_enter();
   if (matchCount == 1) {
@@ -1718,7 +1718,14 @@ void updateStatusFilesFound(const gsize matchCount, statusbarData *status, searc
   if (stopSearch == TRUE) {
     g_strlcat(status->constantString, _(" [cancelled]"), MAX_FILENAME_STRING);
   }
-  
+
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(mSearchControl->widget, "dosExpressionRadioFile"))))
+    {
+        g_strlcat(status->constantString, _("-research mode with jokers(DOS like)"), MAX_FILENAME_STRING);
+       
+    }
+  else g_strlcat(status->constantString, _("-research mode with RegEx"), MAX_FILENAME_STRING);
+   
   gtk_statusbar_pop(statusbar, STATUSBAR_CONTEXT_ID(statusbar));
   gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
                      status->constantString);

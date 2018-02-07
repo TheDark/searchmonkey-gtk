@@ -767,9 +767,15 @@ void realize_statusbar (GtkWidget *widget)
 {
   statusbarData *status;
   GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(widget, "statusbar1"));
-  
   status = g_object_get_data(G_OBJECT(mainWindowApp), MASTER_STATUSBAR_DATA);
-  g_sprintf(status->constantString, _("Ready"));
+  /* we get the research mode - Luc A Feb 2018 */
+
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(widget, "dosExpressionRadioFile"))))
+    {
+        g_sprintf(status->constantString, _("Ready-research mode with jokers(DOS like)"));
+    }
+  else   g_sprintf(status->constantString, _("Ready-research mode with RegEx"));
+
   gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar), status->constantString);
 }
 
