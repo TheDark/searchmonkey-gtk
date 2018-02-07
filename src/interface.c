@@ -813,8 +813,18 @@ create_window1 (void)
   GTK_WIDGET_SET_FLAGS (fileName, GTK_CAN_FOCUS);
   gtk_tooltips_set_tip (tooltips, fileName,
                        _("Please, type here the name or a segment of the name of the file(s).\nDon't type spaces."), NULL);/* Luc A - 3 janv 2018 */
-  regExpWizard1 = gtk_button_new_with_mnemonic (_("RegEx Expression Builder..."));
+ /* widget button with Pango markups - Luc A Feb 2018 */
+  gchar *sUtf8;
+  GtkWidget *labelRegexWizardFile = gtk_label_new(NULL);
+  sUtf8 = g_locale_to_utf8(_("<span foreground=\"#670099\"><b>Reg</b></span><span foreground=\"#FF6600\"><b>Ex</b></span> Expression Builder..."),
+        -1, NULL, NULL, NULL);
+  gtk_label_set_markup(GTK_LABEL(labelRegexWizardFile), sUtf8);
+  g_free(sUtf8);
+  gtk_widget_show(labelRegexWizardFile );
+  regExpWizard1 = gtk_button_new ();
   gtk_widget_show (regExpWizard1);
+  gtk_container_add(GTK_CONTAINER(regExpWizard1),labelRegexWizardFile);
+/* end pango button */
   gtk_box_pack_start (GTK_BOX (fileNameHbox), regExpWizard1, FALSE, FALSE, 5);
   gtk_tooltips_set_tip (tooltips, regExpWizard1, _("Use the wizard to create a file name regular expression..."), NULL);
 
@@ -833,8 +843,18 @@ create_window1 (void)
   GTK_WIDGET_SET_FLAGS (containingText, GTK_CAN_FOCUS);
   gtk_tooltips_set_tip (tooltips, containingText,
                        _("Please, type here a word or a segment of a word researched in the file(s).\nDon't type spaces."), NULL);/* Luc A - 3 janv 2018 */
-  regExpWizard2 = gtk_button_new_with_mnemonic (_("RegEx Expression Builder..."));
+/* pango label - Luc A feb 2018 */
+  GtkWidget *labelRegexWizardContainingText = gtk_label_new(NULL);
+  sUtf8 = g_locale_to_utf8(_("<span foreground=\"#670099\"><b>Reg</b></span><span foreground=\"#FF6600\"><b>Ex</b></span> Expression Builder..."),
+        -1, NULL, NULL, NULL);
+  gtk_label_set_markup(GTK_LABEL(labelRegexWizardContainingText), sUtf8);
+  g_free(sUtf8);
+  gtk_widget_show(labelRegexWizardContainingText );
+  regExpWizard2 = gtk_button_new ();  
   gtk_widget_show (regExpWizard2);
+  gtk_container_add(GTK_CONTAINER(regExpWizard2),labelRegexWizardContainingText);
+/* end pango button label */
+
   gtk_box_pack_start (GTK_BOX (containingTextHbox), regExpWizard2, FALSE, FALSE, 5);
   gtk_tooltips_set_tip (tooltips, regExpWizard2, _("Use the wizard to create a containing text regular expression..."), NULL);
 /* added by Luc A. 29 dec 2017 */
