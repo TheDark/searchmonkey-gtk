@@ -869,8 +869,53 @@ gboolean g_file_get_contents2 (const gchar *filename,
 {
   gboolean retVal;
   gchar *retContents;
+  gsize bytes_read;
+  gsize bytes_written;
+  gchar *charset;
   
   retVal = g_file_get_contents(filename, contents, length, error);
+  /* now me must check if is it a valid UTF8 string ! Luc A Feb 2018 */
+  if (g_utf8_validate (*contents, *length, NULL)){
+                 printf( "fichier %s valid UTF-8, no conversion needed \n", filename);
+      }
+  else {/* the text isn't encoded in UTF8 - Luc A deb 2018 */
+         printf( "fichier %s INvalid UTF-8, conversion needed !!!\n", filename);
+         /* we're trying to get a valid charset */
+         /*  encoding = "ISO-8859-15" by default */
+         retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "ISO-8859-1",
+                                           NULL, &bytes_read, &bytes_written, error);
+
+         if (retContents == NULL) {
+             *contents = NULL;
+             *length = 0;
+             retVal = FALSE;
+             printf("impossible de réencoder le fichier %s en ISO \n", filename);
+             /* then we attempt a conversion FROM Utf16 to utf8 */
+             retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "UTF-16",
+                                           NULL, &bytes_read, &bytes_written, error);
+             if (retContents == NULL) {
+                  *contents = NULL;
+                  *length = 0;
+                  retVal = FALSE;
+                  printf("impossible de réencoder le fichier %s en UTF16 \n", filename);
+                }
+             else {
+                    printf("réussi enconde vers UTF16 de %s \n", filename);
+                    g_free(*contents);    
+                    *contents = retContents;
+                    *length = bytes_written;
+                    retVal = TRUE;
+                  }
+            } 
+         else {
+                g_free(*contents);
+                printf("réussi enconde vers ISO 8859 de %s \n", filename);
+                *contents = retContents;
+                *length = bytes_written;
+                retVal = TRUE;
+              }/* if ISO 8859 OK */
+         /* in other cases, we return Error - i.e empry string */
+       }/* else NOT UTF8 */
   // printf("++++ je suis dans g_file_contents2() ****\n");
   return retVal;
   /* Remove unknown ASCII */

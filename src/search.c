@@ -1342,6 +1342,8 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
     /* in 'contents" string variable we have the content read from file */
     if (g_file_get_contents2(tmpFileName, &contents, &length, NULL)) {
       /* Try to get a match line 954*/
+ 
+
       if (getAllMatches(mSearchData, contents, length, &search, fIsOffice)) {
         
         /* get full filename pointer */
