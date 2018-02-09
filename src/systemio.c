@@ -30,6 +30,13 @@ const gchar *G_EXE_LIST[G_EXE_LIST_MAX_DEPTH][G_EXE_LIST_MAX_WIDTH] = {
   {"nautilus", "iexplore", NULL}
 };
 
+/* thanks to : https://unicodebook.readthedocs.io/guess_encoding.html Luc A feb 2018*/
+const char *UTF_16_BE_BOM = "\xFE\xFF";
+const char *UTF_16_LE_BOM = "\xFF\xFE";
+const char *UTF_8_BOM = "\xEF\xBB\xBF";
+const char *UTF_32_BE_BOM = "\x00\x00\xFE\xFF";
+const char *UTF_32_LE_BOM = "\xFF\xFE\x00\x00";
+
 
 /* *********************************
    function to get a valid file name
@@ -849,7 +856,26 @@ void copyFile(GtkWidget *widget)
   }  
 }
 
-
+gint check_bom(const char *data, size_t size)
+{
+    if (size >= 3) {
+        if (memcmp(data, UTF_8_BOM, 3) == 0)
+            return 1;
+    }
+    if (size >= 4) {
+        if (memcmp(data, UTF_32_LE_BOM, 4) == 0)
+            return 2;/*"UTF-32-LE";*/
+        if (memcmp(data, UTF_32_BE_BOM, 4) == 0)
+            return 2;/*"UTF-32-BE";*/
+    }
+    if (size >= 2) {
+        if (memcmp(data, UTF_16_LE_BOM, 2) == 0)
+            return 4;/*"UTF-16-LE";*/
+        if (memcmp(data, UTF_16_BE_BOM, 2) == 0)
+            return 4;/*"UTF-16-BE";*/
+    }
+    return 0;
+}
 
 /*
  * internal helper: Wrapper function for g_file_get_contents()
@@ -872,48 +898,75 @@ gboolean g_file_get_contents2 (const gchar *filename,
   gsize bytes_read;
   gsize bytes_written;
   gchar *charset;
+  gint sBOM;
   
   retVal = g_file_get_contents(filename, contents, length, error);
   /* now me must check if is it a valid UTF8 string ! Luc A Feb 2018 */
+ 
   if (g_utf8_validate (*contents, *length, NULL)){
-                 printf( "fichier %s valid UTF-8, no conversion needed \n", filename);
+                return TRUE;
       }
-  else {/* the text isn't encoded in UTF8 - Luc A deb 2018 */
-         printf( "fichier %s INvalid UTF-8, conversion needed !!!\n", filename);
+  else{/* the text isn't encoded in UTF8 - Luc A deb 2018 */
+         sBOM= check_bom(*contents,(intptr_t)length );
          /* we're trying to get a valid charset */
+         /* if sBOM == NULL then isn't a UTF string, thus probablu an ISO */
          /*  encoding = "ISO-8859-15" by default */
-         retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "ISO-8859-1",
+         switch(sBOM)
+         {
+          case 0:
+          {
+             retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "ISO-8859-1",
                                            NULL, &bytes_read, &bytes_written, error);
-
-         if (retContents == NULL) {
-             *contents = NULL;
-             *length = 0;
-             retVal = FALSE;
-             printf("impossible de réencoder le fichier %s en ISO \n", filename);
-             /* then we attempt a conversion FROM Utf16 to utf8 */
-             retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "UTF-16",
-                                           NULL, &bytes_read, &bytes_written, error);
-             if (retContents == NULL) {
+            if ((retContents == NULL)||(error)) {
                   *contents = NULL;
                   *length = 0;
                   retVal = FALSE;
-                  printf("impossible de réencoder le fichier %s en UTF16 \n", filename);
                 }
              else {
-                    printf("réussi enconde vers UTF16 de %s \n", filename);
+                    g_free(*contents);    
+                    *contents = retContents;
+                    *length = bytes_written;
+                    retVal = TRUE;
+                  }
+            break;
+          }
+         case 2:
+          {
+             retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "UTF-32",
+                                           NULL, &bytes_read, &bytes_written, error);
+
+             if ((retContents == NULL)||(error)) {
+                  *contents = NULL;
+                  *length = 0;
+                  retVal = FALSE;
+                }
+             else {
+                    g_free(*contents);    
+                    *contents = retContents;
+                    *length = bytes_written;
+                    retVal = TRUE;
+                  }
+             break;
+            } 
+          case 4:
+            {
+            
+             retContents = g_convert_with_fallback (*contents, *length, "UTF-8", "UTF-16",
+                                           NULL, &bytes_read, &bytes_written, error);
+
+             if ((retContents == NULL)||(error)) {
+                  *contents = NULL;
+                  *length = 0;
+                  retVal = FALSE;
+                }
+             else {
                     g_free(*contents);    
                     *contents = retContents;
                     *length = bytes_written;
                     retVal = TRUE;
                   }
             } 
-         else {
-                g_free(*contents);
-                printf("réussi enconde vers ISO 8859 de %s \n", filename);
-                *contents = retContents;
-                *length = bytes_written;
-                retVal = TRUE;
-              }/* if ISO 8859 OK */
+         }/* end switch */
          /* in other cases, we return Error - i.e empry string */
        }/* else NOT UTF8 */
   // printf("++++ je suis dans g_file_contents2() ****\n");

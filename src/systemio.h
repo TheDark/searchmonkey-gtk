@@ -25,6 +25,7 @@ typedef struct { /* Internal structure for */
   guint gid; /* GSource ID */
 } userExeData;
 
+
 gchar *GetTempFileName(gchar *fileSchema);
 
 /* CSV related functions */
