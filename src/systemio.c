@@ -37,6 +37,42 @@ const char *UTF_8_BOM = "\xEF\xBB\xBF";
 const char *UTF_32_BE_BOM = "\x00\x00\xFE\xFF";
 const char *UTF_32_LE_BOM = "\xFF\xFE\x00\x00";
 
+/***********************************
+  escape all spaces chars within
+  a path or filename
+  the entry string isn't freed, and a new string is allocated
+  Luc A - feb 2018
+***********************************/
+gchar *remove_spaces(gchar *str)
+{
+ gchar *str2 =NULL;
+ gint i=0;
+ gint j=1;
+ guint car;
+
+ if(strlen(str)==0)
+   return str2;
+ for(i=0;i<=strlen(str);i++)
+   {
+     if(str[i]==' ')
+       {
+         str2 = (gchar*)g_realloc(str2,j*sizeof(gchar));
+         str2[j-1]='\\';
+         j++;
+         str2 = (gchar*)g_realloc(str2,j*sizeof(gchar));
+         str2[j-1]=' ';
+         j++;
+       }
+     else
+       {
+         str2 = (gchar*)g_realloc(str2,j*sizeof(gchar));
+         str2[j-1]=str[i];
+         j++;
+       }
+   } 
+ str2[j-1]='\0';
+ return str2;
+}
 
 /* *********************************
    function to get a valid file name
@@ -635,7 +671,12 @@ gboolean SMsyscall (const gchar *address, syscallType type)
   }
 
   /* Execute the command (replacing %f with filename) */
-  s1 = replaceAttributeString(attributes, address);
+  /* we must escape spaces from filenames - Luc A Feb 2018*/
+  if( type==TEXTEDITOR_LIST)
+    s1 = replaceAttributeString(attributes,(gchar*) remove_spaces(address));
+    else 
+      s1 = replaceAttributeString(attributes, address);
+
   if (s1 != NULL) {
     s2 = g_strconcat(executable, s1, NULL);
     g_free(s1);
