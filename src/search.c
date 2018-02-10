@@ -120,7 +120,7 @@ gchar *PDFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 
     pdf_npages = poppler_document_get_n_pages(doc);
 
-    printf("* This PDF has %d pages *\n", pdf_npages);
+   /* printf("* This PDF has %d pages *\n", pdf_npages);*/
 
     page = poppler_document_get_page(doc, 0);/* #0 = first page */
     if(!page) 
@@ -1157,7 +1157,7 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
           g_ptr_array_add(mSearchData->fileNameArray, g_strdup(tmpFileName));
           g_ptr_array_add(mSearchData->pLocationArray, GET_LAST_PTR(curDirStack));
           matchCount ++;
-          if ((mSearchControl->flags & SEARCH_TEXT_CONTEXT) == 0) {
+          if ((mSearchControl->flags & SEARCH_TEXT_CONTEXT) == 0) { 
             displayQuickMatch(mSearchControl, mSearchData);
           }
         }
@@ -1224,6 +1224,7 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gchar *tmpExtractedFile = NULL; /* the gchar* to switch the filenames if it's an Office File */
   gboolean fDeepSearch = FALSE; /* special flag armed when we search inside complex files like Docx, ODT, PDF ... in order to keep the "true" filename for status bar */
   gboolean fIsOffice=FALSE; /* flag if we found an office style file */
+
 
   
   if (mSearchData->fullNameArray->len > 100) 
@@ -1350,7 +1351,9 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
         newMatch->pFullName = g_ptr_array_index(mSearchData->fullNameArray, i);
         newMatch->pFileName = g_ptr_array_index(mSearchData->fileNameArray, i);
         newMatch->pLocation = g_ptr_array_index(mSearchData->pLocationArray, i);
-        newMatch->fileSize = length;
+        // newMatch->fileSize = length;/* be careful for Office Files */
+        getFileSize(mSearchData, newMatch);/* added by Luc A feb 2018 */
+
         getLength(mSearchData, newMatch);      
         getFileType(mSearchData, newMatch);
         getModified(mSearchData, newMatch);
