@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.8.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-08 15:39+0100\n"
-"PO-Revision-Date: 2018-02-08 15:45+0100\n"
+"PO-Revision-Date: 2018-02-10 09:47+0100\n"
 "Last-Translator: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language-Team: Adam Cottrell <cottrela@users.sf.net>\n"
 "Language: FR\n"
@@ -62,7 +62,7 @@ msgstr "%s configuration auto-générée - Ne pas modifier !"
 
 #: search.c:1719
 msgid " [cancelled]"
-msgstr " [canceled]"
+msgstr " [interrompu]"
 
 #: search.c:1712
 msgid " [inv]"
@@ -847,7 +847,7 @@ msgstr "Style de fichiers Grep(1-entrée, OU chaque ligne)"
 
 #: interface.c:2677
 msgid "Help with the Regular Expression Builder"
-msgstr "Aide avec le constructeur d'Expressions Régulières"
+msgstr "Aide en ligne pour l'assistant d'Expressions RegEX"
 
 #: interface.c:1225
 msgid "Highlights per line :"
