@@ -25,7 +25,7 @@ typedef struct { /* Internal structure for */
   guint gid; /* GSource ID */
 } userExeData;
 
-gchar *remove_spaces(gchar *str);
+gchar *remove_spaces(const gchar *str);
 gchar *GetTempFileName(gchar *fileSchema);
 
 /* CSV related functions */

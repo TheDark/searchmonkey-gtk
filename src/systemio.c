@@ -43,12 +43,11 @@ const char *UTF_32_LE_BOM = "\xFF\xFE\x00\x00";
   the entry string isn't freed, and a new string is allocated
   Luc A - feb 2018
 ***********************************/
-gchar *remove_spaces(gchar *str)
+gchar *remove_spaces(const gchar *str)
 {
  gchar *str2 =NULL;
  gint i=0;
  gint j=1;
- guint car;
 
  if(strlen(str)==0)
    return str2;
