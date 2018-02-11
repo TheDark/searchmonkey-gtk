@@ -21,7 +21,7 @@
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
-    gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
+    g_object_ref (widget), (GDestroyNotify) g_object_unref)
 
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
@@ -226,7 +226,7 @@ create_window1 (void)
   GtkWidget *maxContentHitsSpinResults;
   GtkWidget *label1008;
   GtkWidget *label2;
-  GtkWidget *vseparator8;
+/*  GtkWidget *vseparator8; non used */
   GtkWidget *vbox2;
   GtkWidget *expertUserCheck;
   GtkWidget *playButton1;
@@ -682,7 +682,7 @@ create_window1 (void)
   gtk_widget_show (hbox68);
   gtk_container_add (GTK_CONTAINER (expander1), hbox68);
 
- 
+
 
   searchNotebook = gtk_notebook_new ();
   gtk_widget_show (searchNotebook);
@@ -911,7 +911,7 @@ create_window1 (void)
   //gtk_widget_show (label253);
   //gtk_box_pack_start (GTK_BOX (hbox40), label253, FALSE, FALSE, 0);
 
-  
+
  /* added by Luc A. 29 dec 2017 */
  GtkWidget *hbox1_advanced = gtk_hbox_new (FALSE, 0);
   gtk_widget_show (hbox1_advanced);
@@ -1319,15 +1319,15 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview1), TRUE);
   gtk_widget_show (textview1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), textview1);
   gtk_tooltips_set_tip (tooltips, textview1, _("Displays the matching text lines when the result is selected."), NULL);
+
   gtk_text_view_set_editable (GTK_TEXT_VIEW (textview1), FALSE);
-  gtk_text_view_set_overwrite (GTK_TEXT_VIEW (textview1), TRUE);
+  /* gtk_text_view_set_overwrite (GTK_TEXT_VIEW (textview1), TRUE); don't USE since Overwrite is defauklt, in other cases DSk warnings ! Luc A feb 2018 */
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (textview1), GTK_WRAP_WORD);
- gtk_text_view_set_justification (GTK_TEXT_VIEW (textview1), GTK_JUSTIFY_LEFT);
+  gtk_text_view_set_justification (GTK_TEXT_VIEW (textview1), GTK_JUSTIFY_LEFT);
   gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (textview1), FALSE);
   gtk_text_view_set_pixels_inside_wrap (GTK_TEXT_VIEW (textview1), 5);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (textview1), 5);
   gtk_text_view_set_right_margin (GTK_TEXT_VIEW (textview1), 5);
-
   resultsVPane = gtk_vpaned_new ();
   gtk_box_pack_start (GTK_BOX (vbox1), resultsVPane, TRUE, TRUE, 0);
 
@@ -1355,7 +1355,7 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
   gtk_container_add (GTK_CONTAINER (scrolledwindow16), textview4);
   gtk_tooltips_set_tip (tooltips, textview4, _("Displays the matching text lines when the result is selected."), NULL);
   gtk_text_view_set_editable (GTK_TEXT_VIEW (textview4), FALSE);
-  gtk_text_view_set_overwrite (GTK_TEXT_VIEW (textview4), TRUE);
+  /* gtk_text_view_set_overwrite (GTK_TEXT_VIEW (textview4), TRUE);don't USE since Overwrite is defauklt, in other cases DSk warnings ! Luc A feb 2018 */
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (textview4), GTK_WRAP_WORD);
   gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (textview4), FALSE);
   gtk_text_view_set_pixels_inside_wrap (GTK_TEXT_VIEW (textview4), 5);
@@ -1698,7 +1698,7 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
   GLADE_HOOKUP_OBJECT (window1, menuitem7, "menuitem7");
   GLADE_HOOKUP_OBJECT (window1, menuitem7_menu, "menuitem7_menu");
   GLADE_HOOKUP_OBJECT (window1, contents1, "contents1");
- // GLADE_HOOKUP_OBJECT (window1, support1, "support1");
+  GLADE_HOOKUP_OBJECT (window1, support1, "support1");
   GLADE_HOOKUP_OBJECT (window1, online_release_notes1, "online_release_notes1");
   GLADE_HOOKUP_OBJECT (window1, forums1, "forums1");
   GLADE_HOOKUP_OBJECT (window1, separator1, "separator1");
@@ -1756,9 +1756,10 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
   GLADE_HOOKUP_OBJECT (window1, alignment18, "alignment18");
   GLADE_HOOKUP_OBJECT (window1, hbox40, "hbox40");
   GLADE_HOOKUP_OBJECT (window1, image9, "image9");
-  GLADE_HOOKUP_OBJECT (window1, label253, "label253");
+ /* GLADE_HOOKUP_OBJECT (window1, label253, "label253"); on used */
   GLADE_HOOKUP_OBJECT (window1, folderDepthSpin, "folderDepthSpin");
 //  GLADE_HOOKUP_OBJECT (window1, searchModifierTable, "searchModifierTable");
+
   GLADE_HOOKUP_OBJECT (window1, moreThanEntry, "moreThanEntry");
   GLADE_HOOKUP_OBJECT (window1, lessThanEntry, "lessThanEntry");
   GLADE_HOOKUP_OBJECT (window1, label17, "label17");
@@ -1779,6 +1780,7 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
   GLADE_HOOKUP_OBJECT (window1, hbox62, "hbox62");
   GLADE_HOOKUP_OBJECT (window1, frame1, "frame1");
   GLADE_HOOKUP_OBJECT (window1, vbox47, "vbox47");
+
   GLADE_HOOKUP_OBJECT (window1, notExpressionCheckFile, "notExpressionCheckFile");
   GLADE_HOOKUP_OBJECT (window1, matchCaseCheckFile, "matchCaseCheckFile");
   GLADE_HOOKUP_OBJECT (window1, ignoreHiddenFiles, "ignoreHiddenFiles");
@@ -1813,14 +1815,16 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
   GLADE_HOOKUP_OBJECT (window1, maxContentHitsSpinResults, "maxContentHitsSpinResults");
   GLADE_HOOKUP_OBJECT (window1, label1008, "label1008");
   GLADE_HOOKUP_OBJECT (window1, label2, "label2");
-  GLADE_HOOKUP_OBJECT (window1, vseparator8, "vseparator8");
+
+ /* GLADE_HOOKUP_OBJECT (window1, vseparator8, "vseparator8"); non used */
   GLADE_HOOKUP_OBJECT (window1, vbox2, "vbox2");
+
   GLADE_HOOKUP_OBJECT (window1, expertUserCheck, "expertUserCheck");
   GLADE_HOOKUP_OBJECT (window1, playButton1, "playButton1");
   GLADE_HOOKUP_OBJECT (window1, alignment36, "alignment36");
   GLADE_HOOKUP_OBJECT (window1, hbox67, "hbox67");
   GLADE_HOOKUP_OBJECT (window1, image27, "image27");
-  GLADE_HOOKUP_OBJECT (window1, label1015, "label1015");
+ /* GLADE_HOOKUP_OBJECT (window1, label1015, "label1015"); not used */
   GLADE_HOOKUP_OBJECT (window1, stopButton1, "stopButton1");
   GLADE_HOOKUP_OBJECT (window1, label1016, "label1016");
   GLADE_HOOKUP_OBJECT (window1, resultsHPane, "resultsHPane");
@@ -1837,6 +1841,7 @@ gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
   GLADE_HOOKUP_OBJECT (window1, statusbar1, "statusbar1");
   GLADE_HOOKUP_OBJECT (window1, progressbar1, "progressbar1");
 /* Luc A - janv 2018 */
+
   GLADE_HOOKUP_OBJECT (window1, MoreThanSize, "MoreThanSize");
   GLADE_HOOKUP_OBJECT (window1, LessThanSize, "LessThanSize");
   GLADE_HOOKUP_OBJECT (window1, hboxSizeModifier, "hboxSizeModifier");
@@ -2220,7 +2225,7 @@ create_testRegExDialog (void)
   GtkWidget *testRegExDialog;
   GtkWidget *dialog_vbox3;
   GtkWidget *vbox21;
-//  GtkWidget *hbox27;
+  GtkWidget *hbox27;
   GtkWidget *label227;
   GtkWidget *testEntry;
 //  GtkWidget *hbox28;
@@ -2253,7 +2258,7 @@ create_testRegExDialog (void)
   gtk_box_pack_start (GTK_BOX (dialog_vbox3), vbox21, TRUE, TRUE, 4);
 
 /* Mac style - Luc A feb 2018 */
-   GtkWidget *hbox27 = gtk_hbox_new (FALSE, 4);
+   hbox27 = gtk_hbox_new (FALSE, 4);
    gtk_widget_show (hbox27);
    gtk_box_pack_start (GTK_BOX (vbox21), hbox27, FALSE, FALSE, 0);
    GtkWidget *labelHeaderTest = gtk_label_new (_("<b>Test Regular Expressions (RegEx):</b>\n<i>With this dialog, you can test a RegEx before using it.\nFeel free to type a RegEx and put an example of text to test it.</i>"));
@@ -2306,7 +2311,7 @@ create_testRegExDialog (void)
   SampleTextView = gtk_text_view_new ();
   gtk_widget_show (SampleTextView);
   gtk_container_add (GTK_CONTAINER (scrolledwindow6), SampleTextView);
-  gtk_text_view_set_overwrite (GTK_TEXT_VIEW (SampleTextView), TRUE);
+  /*gtk_text_view_set_overwrite (GTK_TEXT_VIEW (SampleTextView), TRUE); removed since it's default in other case Gdk warns*/
   gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (SampleTextView), GTK_WRAP_WORD);
   gtk_text_buffer_set_text (gtk_text_view_get_buffer (GTK_TEXT_VIEW (SampleTextView)), _("<Copy and paste your sample text here>"), -1);
 
@@ -2365,7 +2370,7 @@ create_testRegExDialog (void)
   GLADE_HOOKUP_OBJECT_NO_REF (testRegExDialog, testRegExDialog, "testRegExDialog");
   GLADE_HOOKUP_OBJECT_NO_REF (testRegExDialog, dialog_vbox3, "dialog_vbox3");
   GLADE_HOOKUP_OBJECT (testRegExDialog, vbox21, "vbox21");
-//  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox27, "hbox27");
+  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox27, "hbox27");
   GLADE_HOOKUP_OBJECT (testRegExDialog, label227, "label227");
   GLADE_HOOKUP_OBJECT (testRegExDialog, testEntry, "testEntry");
 //  GLADE_HOOKUP_OBJECT (testRegExDialog, hbox28, "hbox28");
@@ -2827,13 +2832,13 @@ create_configDialog (void)
   GtkWidget *autoFindExe;
   GtkWidget *label993;
   GtkWidget *vbox27;
-  GtkWidget *hbox50;
+ /* GtkWidget *hbox50; */
   GtkWidget *label264;
   GtkWidget *configResultEOL;
-  GtkWidget *hbox51;
+ /* GtkWidget *hbox51; */
   GtkWidget *label262;
   GtkWidget *configResultEOF;
-  GtkWidget *hbox56;
+ /* GtkWidget *hbox56;*/
   GtkWidget *label1006;
   GtkWidget *configResultDelimiter;
   GtkWidget *label991;
@@ -3284,6 +3289,7 @@ hbox53 = gtk_hbox_new (FALSE, 4);
   GLADE_HOOKUP_OBJECT (configDialog, label266, "label266");
   GLADE_HOOKUP_OBJECT (configDialog, label267, "label267");
   GLADE_HOOKUP_OBJECT (configDialog, label271, "label271");
+
   GLADE_HOOKUP_OBJECT (configDialog, configTextEditorAttributes, "configTextEditorAttributes");
   GLADE_HOOKUP_OBJECT (configDialog, configFileExplorerAttributes, "configFileExplorerAttributes");
   GLADE_HOOKUP_OBJECT (configDialog, configWebBrowserAttributes, "configWebBrowserAttributes");
@@ -3296,13 +3302,13 @@ hbox53 = gtk_hbox_new (FALSE, 4);
   GLADE_HOOKUP_OBJECT (configDialog, autoFindExe, "autoFindExe");
   GLADE_HOOKUP_OBJECT (configDialog, label993, "label993");
   GLADE_HOOKUP_OBJECT (configDialog, vbox27, "vbox27");
-  GLADE_HOOKUP_OBJECT (configDialog, hbox50, "hbox50");
+ /* GLADE_HOOKUP_OBJECT (configDialog, hbox50, "hbox50"); non used */
   GLADE_HOOKUP_OBJECT (configDialog, label264, "label264");
   GLADE_HOOKUP_OBJECT (configDialog, configResultEOL, "configResultEOL");
-  GLADE_HOOKUP_OBJECT (configDialog, hbox51, "hbox51");
+/*  GLADE_HOOKUP_OBJECT (configDialog, hbox51, "hbox51"); non used */
   GLADE_HOOKUP_OBJECT (configDialog, label262, "label262");
   GLADE_HOOKUP_OBJECT (configDialog, configResultEOF, "configResultEOF");
-  GLADE_HOOKUP_OBJECT (configDialog, hbox56, "hbox56");
+/*  GLADE_HOOKUP_OBJECT (configDialog, hbox56, "hbox56"); non used */
   GLADE_HOOKUP_OBJECT (configDialog, label1006, "label1006");
   GLADE_HOOKUP_OBJECT (configDialog, configResultDelimiter, "configResultDelimiter");
   GLADE_HOOKUP_OBJECT (configDialog, label991, "label991");
