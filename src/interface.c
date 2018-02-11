@@ -925,7 +925,7 @@ create_window1 (void)
   gtk_tooltips_set_tip (tooltips, folderDepthCheck, _("Limit files found by selecting maximum tree-depth to search."), NULL);
   
 
-  folderDepthSpin_adj = gtk_adjustment_new (0, 0, 100, 1, 10, 10);
+  folderDepthSpin_adj = gtk_adjustment_new (0, 0, 100, 1, 10, 0);
   folderDepthSpin = gtk_spin_button_new (GTK_ADJUSTMENT (folderDepthSpin_adj), 1, 0);
   gtk_widget_show (folderDepthSpin);/* position modifyed - Luc A. 29 dec 2017 */
   gtk_box_pack_start (GTK_BOX (hbox1_advanced), folderDepthSpin, FALSE, TRUE, 0);
@@ -1177,7 +1177,7 @@ beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
   gtk_box_pack_start (GTK_BOX (limit_results_hbox), label1010, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label1010), 5, 0);
 
-  maxHitsSpinResults_adj = gtk_adjustment_new (25, 1, 99999, 1, 10, 10);
+  maxHitsSpinResults_adj = gtk_adjustment_new (25, 1, 99999, 1, 10, 0);
   maxHitsSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (maxHitsSpinResults_adj), 1, 0);
   gtk_widget_show (maxHitsSpinResults);
   gtk_box_pack_start (GTK_BOX (limit_results_hbox), maxHitsSpinResults, TRUE, TRUE, 2);
@@ -1201,7 +1201,7 @@ beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
   gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), label1009, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label1009), 5, 0);
 
-  showLinesSpinResults_adj = gtk_adjustment_new (0, 0, 20, 1, 5, 5);
+  showLinesSpinResults_adj = gtk_adjustment_new (0, 0, 20, 1, 5, 0);
   showLinesSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (showLinesSpinResults_adj), 1, 0);
   gtk_widget_show (showLinesSpinResults);
   gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), showLinesSpinResults, TRUE, TRUE, 2);
@@ -1227,7 +1227,7 @@ beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
   gtk_box_pack_start (GTK_BOX (limit_contents_hbox), label1025, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label1025), 5, 0);
 
-  maxContentHitsSpinResults_adj = gtk_adjustment_new (1, 1, 99999, 1, 5, 5);
+  maxContentHitsSpinResults_adj = gtk_adjustment_new (1, 1, 99999, 1, 5, 0);
   maxContentHitsSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (maxContentHitsSpinResults_adj), 1, 0);
   gtk_widget_show (maxContentHitsSpinResults);
   gtk_box_pack_start (GTK_BOX (limit_contents_hbox), maxContentHitsSpinResults, TRUE, TRUE, 2);
