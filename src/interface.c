@@ -289,7 +289,7 @@ create_window1 (void)
   gtk_widget_show (newInstance1);
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), newInstance1);
   gtk_widget_add_accelerator (newInstance1, "activate", accel_group,
-                              GDK_n, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
+                              GDK_KEY_n, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
                               GTK_ACCEL_VISIBLE);
 
   image165 = gtk_image_new_from_stock ("gtk-new", GTK_ICON_SIZE_MENU);
@@ -457,7 +457,7 @@ create_window1 (void)
   gtk_widget_show (playButton3);
   gtk_container_add (GTK_CONTAINER (search1_menu), playButton3);
   gtk_widget_add_accelerator (playButton3, "activate", accel_group,
-                              GDK_Return, (GdkModifierType) 0,
+                              GDK_KEY_Return, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
   image171 = gtk_image_new_from_stock ("gtk-find", GTK_ICON_SIZE_MENU);
@@ -469,7 +469,7 @@ create_window1 (void)
   gtk_container_add (GTK_CONTAINER (search1_menu), stopButton3);
   gtk_widget_set_sensitive (stopButton3, FALSE);
   gtk_widget_add_accelerator (stopButton3, "activate", accel_group,
-                              GDK_Escape, (GdkModifierType) 0,
+                              GDK_KEY_Escape, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
   image172 = gtk_image_new_from_stock ("gtk-stop", GTK_ICON_SIZE_MENU);
@@ -539,7 +539,7 @@ create_window1 (void)
   gtk_widget_show (open_criteria1);
   gtk_container_add (GTK_CONTAINER (test1_menu), open_criteria1);
   gtk_widget_add_accelerator (open_criteria1, "activate", accel_group,
-                              GDK_o, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
+                              GDK_KEY_o, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
                               GTK_ACCEL_VISIBLE);
 
   image174 = gtk_image_new_from_stock ("gtk-open", GTK_ICON_SIZE_MENU);
@@ -550,7 +550,7 @@ create_window1 (void)
   gtk_widget_show (save_criteria1);
   gtk_container_add (GTK_CONTAINER (test1_menu), save_criteria1);
   gtk_widget_add_accelerator (save_criteria1, "activate", accel_group,
-                              GDK_s, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
+                              GDK_KEY_s, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
                               GTK_ACCEL_VISIBLE);
 
   image175 = gtk_image_new_from_stock ("gtk-save-as", GTK_ICON_SIZE_MENU);
@@ -577,7 +577,7 @@ create_window1 (void)
   gtk_widget_show (contents1);
   gtk_container_add (GTK_CONTAINER (menuitem7_menu), contents1);
   gtk_widget_add_accelerator (contents1, "activate", accel_group,
-                              GDK_F1, (GdkModifierType) 0,
+                              GDK_KEY_F1, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
   support1 = gtk_menu_item_new_with_mnemonic (_("_Support"));
@@ -1259,7 +1259,7 @@ beforeCheck = gtk_check_button_new_with_mnemonic (_("Before:"));
   gtk_box_pack_start (GTK_BOX (vbox2), playButton1, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, playButton1, _("Start the search!"), NULL);
   gtk_widget_add_accelerator (playButton1, "clicked", accel_group,
-                              GDK_KP_Enter, (GdkModifierType) 0,
+                              GDK_KEY_KP_Enter, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
   alignment36 = gtk_alignment_new (0.5, 0.5, 0, 0);
