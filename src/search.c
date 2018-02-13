@@ -860,7 +860,7 @@ void start_search_thread(GtkWidget *widget)
   /* modifiy windows' title according to research criteria */
   gtk_window_set_title (GTK_WINDOW(window1), g_strdup_printf(_("Searchmonkey : search in %s/"), mSearchControl->startingFolder));/* Luc A - janv 2018 */
   /* create the search thread */
-  g_thread_create (walkDirectories, window1, FALSE, NULL); 
+  g_thread_new  ("walkDirectories", walkDirectories, window1); 
   //  threadId = g_thread_create (walkDirectories, window1, FALSE, NULL); 
 }
 
