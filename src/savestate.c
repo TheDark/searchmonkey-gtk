@@ -1025,7 +1025,8 @@ void realizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
     if (newFont != NULL) {
       desc = pango_font_description_from_string(newFont);
       if (desc != NULL) {   
-        gtk_widget_modify_font (GTK_WIDGET(textview), desc);
+        gtk_widget_modify_font (GTK_WIDGET(lookup_widget(widget, "textview1")), desc);
+        gtk_widget_modify_font (GTK_WIDGET(lookup_widget(widget, "textview4")), desc);
         pango_font_description_free(desc);
       }
       g_free(newFont);
@@ -1061,28 +1062,35 @@ void unrealizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *
  */
 void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  GtkTextView *textview;
-  if (getResultsViewHorizontal(widget)) {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
-  } else {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
-  }
+  GtkTextView *textview1, *textview4;
+
+  textview1 = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
+  textview4 = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
   gchar *newColor;
   GdkColor cp;
-  GtkTextBuffer* textBuf = gtk_text_view_get_buffer (textview);
-  GtkTextTagTable* tagTable = gtk_text_buffer_get_tag_table(textBuf);
-  GtkTextTag* tag = gtk_text_tag_table_lookup(tagTable, "word_highlight");
+
+  GtkTextBuffer* textBuf1 = gtk_text_view_get_buffer (textview1);
+  GtkTextTagTable* tagTable1 = gtk_text_buffer_get_tag_table(textBuf1);
+  GtkTextTag* tag1 = gtk_text_tag_table_lookup(tagTable1, "word_highlight");
+  GtkTextBuffer* textBuf4 = gtk_text_view_get_buffer (textview4);
+  GtkTextTagTable* tagTable4 = gtk_text_buffer_get_tag_table(textBuf4);
+  GtkTextTag* tag4 = gtk_text_tag_table_lookup(tagTable4, "word_highlight");
   
-  g_assert(textview != NULL);
-  g_assert(tag != NULL);
-  g_assert(tagTable != NULL);
-  g_assert(textBuf != NULL);
+  g_assert(textview1 != NULL);
+  g_assert(textview4 != NULL);
+  g_assert(tag1 != NULL);
+  g_assert(tagTable1 != NULL);
+  g_assert(textBuf1 != NULL);
+  g_assert(tag4 != NULL);
+  g_assert(tagTable4 != NULL);
+  g_assert(textBuf4 != NULL);
   
   if (g_key_file_has_key(keyString, group, name, NULL)) {
     newColor = g_key_file_get_string (keyString, group, name, NULL);
     if (newColor != NULL) {
       if (gdk_color_parse (newColor, &cp)) {
-        g_object_set( G_OBJECT(tag), "background-gdk", &cp, NULL);
+        g_object_set( G_OBJECT(tag1), "background-gdk", &cp, NULL);
+        g_object_set( G_OBJECT(tag4), "background-gdk", &cp, NULL);
       }
       g_free(newColor);
     }
@@ -1114,6 +1122,7 @@ void unrealizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gc
   gdk_color_free(cp);
   g_free(newColor);
 }
+
 
 
 /*
