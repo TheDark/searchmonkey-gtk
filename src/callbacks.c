@@ -114,12 +114,17 @@ on_set_font1_activate                  (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
     gchar *newFont;
+    GtkWidget *textView1, *textView4;
     GtkWidget *textView;
+
     if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
       textView = lookup_widget(GTK_WIDGET(menuitem), "textview1");
     } else {
       textView = lookup_widget(GTK_WIDGET(menuitem), "textview4");
     }
+
+    textView1 = lookup_widget(GTK_WIDGET(menuitem), "textview1");
+    textView4 = lookup_widget(GTK_WIDGET(menuitem), "textview4");
     
     GtkFontSelectionDialog *dialog = GTK_FONT_SELECTION_DIALOG(create_fontSelectionDialog());
     PangoContext* context = gtk_widget_get_pango_context  (textView);
@@ -132,7 +137,8 @@ on_set_font1_activate                  (GtkMenuItem     *menuitem,
       if (newFont != NULL) { 
         desc = pango_font_description_from_string (newFont);
         if (desc != NULL) {
-          gtk_widget_modify_font (GTK_WIDGET(textView), desc);
+          gtk_widget_modify_font (GTK_WIDGET(textView1), desc);
+          gtk_widget_modify_font (GTK_WIDGET(textView4), desc);
           pango_font_description_free(desc);
         }
         g_free(newFont);
@@ -148,31 +154,43 @@ on_set_highligting_colour1_activate    (GtkMenuItem     *menuitem,
 {
     GdkColor color, *cp;
     GtkTextView *textView;
-    if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-      textView = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview1"));
-    } else {
-      textView = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview4"));
-    }
-    GtkTextBuffer* textBuf = gtk_text_view_get_buffer (textView);
-    GtkTextTagTable* tagTable = gtk_text_buffer_get_tag_table(textBuf);
-    GtkTextTag* tag = gtk_text_tag_table_lookup(tagTable, "word_highlight");
+    GtkTextView *textView1, *textView4;
+
+    textView1 = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview1"));
+    textView4 = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview4"));
+
+    GtkTextBuffer* textBuf1 = gtk_text_view_get_buffer (textView1);
+    GtkTextTagTable* tagTable1 = gtk_text_buffer_get_tag_table(textBuf1);
+    GtkTextTag* tag1 = gtk_text_tag_table_lookup(tagTable1, "word_highlight");
+    GtkTextBuffer* textBuf4 = gtk_text_view_get_buffer (textView4);
+    GtkTextTagTable* tagTable4 = gtk_text_buffer_get_tag_table(textBuf4);
+    GtkTextTag* tag4 = gtk_text_tag_table_lookup(tagTable4, "word_highlight");
+
     GtkWidget *dialog = create_highlightColourDialog();
     GtkColorSelection *colorsel = GTK_COLOR_SELECTION(lookup_widget(dialog, "color_selection1"));
 
-    g_assert(textView != NULL);
-    g_assert(textBuf != NULL);
-    g_assert(tagTable != NULL);
-    g_assert(tag != NULL);
+    g_assert(textView1 != NULL);
+    g_assert(textBuf1 != NULL);
+    g_assert(tagTable1 != NULL);
+    g_assert(tag1 != NULL);
     g_assert(dialog != NULL);
     g_assert(colorsel != NULL);
     
-    g_object_get( G_OBJECT(tag), "background-gdk", &cp, NULL);
+
+    if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
+      g_object_get( G_OBJECT(tag1), "background-gdk", &cp, NULL);
+    } else {
+      g_object_get( G_OBJECT(tag4), "background-gdk", &cp, NULL);
+    }
+    
+
     gtk_color_selection_set_current_color(colorsel, cp);
     gdk_color_free(cp);
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
         GtkColorSelection *colorsel = GTK_COLOR_SELECTION(lookup_widget(dialog, "color_selection1"));
         gtk_color_selection_get_current_color(colorsel, &color);
-        g_object_set( G_OBJECT(tag), "background-gdk", &color, NULL);
+        g_object_set( G_OBJECT(tag1), "background-gdk", &color, NULL);
+        g_object_set( G_OBJECT(tag1), "background-gdk", &color, NULL);
     }
     gtk_widget_destroy(dialog);
 }
