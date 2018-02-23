@@ -270,7 +270,7 @@ create_window1 (void)
     }
 
   vbox1 = gtk_vbox_new (FALSE, 0);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 4);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 0);
   gtk_widget_show (vbox1);
   gtk_container_add (GTK_CONTAINER (window1), vbox1);
 
