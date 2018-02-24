@@ -190,7 +190,7 @@ on_set_highligting_colour1_activate    (GtkMenuItem     *menuitem,
         GtkColorSelection *colorsel = GTK_COLOR_SELECTION(lookup_widget(dialog, "color_selection1"));
         gtk_color_selection_get_current_color(colorsel, &color);
         g_object_set( G_OBJECT(tag1), "background-gdk", &color, NULL);
-        g_object_set( G_OBJECT(tag1), "background-gdk", &color, NULL);
+        g_object_set( G_OBJECT(tag4), "background-gdk", &color, NULL);
     }
     gtk_widget_destroy(dialog);
 }
