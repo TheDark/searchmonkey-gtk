@@ -15,6 +15,96 @@
 #include "misc.h"
 #include <regex.h>
 
+/******************************************
+ get a human readable string for the 
+ modified date datas in order to
+ be used whith the MAIN button in the GUI
+mandatory if we want to keep the original
+Adam's idea in module search.c
+******************************************/
+gchar *misc_get_modified_after_search(gint index, gchar *str1, gchar *str2)
+{
+ gchar *str = NULL;
+
+ switch(index)
+  {
+   case 0:
+     { str=g_strconcat(_("Since "), str1, str2,NULL);break;}
+   case 1:
+     {str=g_strconcat(_("After"), str1, _(" and before "), str2, NULL);break;}
+   case 2:
+     { str=g_strconcat(_("Before "), str1, NULL) ;break;}
+   case 3:
+     { str=g_strconcat(_("After "),str1, NULL);break;}
+   case 4:
+     { str=g_strconcat(_("Today"),NULL);break;}
+   case 5:
+     { str=g_strconcat(_("Any date"),NULL) ;break;}
+  }/* end switch */
+ return str;
+}
+
+
+/******************************************
+ get a human readable string for the 
+ modified date datas in order to
+ be used whith the button in the GUI
+******************************************/
+gchar *misc_get_modified(GKeyFile *keyString)
+{
+ gchar *str = NULL;
+ gchar *str2 = NULL;
+ gchar *str3 = NULL;
+
+ if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "sinceCheck", NULL),"true", 4)  == 0 )
+     {
+       switch( atoi(g_key_file_get_string (keyString, "configuration", "sinceUnits-active", NULL) ))
+        {
+         case 0:{str2 = g_strdup_printf("%s",_("Day(s)"));break;}
+         case 1:{str2 = g_strdup_printf("%s",_("Week(s)"));break;}
+         case 2:{str2 = g_strdup_printf("%s",_("Month(s)"));break;}
+         case 3:{str2 = g_strdup_printf("%s",_("Year(s)"));break;}
+        }
+       str3 = g_strdup_printf("%s", g_key_file_get_string (keyString, "history", "entrySince", NULL));
+       str=g_strconcat(_("Since "), str3," ",str2, NULL);
+       g_free(str2);
+       g_free(str3);
+     }
+ if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "beforeCheck", NULL),"true", 4)  == 0 )
+     {str=g_strconcat(_("Before "), g_key_file_get_string (keyString, "history", "beforeEntry", NULL) ,NULL);}
+ if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "afterCheck", NULL),"true", 4)  == 0 )
+     {str=g_strconcat(_("After "), g_key_file_get_string (keyString, "history", "afterEntry", NULL),NULL);}
+ if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "intervalCheck", NULL),"true", 4)  == 0 )
+     {str=g_strconcat(_("After "),  g_key_file_get_string (keyString, "history", "intervalStartEntry", NULL), _(" and before  "),  g_key_file_get_string (keyString, "history", "intervalEndEntry", NULL),NULL);}
+ if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "todayCheck", NULL),"true", 4)  == 0 )
+     {str=g_strconcat(_("Today"),NULL);}
+ if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "anyDateCheck", NULL),"true", 4)  == 0 )
+     {str=g_strconcat(_("Any date"),NULL);}
+ return str;
+}
+/******************************************
+ get a human readable string for size units
+gint index :
+0 = kb, 1 = Mb, 2 = Gb
+********************************************/
+gchar *misc_combo_index_to_size_units(gint index)
+{
+  gchar *str;
+
+  switch(index)
+   {
+     case 0:
+      {str=g_strdup_printf("%s",_("Kb"));break;}
+     case 1:
+      {str=g_strdup_printf("%s",_("Mb"));break;}
+     case 2:
+      {str=g_strdup_printf("%s",_("Gb"));break;}
+     default:
+      {str=g_strdup_printf("%s",_("N/A"));break;}
+   }
+ return str;
+}
+
 /****************************************************
   display an erreor/warning dialog
 ****************************************************/
@@ -249,76 +339,6 @@ gint g_strlen(const gchar *string)
 }
 
 
-/*
- * Internal convenience function to copy info across between basic and advanced modes
- */
-void copySettings(GtkWidget *widget, gboolean expertMode)
-{
-    /* in each, index zero is for the basic mode, and 1 is for advanced mode*/
-    gint source = 0;
-    gint target = 1;
-    GtkWidget* filename[2];
-    GtkWidget* containingText[2];
-    GtkToggleButton* containingTextCheck[2];
-    GtkToggleButton* recursive[2];
-    GtkWidget* lookin[2];
-    gchar *tmpString;
-    guint tmpFlags = 0;
-
-    filename[0] = lookup_widget(widget, "fileName2");
-    filename[1] = lookup_widget(widget, "fileName");
-    containingText[0] = lookup_widget(widget, "containingText2");
-    containingText[1] = lookup_widget(widget, "containingText");
-    containingTextCheck[0] = GTK_TOGGLE_BUTTON(lookup_widget(widget, "containingTextCheck2"));
-    containingTextCheck[1] = GTK_TOGGLE_BUTTON(lookup_widget(widget, "containingTextCheck"));
-    recursive[0] = GTK_TOGGLE_BUTTON(lookup_widget(widget, "searchSubfoldersCheck2"));
-    recursive[1] = GTK_TOGGLE_BUTTON(lookup_widget(widget, "searchSubfoldersCheck"));
-    lookin[0] = lookup_widget(widget, "lookIn2");
-    lookin[1] = lookup_widget(widget, "lookIn");
-
-    if (expertMode == FALSE) {
-	source = 1;
-	target = 0;
-    }
-    tmpString = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(filename[source]));
-    if (getExtendedRegexMode(widget)) {
-      tmpFlags |= REG_EXTENDED;
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "regularExpressionRadioFile")))) {
-      if (test_regexp(tmpString, tmpFlags, _("Error! Invalid File Name regular expression"))) {
-        addUniqueRow(filename[target], tmpString);
-        addUniqueRow(filename[source], tmpString);
-      }
-    }
-    g_free(tmpString);
-    
-    gtk_toggle_button_set_active(containingTextCheck[target],gtk_toggle_button_get_active(containingTextCheck[source]));
-    
-    tmpString = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(containingText[source]));
-    if (test_regexp(tmpString, tmpFlags, _("Error! Invalid Containing Text regular expression"))) {
-      addUniqueRow(containingText[target], tmpString);
-      addUniqueRow(containingText[source], tmpString);
-    }
-    g_free(tmpString);
-
-    tmpString = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookin[source]));
-    if (validate_folder(tmpString)) {
-      addUniqueRow(lookin[target], tmpString);
-      addUniqueRow(lookin[source], tmpString);
-    }
-    g_free(tmpString);
-
-    gtk_toggle_button_set_active(recursive[target], gtk_toggle_button_get_active(recursive[source]));
-}
-
-
-/*
- * Callback helper: Switch mode between expert/beginner
- */
-void setExpertSearchMode (GtkWidget *widget, gboolean expertMode)
-{
-  copySettings(widget, expertMode);
-}
 
 
 /*
@@ -326,13 +346,8 @@ void setExpertSearchMode (GtkWidget *widget, gboolean expertMode)
  */
 gboolean getExpertSearchMode (GtkWidget *widget)
 {
-  GtkWidget *searchNotebook = lookup_widget(widget, "searchNotebook");
-  /* modified by Luc A - if the current page == option, then all options are deactivated !!! FIXED janv 2018 */
-  if (gtk_notebook_get_current_page(GTK_NOTEBOOK(searchNotebook)) != 0) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
+  GtkWidget *searchNotebook = lookup_widget(widget, "hboxSearchmonkey");
+  return TRUE; /* since Feb 2018, only Expert mode !*/
 }
 
 void sel (GtkTreeModel *model, GtkTreePath *path,GtkTreeIter *iter, gpointer data)
@@ -388,7 +403,6 @@ void changeModel(GtkWidget *widget, const gchar * from, const gchar * to)
 {
   gint* storeActive;
   GtkComboBox *advancedCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
-  GtkComboBox *basicCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName2"));
   GtkListStore *store = GTK_LIST_STORE(gtk_combo_box_get_model(advancedCombo));
   GtkListStore *setStore;
 
@@ -402,28 +416,18 @@ void changeModel(GtkWidget *widget, const gchar * from, const gchar * to)
     storeActive = (gint *)g_malloc(sizeof(gint));
     *storeActive = gtk_combo_box_get_active(advancedCombo);
     g_object_set_data_full(G_OBJECT(advancedCombo), setActiveKey, (gpointer)storeActive, &g_free);
-    gtk_entry_set_text(GTK_ENTRY(GTK_BIN (advancedCombo)->child), "");
+    gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child (GTK_BIN (advancedCombo))), "");
     gtk_combo_box_set_model(advancedCombo, GTK_TREE_MODEL(setStore));
     gtk_combo_box_set_active(advancedCombo, *((gint *)g_object_get_data(G_OBJECT(advancedCombo), getActiveKey)));
-
-    /* Basic tab */
-    storeActive = (gint *)g_malloc(sizeof(gint));
-    *storeActive = gtk_combo_box_get_active(basicCombo);
-
-    g_object_set_data_full(G_OBJECT(basicCombo), setActiveKey, (gpointer)storeActive, &g_free);
-    gtk_entry_set_text(GTK_ENTRY(GTK_BIN (basicCombo)->child), "");
-    gtk_combo_box_set_model(basicCombo, GTK_TREE_MODEL(GTK_LIST_STORE(g_object_get_data(G_OBJECT(basicCombo), to))));
-    gtk_combo_box_set_active(basicCombo, *((gint *)g_object_get_data(G_OBJECT(basicCombo), getActiveKey)));
-
     g_free((gpointer)setActiveKey);
     g_free((gpointer)getActiveKey);
   }
 }
 
 /*Callback helper: Displays a calendar popup and returns selected date */
-gchar *getDate(const gchar *curDate)
+gchar *getDate(const gchar *curDate, GtkWidget *win)
 {
-  GtkWidget * calendarDialog = create_calendarDialog();
+  GtkWidget * calendarDialog = create_calendarDialog(win);
   GtkCalendar *calendar = GTK_CALENDAR(lookup_widget(calendarDialog, "calendar1"));
   gchar* result = g_strdup(curDate);
   guint year, month, day;

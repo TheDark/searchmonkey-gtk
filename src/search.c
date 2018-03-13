@@ -26,8 +26,8 @@
 #include "misc.h" /* Everything else */
 
 /*mutexes for searchdata and searchControl->cancelSearch */
-GStaticMutex mutex_Data = G_STATIC_MUTEX_INIT; /* Global mutex used by savestate.c too */
-GStaticMutex mutex_Control = G_STATIC_MUTEX_INIT; /* Global mutex used by savestate.c too*/
+static GMutex mutex_Data; /* Global mutex used by savestate.c too */
+static GMutex mutex_Control; /* Global mutex used by savestate.c too*/
 
 /* it's very easy to improve the quality by changing the field icon_file_name */
 static t_symstruct lookuptable[] = {
@@ -525,32 +525,79 @@ GdkPixbuf *get_icon_for_display(gchar *stype)
 
 /*
  * Internal Helper: Converts the date/modified criteria into internal data format
+widget = mainAppWindow !!!
  */
 void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
 {
-  const gchar *after = gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, "afterEntry")));
-  const gchar *before = gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, "beforeEntry")));
-  const gchar *moreThan = gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, "moreThanEntry")));
-  const gchar *lessThan = gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, "lessThanEntry")));
-  const gint tmpDepth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "folderDepthSpin")));
-  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxHitsSpinResults")));
-  const gint tmpContentLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxContentHitsSpinResults")));
-  const gint tmpLines = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "showLinesSpinResults")));
-/* Luc A - janv 2018 */
-  gint kb_multiplier_more_than = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"MoreThanSize")));
-  gint kb_multiplier_less_than = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"LessThanSize")));
-
+  gchar *tmpString;
+  gint multiplierLess, multiplierMore =0;
+  gboolean fMoreThanCheck = FALSE;
+  gboolean fLessThanCheck = FALSE;
+  gboolean fBeforeCheck = FALSE;
+  gboolean fAfterCheck = FALSE;
+  gboolean fIntervalCheck = FALSE;
+  gboolean fSinceCheck = FALSE;
+  gboolean fTodayCheck = FALSE;
+  gint date_mode = 0;
   gdouble tmpDouble, tmpMultiplierLess, tmpMultiplierMore, tmpMoreThan =0, tmpLessThan=0;
   gint i;
   GDate DateAfter, DateBefore;
   gchar buffer[MAX_FILENAME_STRING + 1];
   struct tm tptr;
   gchar *endChar;
+  time_t rawtime; 
+  GDate current_date, previous_date;
+  gint current_since_unit = 0;
+  gint current_since_value = 1;
 
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(lookup_widget(widget, "window1")));
+
+  const gchar *after = gtk_button_get_label (GTK_BUTTON (lookup_widget(widget, "afterEntry") ) );
+  const gchar *before = gtk_button_get_label (GTK_BUTTON (lookup_widget(widget, "beforeEntry") ) );
+  const gchar *intervalStart = gtk_button_get_label (GTK_BUTTON (lookup_widget(widget, "intervalStartEntry") ) );
+  const gchar *intervalEnd = gtk_button_get_label (GTK_BUTTON (lookup_widget(widget, "intervalEndEntry") ) );
+
+  const gint tmpSinceEntry = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "entrySince")));
+  const gint tmpSinceUnits = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"sinceUnits")));
+ // const gchar *moreThan = g_key_file_get_string (keyString, "history", "moreThanEntry", NULL);
+ // const gchar *lessThan = g_key_file_get_string (keyString, "history", "lessThanEntry", NULL);
+  const gchar *moreThan = gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, "moreThanEntry")));
+  const gchar *lessThan = gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, "lessThanEntry")));
+
+  const gint tmpDepth = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "folderDepthSpin")));
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxHitsSpinResults")));
+  const gint tmpContentLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxContentHitsSpinResults")));
+
+  const gint tmpLines = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "showLinesSpinResults")));
+/* Luc A - janv 2018 */
+ // multiplierLess = atoi(g_key_file_get_string (keyString, "configuration", "LessThanSize-active", NULL));
+ // multiplierMore = atoi(g_key_file_get_string (keyString, "configuration", "MoreThanSize-active", NULL));
+ multiplierMore = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"MoreThanSize")));
+ multiplierLess = gtk_combo_box_get_active( GTK_COMBO_BOX(lookup_widget(widget,"LessThanSize")));
+
+  gint kb_multiplier_more_than = multiplierMore;
+  gint kb_multiplier_less_than = multiplierLess;
+
+  /* get the flags from a string to a boolean ; set-up the gint for switches */
+
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "lessThanCheck"))) )
+     {fLessThanCheck = TRUE;}
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "moreThanCheck"))))
+     {fMoreThanCheck = TRUE;}
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "todayCheck"))) )
+    {fTodayCheck = TRUE;date_mode = 1;}
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "afterCheck"))) )
+    {fAfterCheck = TRUE;date_mode = 2;}
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "beforeCheck"))))
+    {fBeforeCheck = TRUE;date_mode = 3;}
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "intervalCheck"))))
+    {fIntervalCheck = TRUE;date_mode = 4;}
+  if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "sinceCheck"))))
+    {fSinceCheck = TRUE;date_mode = 5;}
    
   /* get current size values */
   if(moreThan!=NULL )
-     tmpMoreThan = strtod(moreThan, &endChar);
+     tmpMoreThan = strtod(moreThan, &endChar);/* ,???? free */
   if(lessThan!=NULL)
      tmpLessThan = strtod(lessThan, &endChar);
 
@@ -572,15 +619,13 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
        tmpLessThan = tmpLessThan*1024;
      }
 
-// printf("valeurs entries taille- more than :%f.0 less than %f.0 \n", tmpMoreThan, tmpLessThan);
-//printf("kbmu less %d kb mul more %d état actuel multi less %10.1f more %10.1f\n",  kb_multiplier_less_than,  kb_multiplier_more_than, tmpMultiplierLess, tmpMultiplierMore);
-
+/* !!!!!! to verifiy */
   if (getExpertSearchMode(widget) == FALSE) {
     mSearchControl->numExtraLines = 0;
     mSearchControl->flags |= SEARCH_EXTRA_LINES;
     return;
   }
-/* Read extra lines spin box */
+ /* Read extra lines spin box */
   mSearchControl->numExtraLines = tmpLines;
 
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "showLinesCheckResults")))) {
@@ -599,13 +644,13 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
     mSearchControl->flags |= LIMIT_RESULTS_SET;
   }
 
-/* Read folder depth setting */
+ /* Read folder depth setting */
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "folderDepthCheck")))) {
     mSearchControl->folderDepth = tmpDepth;
     mSearchControl->flags |= DEPTH_RESTRICT_SET;
   }
-/* Read file min/max size strings */
-  if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "moreThanCheck")))) &&
+ /* Read file min/max size strings */
+  if ((fMoreThanCheck) &&
       (moreThan != NULL)) 
     {
       tmpDouble = strtod(moreThan, &endChar);
@@ -614,66 +659,148 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
            miscErrorDialog(widget, _("<b>Error!</b>\n\nMoreThan file size must be <i>positive</i> value\nSo this criteria will not be used.\n\nPlease, check your entry and the units."));
           return;
         }
-      if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "lessThanCheck")))) && (tmpMoreThan >=tmpLessThan)) {
+      if ((fLessThanCheck) && (tmpMoreThan >=tmpLessThan)) {
            miscErrorDialog(widget, _("<b>Error!</b>\n\nMoreThan file size must be <i>stricly inferior</i> to LessThan file size.So this criteria will not be used.\n\nPlease, check your entry and the units."));      
           return;
          }
       g_ascii_formatd (buffer, MAX_FILENAME_STRING, "%1.1f", tmpDouble);
-      gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "moreThanEntry")), buffer);
+/*pb !!!!!! */
+      g_key_file_set_string (keyString, "history", "moreThanEntry",buffer);
+
+//      gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "moreThanEntry")), buffer);
       mSearchControl->moreThan = (gsize)(tmpMultiplierMore*1024 * tmpDouble);/* modif Luc A janv 2018 */
       mSearchControl->flags |= SEARCH_MORETHAN_SET;
     }
-  if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "lessThanCheck")))) &&
+  if ((fLessThanCheck) &&
       (lessThan != NULL)) {
       tmpDouble = strtod (lessThan, &endChar);
       if (tmpDouble <= 0) {
            miscErrorDialog(widget, _("<b>Error!</b>\n\nLessThan file size must be <i>positive</i> value\nSo this criteria will not be used.\n\nPlease, check your entry and the units."));
           return;
       }
-     if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "moreThanCheck")))) && (tmpMoreThan >=tmpLessThan)) {
+     if ((fMoreThanCheck) && (tmpMoreThan >=tmpLessThan)) {
            miscErrorDialog(widget, _("<b>Error!</b>\n\nMoreThan file size must be <i>stricly inferior</i> to LessThan file size.So this criteria will not be used.\n\nPlease, check your entry and the units."));
           return;
       }
       g_ascii_formatd (buffer, MAX_FILENAME_STRING, "%1.1f", tmpDouble);
-      gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "lessThanEntry")), buffer);
+/*pb !!!!!! */
+      g_key_file_set_string (keyString, "history", "lessThanEntry",buffer);
+//      gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "lessThanEntry")), buffer);
       mSearchControl->lessThan = (gsize)(tmpMultiplierLess*1024 * tmpDouble);
       mSearchControl->flags |= SEARCH_LESSTHAN_SET;
   }
 
   /* Read date strings */
      
+  switch(date_mode )
+    {
+      case 1:
+       {printf("date mode Today \n");
+        /* we get the current date */
+        time ( &rawtime );
+        strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
+        g_date_set_parse(&current_date, buffer);
+        g_date_strftime(buffer, 75, _("%x"), &current_date);
+        setTimeFromDate(&tptr, &current_date);
+        mSearchControl->after = mktime(&tptr); 
+        mSearchControl->flags |= SEARCH_AFTER_SET;
+        break;
+       }
+      case 2:
+       {printf("date mode After \n");
+         if ((fAfterCheck) &&
+            ((after != NULL) && (after != '\0'))) {
+           g_date_set_parse(&DateAfter, after);
+           if (!g_date_valid(&DateAfter)) {
+             miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'After'date - format as dd/mm/yyyy or dd mmm yy."));
+             return;
+           }/* if datevalid */
+           if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateAfter) > 0) {/* !!!!!! ddoit être revu */
+             }
+           setTimeFromDate(&tptr, &DateAfter);
+           mSearchControl->after = mktime(&tptr); 
+           mSearchControl->flags |= SEARCH_AFTER_SET;
+         }
+        break;
+       }
+      case 3:
+       {printf("date mode Before \n");
+         if ((fBeforeCheck) &&
+            ((before != NULL) && (before != '\0'))) {
+          g_date_set_parse(&DateBefore, before);
+          if (!g_date_valid(&DateBefore)) {
+             miscErrorDialog(widget, _("<b>Error!</b>\n\nInvalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."));
+             return;
+          }
+          if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateBefore) > 0) {/* !!!!!! ddoit être revu */
+             }
+          setTimeFromDate(&tptr, &DateBefore);
+          mSearchControl->before = mktime(&tptr);
+          mSearchControl->flags |= SEARCH_BEFORE_SET;
+         }
+        break;
+       }
+      case 4:
+       {printf("date mode Interval \n");
+        /* the dates are previously checked in Dialog box, so we can take our risks ;-) */
+        g_date_set_parse(&DateBefore,intervalEnd );
+        g_date_set_parse(&DateAfter,intervalStart );
+        if (!g_date_valid(&DateAfter) || !g_date_valid(&DateBefore)) {
+             miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'Interval'date(s) - format as dd/mm/yyyy or dd mmm yy."));
+             return;
+           }
+        setTimeFromDate(&tptr, &DateBefore);
+        mSearchControl->before = mktime(&tptr);
+        mSearchControl->flags |= SEARCH_BEFORE_SET;
+        setTimeFromDate(&tptr, &DateAfter);
+        mSearchControl->after = mktime(&tptr); 
+        mSearchControl->flags |= SEARCH_AFTER_SET;
+        break;
+       }
+      case 5:
+       {printf("date mode Since \n");
+        time ( &rawtime );
+        strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
+        g_date_set_parse(&previous_date, buffer);
+        /* we get the unit and entry value to substract to current date - thus wa get the 'after' limit*/
+        current_since_unit = tmpSinceUnits;
+        if(current_since_unit<1) 
+               current_since_unit = 0;
+        current_since_value = tmpSinceEntry; 
+        if(current_since_value<1) 
+               current_since_value = 1;
+        switch(current_since_unit)
+           {
+             case 0:{g_date_subtract_days (&previous_date,current_since_value);break;}/* days */
+             case 1:{g_date_subtract_days (&previous_date,current_since_value*7);break;}/* weeks */
+             case 2:{g_date_subtract_months (&previous_date,current_since_value);break;}/* months */
+             case 3:{g_date_subtract_months (&previous_date,current_since_value*3);break;}/* quarters */
+             case 4:{g_date_subtract_years (&previous_date,current_since_value);break;}/* years */
+             default:;
+           }/* end switch */
+       g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &previous_date);
+       printf("date passée=%s\n", buffer);
+        setTimeFromDate(&tptr, &previous_date);
+        mSearchControl->after = mktime(&tptr); 
+        mSearchControl->flags |= SEARCH_AFTER_SET;
+       /* we get the current date - the current date is the before limit, of course*/
+        time ( &rawtime );
+        strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
+        g_date_set_parse(&current_date, buffer);
+      printf("date courante=%s\n", buffer);
+        setTimeFromDate(&tptr, &current_date);
+        mSearchControl->before = mktime(&tptr);
+        mSearchControl->flags |= SEARCH_BEFORE_SET;
+        break;
+       }
+      default:;
+    }/* end switch */
 
-  if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "afterCheck")))) &&
-      ((after != NULL) && (after != '\0'))) {
-    g_date_set_parse(&DateAfter, after);
-    if (!g_date_valid(&DateAfter)) {
-      miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'After'date - format as dd/mm/yyyy or dd mmm yy."));
-      return;
-    }
-    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateAfter) > 0) {
-      gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "afterEntry")), buffer);
-    }
-    setTimeFromDate(&tptr, &DateAfter);
-    mSearchControl->after = mktime(&tptr); 
-    mSearchControl->flags |= SEARCH_AFTER_SET;
-  }
-  if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "beforeCheck")))) &&
-      ((before != NULL) && (before != '\0'))) {
-    g_date_set_parse(&DateBefore, before);
-    if (!g_date_valid(&DateBefore)) {
-      miscErrorDialog(widget, _("<b>Error!</b>\n\nInvalid 'Before' date - format as dd/mm/yyyy or dd mmm yy."));
-      return;
-    }
-    if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateBefore) > 0) {
-      gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "beforeEntry")), buffer);
-    }
-    setTimeFromDate(&tptr, &DateBefore);
-    mSearchControl->before = mktime(&tptr);
-    mSearchControl->flags |= SEARCH_BEFORE_SET;
-  }
+
+ /* coherence tests - useless - Luc A feb 2018 - to remove - only useful for Interval mode */
  if((g_date_valid(&DateAfter)) && (g_date_valid(&DateBefore) )  )
   {
-     if( (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "beforeCheck")))) && (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "afterCheck")))))
+     if( (fBeforeCheck) && (fAfterCheck))
       {
         gint cmp_date = g_date_compare (&DateAfter,&DateBefore);/* returns 1 if the first is wrong, i.e. after last, 0 if equal */
         if(cmp_date>=0)
@@ -694,15 +821,10 @@ void getSearchCriteria(GtkWidget *widget, searchControl *mSearchControl)
   mSearchControl->fileSearchIsRegEx = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "regularExpressionRadioFile")));
 
   /* Grab the filename, containing, and look-in entries */
-  if (getExpertSearchMode(widget)) { /* If expert mode */
+
     mSearchControl->textSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "containingText")));
     mSearchControl->fileSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "fileName")));
     mSearchControl->startingFolder = comboBoxReadCleanFolderName(GTK_COMBO_BOX(lookup_widget(widget, "lookIn")));
-  } else { /* in basic mode */
-    mSearchControl->textSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "containingText2")));
-    mSearchControl->fileSearchRegEx = (gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(widget, "fileName2")));
-    mSearchControl->startingFolder = comboBoxReadCleanFolderName(GTK_COMBO_BOX(lookup_widget(widget, "lookIn2")));
-  }  
 }
 
 /*
@@ -716,7 +838,7 @@ void getSearchFlags(GtkWidget *widget, searchControl *mSearchControl)
   mSearchControl->textSearchFlags = REG_NEWLINE; /* Force search to treat newlines appropriately */
 
   /* Store the search specific options */
-  if (getExpertSearchMode(widget)) { /* If expert mode */
+ /* If expert mode */
     if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "containingTextCheck")))) &&
         (*mSearchControl->textSearchRegEx != '\0')) {
       mSearchControl->flags |= SEARCH_TEXT_CONTEXT; /* Allow context switching */
@@ -724,15 +846,6 @@ void getSearchFlags(GtkWidget *widget, searchControl *mSearchControl)
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "searchSubfoldersCheck")))) {
       mSearchControl->flags |= SEARCH_SUB_DIRECTORIES; /* Allow sub-directory searching */
     }
-  } else { /* Simple mode */
-    if ((gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "containingTextCheck2")))) &&
-        (*mSearchControl->textSearchRegEx != '\0')) {
-      mSearchControl->flags |= SEARCH_TEXT_CONTEXT; /* Allow context switching */
-    }
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "searchSubfoldersCheck2")))) {
-      mSearchControl->flags |= SEARCH_SUB_DIRECTORIES; /* Allow sub-directory searching */
-    }
-  }
 
   /* Store the common options */
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "notExpressionCheckFile")))) {
@@ -785,7 +898,7 @@ void start_search_thread(GtkWidget *widget)
   GtkTreeView *listView;
   GtkListStore *sortedModel;
 
-  
+
   /* Clear results prior to resetting data */
   if (getResultsViewHorizontal(widget)) {
     listView = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
@@ -808,8 +921,6 @@ void start_search_thread(GtkWidget *widget)
   getSearchCriteria(widget, mSearchControl); /* Store the user entered criteria */
   getSearchFlags(widget, mSearchControl); /* Store the user set flags */
   getSearchExtras(mainWindowApp, mSearchControl); /* Store the extended criteria too */
-
-
 
   /* Test starting folder exists */
   if ((mSearchControl->startingFolder == NULL) || (*(mSearchControl->startingFolder) == '\0')) {
@@ -847,20 +958,14 @@ void start_search_thread(GtkWidget *widget)
   }
 
   /* Store the text strings (once validated) into the combo boxes */
-  if (getExpertSearchMode(widget)) {
+
     addUniqueRow(lookup_widget(widget, "fileName"), mSearchControl->fileSearchRegEx);
     addUniqueRow(lookup_widget(widget, "containingText"), mSearchControl->textSearchRegEx);
     addUniqueRow(lookup_widget(widget, "lookIn"), mSearchControl->startingFolder);
-  } else {
-    addUniqueRow(lookup_widget(widget, "fileName2"), mSearchControl->fileSearchRegEx);
-    addUniqueRow(lookup_widget(widget, "containingText2"), mSearchControl->textSearchRegEx);
-    addUniqueRow(lookup_widget(widget, "lookIn2"), mSearchControl->startingFolder);
-  }
-
   /* modifiy windows' title according to research criteria */
   gtk_window_set_title (GTK_WINDOW(window1), g_strdup_printf(_("Searchmonkey : search in %s/"), mSearchControl->startingFolder));/* Luc A - janv 2018 */
   /* create the search thread */
-  g_thread_new  ("walkDirectories", walkDirectories, window1); 
+  g_thread_new ("walkDirectories",walkDirectories, window1); 
   //  threadId = g_thread_create (walkDirectories, window1, FALSE, NULL); 
 }
 
@@ -875,9 +980,9 @@ void stop_search_thread(GtkWidget *widget)
   
   mSearchControl = g_object_get_data(window1, MASTER_SEARCH_CONTROL);
 
-  g_static_mutex_lock(&mutex_Control);
+  g_mutex_lock(&mutex_Control);
   mSearchControl->cancelSearch = TRUE;
-  g_static_mutex_unlock(&mutex_Control);
+  g_mutex_unlock(&mutex_Control);
  /* modifiy windows' title according to research criteria */
   gtk_window_set_title (GTK_WINDOW(window1), _("Aborting research-Searchmonkey"));/* Luc A - janv 2018 - the order if VOLONTARY inverted to keep attention */
 }
@@ -903,7 +1008,7 @@ void *walkDirectories(void *args)
   GtkListStore *sortedModel;
   GtkTextBuffer *textBuffer;
 
-  g_static_mutex_lock(&mutex_Data);
+  g_mutex_lock(&mutex_Data);
   gdk_threads_enter ();
   mSearchData = g_object_get_data(object, MASTER_SEARCH_DATA);
   mSearchControl = g_object_get_data(object, MASTER_SEARCH_CONTROL);
@@ -918,12 +1023,12 @@ void *walkDirectories(void *args)
   /* Disable go button, enable stop button.. */
   gdk_threads_enter ();
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton1"), FALSE);
-  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton2"), FALSE);
+ /* gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton2"), FALSE);*/
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton3"), FALSE);
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton1"), TRUE);
-  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton2"), TRUE);
+/*  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton2"), TRUE);*/
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton3"), TRUE);
-  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "saveResults"), FALSE);
+/*  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "saveResults"), FALSE);*/
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "save_results1"), FALSE);
   gdk_threads_leave ();
   
@@ -946,9 +1051,9 @@ void *walkDirectories(void *args)
   if (matchCount > 0) {
     gboolean phasetwo;
     
-    g_static_mutex_lock(&mutex_Control);
+    g_mutex_lock(&mutex_Control);
     phasetwo = ((mSearchControl->cancelSearch == FALSE) && ((mSearchControl->flags & SEARCH_TEXT_CONTEXT) != 0));
-    g_static_mutex_unlock(&mutex_Control);
+    g_mutex_unlock(&mutex_Control);
 
     if (phasetwo) {
       matchCount = phaseTwoSearch(mSearchControl, mSearchData, status); 
@@ -959,18 +1064,18 @@ void *walkDirectories(void *args)
 /* Re-enable the go button */
   gdk_threads_enter ();
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton1"), TRUE);
-  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton2"), TRUE);
+ /* gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton2"), TRUE);*/
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "playButton3"), TRUE);
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton1"), FALSE);
-  gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton2"), FALSE);
+ /* gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton2"), FALSE);*/
   gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "stopButton3"), FALSE);
   if (matchCount > 0) {
-      gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "saveResults"), TRUE);
+     /* gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "saveResults"), TRUE);*/
       gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "save_results1"), TRUE);
   }
   gdk_threads_leave ();
   
-  g_static_mutex_unlock(&mutex_Data);
+  g_mutex_unlock(&mutex_Data);
   g_thread_exit (GINT_TO_POINTER(0));
 }
 
@@ -1030,9 +1135,9 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gdk_threads_leave ();
 
   
-  g_static_mutex_lock(&mutex_Control);
+  g_mutex_lock(&mutex_Control);
   stopSearch = mSearchControl->cancelSearch;
-  g_static_mutex_unlock(&mutex_Control);
+  g_mutex_unlock(&mutex_Control);
 
   while ((curDirStack->len > 0) && (stopSearch == FALSE)) {
     if (((mSearchControl->flags & SEARCH_TEXT_CONTEXT) == 0) && 
@@ -1165,18 +1270,18 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
     }
 
     /* Update cancel search detection, free tmp strings, and reset symlink flag */
-    g_static_mutex_lock(&mutex_Control);
+    g_mutex_lock(&mutex_Control);
     stopSearch = mSearchControl->cancelSearch;
-    g_static_mutex_unlock(&mutex_Control);
+    g_mutex_unlock(&mutex_Control);
     g_free(tmpFullFileName);
     g_free(tmpFileName);
     symlink = FALSE;
   }
 
   /* Clean up status/progress bar */
-  g_static_mutex_lock(&mutex_Control);
+  g_mutex_lock(&mutex_Control);
   stopSearch = mSearchControl->cancelSearch;
-  g_static_mutex_unlock(&mutex_Control);
+  g_mutex_unlock(&mutex_Control);
 
   if (((mSearchControl->flags & SEARCH_TEXT_CONTEXT) == 0) ||
       (stopSearch == TRUE)){
@@ -1371,9 +1476,9 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
       if(tmpFileName!=NULL)
           g_free(tmpFileName);
       g_free(contents); /* Clear file contents from memory */
-      g_static_mutex_lock(&mutex_Control);
+      g_mutex_lock(&mutex_Control);
       stopSearch = mSearchControl->cancelSearch;
-      g_static_mutex_unlock(&mutex_Control);
+      g_mutex_unlock(&mutex_Control);
       if (stopSearch == TRUE) {
         break;
       }
@@ -1663,7 +1768,7 @@ void getModified(searchData *mSearchData, textMatch *newMatch)
   struct stat buf; /* ce sont des structures propres au C dans les libs Stat et time */
   gint stringSize;
   gchar *tmpString;
-  char buffer[80];/* added by Luc A., 27/12/2017 */
+  gchar buffer[80];/* added by Luc A., 27/12/2017 */
   textMatch *textMatch = GET_LAST_PTR(mSearchData->textMatchArray);
   
   lstat(textMatch->pFullName, &buf); /* Replaces the buggy GLIB equivalent */
@@ -1716,9 +1821,9 @@ void updateStatusFilesFound(const gsize matchCount, statusbarData *status, searc
     g_strlcat(status->constantString, _(" [inv]"), MAX_FILENAME_STRING);
   }
   
-  g_static_mutex_lock(&mutex_Control);
+  g_mutex_lock(&mutex_Control);
   stopSearch = mSearchControl->cancelSearch;
-  g_static_mutex_unlock(&mutex_Control);
+  g_mutex_unlock(&mutex_Control);
   if (stopSearch == TRUE) {
     g_strlcat(status->constantString, _(" [cancelled]"), MAX_FILENAME_STRING);
   }

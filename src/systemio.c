@@ -896,7 +896,7 @@ void copyFile(GtkWidget *widget)
   }  
 }
 
-gint check_bom(const char *data, size_t size)
+gint check_bom(const char *data, gint size)
 {
     if (size >= 3) {
         if (memcmp(data, UTF_8_BOM, 3) == 0)

@@ -26,8 +26,8 @@
 
 /* Externals */
 extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
-extern GStaticMutex mutex_Data; /* Created in search.c to control access to search results data. */
-extern GStaticMutex mutex_Control; /* Created in search.c to control access to search controls. */
+extern GMutex mutex_Data; /* Created in search.c to control access to search results data. */
+extern GMutex mutex_Control; /* Created in search.c to control access to search controls. */
 
 
 
@@ -198,7 +198,7 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   GKeyFile *keyString = getGKeyFile(widget);
   GtkComboBox* tmpCombo;
   GtkTreeIter iter;
-  /* luc A janv 2018 */
+  /* luc A janv 2018 : get command line parameters is they exist */
   gchar *sParamater1 = g_object_get_data(G_OBJECT(mainWindowApp), "argvParameter1");
   gchar *sParamater2 = g_object_get_data(G_OBJECT(mainWindowApp), "argvParameter2");
   gchar *sParamater3 = g_object_get_data(G_OBJECT(mainWindowApp), "argvParameter3");
@@ -210,26 +210,13 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   initComboBox2(lookup_widget(widget, "fileName"));
   initComboBox(lookup_widget(widget, "containingText"));
   initComboBox(lookup_widget(widget, "lookIn"));
-  initComboBox2(lookup_widget(widget, "fileName2"));
-  initComboBox(lookup_widget(widget, "containingText2"));
-  initComboBox(lookup_widget(widget, "lookIn2"));
+
+  /* main part : all variables are retrieved from config.ini file with file's corruption checking */
   realize_searchNotebook(widget);
 
   /* directories parameters = parameter1 from command line - Luc A janv 2018 */
   tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "lookIn"));
   g_assert(tmpCombo != NULL);
-
-  if(sParamater1!=NULL) 
-       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater1); /* Luc A janv 2018 */
-  else
-    if (gtk_tree_model_get_iter_first(gtk_combo_box_get_model(tmpCombo), &iter) == FALSE) 
-       {    
-         addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
-       }
-  
-  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "lookIn2"));
-  g_assert(tmpCombo != NULL);
-
   if(sParamater1!=NULL) 
        addUniqueRow(GTK_WIDGET(tmpCombo), sParamater1); /* Luc A janv 2018 */
   else
@@ -239,33 +226,16 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
        }
 
   /* file(s) name parameters = parameter2 from command line - Luc A janv 2018 */
-
   tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
   g_assert(tmpCombo != NULL);
-
-  if(sParamater2!=NULL) 
-       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater2); /* Luc A janv 2018 */
-  
-  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName2"));
-  g_assert(tmpCombo != NULL);
-
   if(sParamater2!=NULL) 
        addUniqueRow(GTK_WIDGET(tmpCombo), sParamater2); /* Luc A janv 2018 */
   
   /* containing text parameters = parameter3 from command line - Luc A janv 2018 */
-
   tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "containingText"));
   g_assert(tmpCombo != NULL);
-
   if(sParamater3!=NULL) 
        addUniqueRow(GTK_WIDGET(tmpCombo), sParamater3); /* Luc A janv 2018 */
-  
-  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "containingText2"));
-  g_assert(tmpCombo != NULL);
-
-  if(sParamater3!=NULL) 
-       addUniqueRow(GTK_WIDGET(tmpCombo), sParamater3); /* Luc A janv 2018 */
-
 
   /* Results stuff */
   setResultsViewHorizontal(widget, TRUE); /* Default to horizontal */
@@ -282,7 +252,7 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   createStatusbarData(G_OBJECT(mainWindowApp), MASTER_STATUSBAR_DATA);
   realize_statusbar (widget);
 
-  /* Menu stuff (do this last so that all view options get set) */
+ /* Menu stuff (do this last so that all view options get set) */
   realize_menubar(widget);
   gtk_widget_grab_focus (lookup_widget(widget, "playButton1"));
   // g_free(sParamater1);
@@ -303,6 +273,8 @@ void unrealize_searchmonkeyWindow (GtkWidget *widget)
 
   /* Search stuff */
   unrealize_searchNotebook(widget);
+
+ /* launch parameters - Luc A - feb 2018 */
   
   /* Results stuff */
   gboolean autoColumnWidth = ((!g_key_file_has_key (keyString, "configuration", "autosize_columns", NULL)) ||
@@ -352,10 +324,121 @@ void realize_configDialog (GtkWidget *widget)
 
   setConfigFileLocation (widget);
 }
+/**************************************************
+ callback for dialog modified - Luc A Feb 2018
+widget = pointer on GtkWidget dialog just created 
+before this call
+*************************************************/
+void realize_FileModifiedDialog (GtkWidget *widget)
+{
+  const gchar *err_msg = _("* warning ! Corrupted config.ini configuration file ; the <<%s>> key is absent. I set up a default value *\n");
+  gchar buffer[80];
+  struct stat buf;
+  time_t rawtime; 
+  GDate current_date;
 
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(widget));
+  /* we get the current date */
+  time ( &rawtime );
+  strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
+  g_date_set_parse(&current_date, buffer);
+  g_date_strftime(buffer, 75, _("%x"), &current_date);
+
+ /* retieve global settings and setup the dialog widgets*/
+  realizeToggle(widget, keyString, "configuration", "todayCheck");
+  realizeToggle(widget, keyString, "configuration", "anyDateCheck");
+  realizeToggle(widget, keyString, "configuration", "afterCheck");
+  realizeToggle(widget, keyString, "configuration", "beforeCheck");
+  realizeToggle(widget, keyString, "configuration", "intervalCheck");
+  realizeToggle(widget, keyString, "configuration", "sinceCheck");
+ /* before & after section */
+  if (g_key_file_has_key(keyString, "history", "beforeEntry", NULL)==NULL) {
+      printf(err_msg, " beforeEntry ");
+      gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "beforeEntry")), buffer);
+  }
+  if (g_key_file_has_key(keyString, "history", "afterEntry", NULL)==NULL) {
+      printf(err_msg, " afterEntry ");
+      gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "afterEntry")), buffer);
+  }
+  realizeButtonString(widget, keyString, "history", "beforeEntry");
+  realizeButtonString(widget, keyString, "history", "afterEntry");
+  /* interval section */
+  if (g_key_file_has_key(keyString, "history", "intervalStartEntry", NULL)==NULL) {
+      printf(err_msg, " intervalStartEntry ");
+      gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "intervalStartEntry")), buffer);
+  }
+  if (g_key_file_has_key(keyString, "history", "intervalEndEntry", NULL)==NULL) {
+      printf(err_msg, " intervalEndEntry ");
+     gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "intervalEndEntry")), buffer);
+   }
+  if (g_key_file_has_key(keyString, "configuration", "sinceUnits", NULL)==NULL) {
+      printf(err_msg, " sinceUnits ");
+      gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "sinceUnits")), 0);/* by default : days(s) */
+  }
+  if (g_key_file_has_key(keyString, "history", "entrySince", NULL)==NULL) {
+      printf(err_msg, " entrySince ");
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON(lookup_widget(widget, "entrySince")), 1);/* by default : days(s) */
+  }
+  realizeComboBoxText(widget, keyString, "configuration", "sinceUnits");
+  realizeSpin(widget, keyString, "history", "entrySince");
+  realizeButtonString(widget, keyString, "history", "intervalEndEntry");
+  realizeButtonString(widget, keyString, "history", "intervalStartEntry");
+}
+
+void unrealize_FileModifiedDialog (GtkWidget *widget)
+{
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(widget));
+
+  /* flags */
+  unrealizeToggle(widget, keyString, "configuration", "todayCheck");
+  unrealizeToggle(widget, keyString, "configuration", "anyDateCheck");
+  unrealizeToggle(widget, keyString, "configuration", "beforeCheck");
+  unrealizeToggle(widget, keyString, "configuration", "afterCheck");
+  unrealizeToggle(widget, keyString, "configuration", "intervalCheck");
+  unrealizeToggle(widget, keyString, "configuration", "sinceCheck");
+  unrealizeComboBox(widget, keyString, "configuration", "sinceUnits");
+  /* values */
+  unrealizeButtonString(widget, keyString, "history", "afterEntry");
+  unrealizeButtonString(widget, keyString, "history", "beforeEntry");
+  unrealizeButtonString(widget, keyString, "history", "intervalStartEntry");
+  unrealizeButtonString(widget, keyString, "history", "intervalEndEntry");
+  unrealizeSpin(widget, keyString, "history", "entrySince");
+
+}
+/*************************************************
+ callback for dialog FileSize - Luc A Feb 2018
+widget = pointer on GtkWidget dialog just created 
+before this call
+*************************************************/
+void realize_FileSizeDialog (GtkWidget *widget)
+{
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(widget));
+
+ /* retieve global settings and setup the dialog widgets*/
+  realizeToggle (widget, keyString, "configuration", "moreThanCheck");
+  realizeToggle (widget, keyString, "configuration", "lessThanCheck");
+  realizeString(widget, keyString, "history", "lessThanEntry");
+  realizeString(widget, keyString, "history", "moreThanEntry");
+  realizeComboBoxText(widget, keyString, "configuration", "MoreThanSize");/* Luc A - janv 2018 */
+  realizeComboBoxText(widget, keyString, "configuration", "LessThanSize");/* Luc A - janv 2018 */
+}
+
+void unrealize_FileSizeDialog (GtkWidget *widget)
+{
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(widget));
+
+ /* Restore global settings */
+  unrealizeToggle (widget, keyString, "configuration", "moreThanCheck");
+  unrealizeToggle (widget, keyString, "configuration", "lessThanCheck");
+  unrealizeString(widget, keyString, "history", "moreThanEntry");
+  unrealizeString(widget, keyString, "history", "lessThanEntry");
+  unrealizeComboBox(widget, keyString, "configuration", "MoreThanSize");/* Luc A - janv 2018 */
+  unrealizeComboBox(widget, keyString, "configuration", "LessThanSize");/* Luc A - janv 2018 */
+}
 
 /*
  * Callback helper: store all configuration settings into config.ini
+ widget == dialog === the widget of the config dialog
  */
 void unrealize_configDialog (GtkWidget *widget)
 {
@@ -389,36 +472,28 @@ void unrealize_configDialog (GtkWidget *widget)
 void realize_searchNotebook (GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
+  gint count_error_modified_check = 0;
+  const gchar *err_msg = _("* warning ! Corrupted config.ini configuration file ; the <<%s>> key is absent. I set up a default value *\n");
 
-  /* Store basic Tab */
-  realizeComboBox2(widget, keyString, "history", "fileName2");
-  realizeComboBox(widget, keyString, "history", "containingText2");
-  realizeToggle(widget, keyString, "history", "containingTextCheck2");
-  realizeComboBox(widget, keyString, "history", "lookIn2");
-  realizeToggle(widget, keyString, "history", "searchSubfoldersCheck2");
+  /* Store advanced options expander */
   realizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
-
-  /* Store advanced Tab */
   realizeComboBox2(widget, keyString, "history", "fileName");
-  realizeToggle(widget, keyString, "history", "expertUserCheck");
+  /* we retrieve last user's mode */
+  if (g_key_file_has_key(keyString, "configuration", "advancedMode", NULL)==NULL) {
+      g_key_file_set_string (keyString, "configuration", "advancedMode", "false");
+      gtk_switch_set_active (GTK_SWITCH(lookup_widget(widget, "advancedMode")), FALSE);
+      gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "expander_options")) , FALSE);   
+      gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard1")) , FALSE);
+      gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard2")) , FALSE);
+    }
+  realizeSwitch(widget, keyString, "configuration", "advancedMode");
+//  realizeToggle(widget, keyString, "history", "expertUserCheck");
   realizeComboBox(widget, keyString, "history", "containingText");
   realizeToggle(widget, keyString, "history", "containingTextCheck");
   realizeComboBox(widget, keyString, "history", "lookIn");
   realizeToggle(widget, keyString, "history", "searchSubfoldersCheck");
-  realizeToggle(widget, keyString, "history", "moreThanCheck");
-  realizeString(widget, keyString, "history", "moreThanEntry");
-  realizeComboBoxText(widget, keyString, "configuration", "MoreThanSize");/* Luc A - janv 2018 */
-  realizeToggle(widget, keyString, "history", "lessThanCheck");
-  realizeString(widget, keyString, "history", "lessThanEntry");
-  realizeComboBoxText(widget, keyString, "configuration", "LessThanSize");/* Luc A - janv 2018 */
-  realizeToggle(widget, keyString, "history", "afterCheck");
-  realizeString(widget, keyString, "history", "afterEntry");
-  realizeToggle(widget, keyString, "history", "beforeCheck");
-  realizeString(widget, keyString, "history", "beforeEntry");
   realizeToggle(widget, keyString, "history", "folderDepthCheck");
   realizeSpin(widget, keyString, "history", "folderDepthSpin");
-
-  /* Store Advanced Options Tab */
   realizeToggle(widget, keyString, "history", "notExpressionCheckFile");
   realizeToggle(widget, keyString, "history", "matchCaseCheckFile");
   realizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
@@ -435,11 +510,71 @@ void realize_searchNotebook (GtkWidget *widget)
   realizeToggle(widget, keyString, "history","followSymLinksCheck");
   realizeToggle(widget, keyString, "history", "limitContentsCheckResults");
   realizeSpin(widget, keyString, "history", "maxContentHitsSpinResults");
-
+  /* we must check if size and modified filters already exist - in other case, set them to default values */
+  /* part -1 for filesize filter */
+  if (g_key_file_has_key(keyString, "configuration", "LessThanSize-active", NULL)==NULL) {
+      printf(err_msg, " LessThanSize-active ");
+      g_key_file_set_string (keyString, "configuration", "LessThanSize-active", "0");
+    }
+  if (g_key_file_has_key(keyString, "configuration", "MoreThanSize-active", NULL)==NULL) {
+      printf(err_msg, " MoreThanSize-active ");
+      g_key_file_set_string (keyString, "configuration", "MoreThanSize-active", "0");
+    }
+  if (g_key_file_has_key(keyString, "configuration", "moreThanCheck", NULL)==NULL) {
+      printf(err_msg," moreThanCheck ");
+      g_key_file_set_string (keyString, "configuration", "moreThanCheck", "false");
+    }
+  if (g_key_file_has_key(keyString, "configuration", "lessThanCheck", NULL)==NULL) {
+      printf(err_msg," lessThanCheck key ");
+      g_key_file_set_string (keyString, "configuration", "lessThanCheck", "false");
+    }
+/* part - 2 for modified date part */
+  if (g_key_file_has_key(keyString, "configuration", "sinceCheck", NULL)==NULL) {
+      printf(err_msg, " sinceCheck key ");
+     g_key_file_set_string (keyString, "configuration", "sinceCheck", "false");
+     count_error_modified_check++;
+    }   
+  if (g_key_file_has_key(keyString, "configuration", "afterCheck", NULL)==NULL) {
+      printf(err_msg, " afterCheck ");
+     g_key_file_set_string (keyString, "configuration", "afterCheck", "false");
+     count_error_modified_check++;
+    }
+  if (g_key_file_has_key(keyString, "configuration", "beforeCheck", NULL)==NULL) {
+      printf(err_msg, " beforeCheck ");
+     g_key_file_set_string (keyString, "configuration", "beforeCheck", "false");
+     count_error_modified_check++;
+    }
+  if (g_key_file_has_key(keyString, "configuration", "intervalCheck", NULL)==NULL) {
+      printf(err_msg, " intervalCheck ");
+     g_key_file_set_string (keyString, "configuration", "intervalCheck", "false");
+     count_error_modified_check++;
+    }
+  if (g_key_file_has_key(keyString, "configuration", "todayCheck", NULL)==NULL) {
+      printf(err_msg, " todayCheck key ");
+     g_key_file_set_string (keyString, "configuration", "todayCheck", "false");
+     count_error_modified_check++;
+    }
+  if (g_key_file_has_key(keyString, "configuration", "anyDateCheck", NULL)==NULL) {
+      printf(err_msg, " anyDateCheck ");
+     g_key_file_set_string (keyString, "configuration", "anyDateCheck", "false");
+     count_error_modified_check++;
+    }
+  /* if all modified dates are default, then we must "force" a value for display button */
+  if(count_error_modified_check==6)
+     {
+       g_key_file_set_string (keyString, "configuration", "anyDateCheck", "true");
+       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(widget, "anyDateCheck")), TRUE);
+     }
+printf("passé 1\n");
+ /* get from config.ini file and store file size options to corresponding widgets  */
+  realize_FileSizeDialog(widget);
+printf("passé 2\n");
+  /* get from config.ini file and store modified date options to corresponding widgets  */
+  realize_FileModifiedDialog(widget);
+printf("passé \n");
   /* Store notebook global settings */
-  realizeNotebook(widget, keyString, "history", "searchNotebook");  
+ // realizeNotebook(widget, keyString, "history", "hboxSearchmonkey");  
 }
-
 
 
 /*
@@ -451,34 +586,16 @@ void unrealize_searchNotebook (GtkWidget *widget)
   GtkComboBox * combo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
 
   /* Store notebook global settings */
-  unrealizeNotebook(widget, keyString, "history", "searchNotebook");
-  
+ // unrealizeNotebook(widget, keyString, "history", "hboxSearchmonkey");
+  unrealizeSwitch(widget, keyString, "configuration", "advancedMode");
   /* Store basic Tab */
-  unrealizeComboBox2(widget, keyString, "history", "fileName2");
-  unrealizeComboBox(widget, keyString, "history", "containingText2");
-  unrealizeToggle(widget, keyString, "history", "containingTextCheck2");
-  unrealizeComboBox(widget, keyString, "history", "lookIn2");
-  unrealizeToggle(widget, keyString, "history", "searchSubfoldersCheck2");
+
   unrealizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
-
-
-  /* Store advanced Tab */
   unrealizeComboBox2(widget, keyString, "history", "fileName");
-  unrealizeToggle(widget, keyString, "history", "expertUserCheck");
   unrealizeComboBox(widget, keyString, "history", "containingText");
   unrealizeToggle(widget, keyString, "history", "containingTextCheck");
   unrealizeComboBox(widget, keyString, "history", "lookIn");
   unrealizeToggle(widget, keyString, "history", "searchSubfoldersCheck");
-  unrealizeToggle(widget, keyString, "history", "moreThanCheck");
-  unrealizeString(widget, keyString, "history", "moreThanEntry");
-  unrealizeComboBox(widget, keyString, "configuration", "MoreThanSize");/* Luc A - janv 2018 */
-  unrealizeToggle(widget, keyString, "history", "lessThanCheck");
-  unrealizeString(widget, keyString, "history", "lessThanEntry");
-  unrealizeComboBox(widget, keyString, "configuration", "LessThanSize");/* Luc A - janv 2018 */
-  unrealizeToggle(widget, keyString, "history", "afterCheck");
-  unrealizeString(widget, keyString, "history", "afterEntry");
-  unrealizeToggle(widget, keyString, "history", "beforeCheck");
-  unrealizeString(widget, keyString, "history", "beforeEntry");
   unrealizeToggle(widget, keyString, "history", "folderDepthCheck");
   unrealizeSpin(widget, keyString, "history", "folderDepthSpin");
 
@@ -499,6 +616,9 @@ void unrealize_searchNotebook (GtkWidget *widget)
   unrealizeToggle(widget, keyString, "history","followSymLinksCheck");
   unrealizeToggle(widget, keyString, "history", "limitContentsCheckResults");
   unrealizeSpin(widget, keyString, "history", "maxContentHitsSpinResults");
+ /* size and date search options */
+  unrealize_FileSizeDialog(widget);
+  unrealize_FileModifiedDialog(widget);
 }
 
 
@@ -509,7 +629,7 @@ void realize_menubar (GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
   /* Restore View */
-  realizeMenuCheck(widget, keyString, "menuOptions", "toolbar2");
+/*  realizeMenuCheck(widget, keyString, "menuOptions", "toolbar2");*/
   realizeMenuCheck(widget, keyString, "menuOptions", "status_bar1");
   realizeMenuCheck(widget, keyString, "menuOptions", "horizontal_results1");
   realizeMenuCheck(widget, keyString, "menuOptions", "vertical_results1");
@@ -536,7 +656,7 @@ void unrealize_menubar (GtkWidget *widget)
   GKeyFile *keyString = getGKeyFile(widget);
 
   /* Store View */
-  unrealizeMenuCheck(widget, keyString, "menuOptions", "toolbar2");
+/*  unrealizeMenuCheck(widget, keyString, "menuOptions", "toolbar2");*/
   unrealizeMenuCheck(widget, keyString, "menuOptions", "status_bar1");
   unrealizeMenuCheck(widget, keyString, "menuOptions", "horizontal_results1");
   unrealizeMenuCheck(widget, keyString, "menuOptions", "vertical_results1");
@@ -858,6 +978,32 @@ void realizeString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
 /*
  * Callback helper: store generic text entry box text into config.ini settings
  */
+void unrealizeButtonString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+{
+  g_key_file_set_string (keyString, group, name,
+                         gtk_button_get_label(GTK_BUTTON(lookup_widget(widget, name))));
+}
+
+/*
+ * Callback helper: retrieve generic text entry box text from config.ini settings
+ */
+void realizeButtonString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+{
+  gchar *tmpString;
+  
+  if (g_key_file_has_key(keyString, group, name, NULL)) {
+    tmpString = g_key_file_get_string (keyString, group, name, NULL);
+    if (tmpString != NULL) {
+      gtk_button_set_label(GTK_BUTTON(lookup_widget((widget), name)), tmpString);
+      g_free(tmpString);
+     }
+  }
+}
+
+
+/*
+ * Callback helper: store generic text entry box text into config.ini settings
+ */
 void unrealizeString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   g_key_file_set_string (keyString, group, name,
@@ -899,6 +1045,25 @@ void unrealizeFileButton(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
   }
 }
 
+/*************************************
+ callbacks for switches
+*************************************/
+void realizeSwitch(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+{
+  gboolean flag = FALSE;
+  if (g_key_file_has_key(keyString, group, name, NULL)) {
+    flag = g_key_file_get_boolean (keyString, group, name, NULL);
+    gtk_switch_set_active(GTK_SWITCH(lookup_widget(widget, name)), flag);
+    gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard1")) , flag);
+    gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard2")) , flag);
+  }
+}
+
+void unrealizeSwitch(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+{
+  g_key_file_set_boolean (keyString, group, name,
+                          gtk_switch_get_active(GTK_SWITCH(lookup_widget(widget, name))));
+}
 
 /*
  * Callback helper: retrieve generic toggle button value from config.ini settings
@@ -921,27 +1086,6 @@ void unrealizeToggle(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
                           gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, name))));
 }
 
-
-/*
- * Callback helper: retrieve generic current notebook page number from config.ini settings
- */
-void realizeNotebook(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
-{
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(lookup_widget(widget, name)),
-                                  g_key_file_get_integer (keyString, group, name, NULL));
-  }
-}
-
-
-/*
- * Callback helper: store generic current notebook page number into config.ini settings
- */
-void unrealizeNotebook(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
-{
-  g_key_file_set_integer (keyString, group, name,
-                          gtk_notebook_get_current_page(GTK_NOTEBOOK(lookup_widget(widget, name))));
-}
 
 
 /*
@@ -1066,8 +1210,9 @@ void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gcha
 
   textview1 = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
   textview4 = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
+
   gchar *newColor;
-  GdkColor cp;
+  GdkRGBA cp;
 
   GtkTextBuffer* textBuf1 = gtk_text_view_get_buffer (textview1);
   GtkTextTagTable* tagTable1 = gtk_text_buffer_get_tag_table(textBuf1);
@@ -1084,13 +1229,14 @@ void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gcha
   g_assert(tag4 != NULL);
   g_assert(tagTable4 != NULL);
   g_assert(textBuf4 != NULL);
+
   
   if (g_key_file_has_key(keyString, group, name, NULL)) {
     newColor = g_key_file_get_string (keyString, group, name, NULL);
     if (newColor != NULL) {
-      if (gdk_color_parse (newColor, &cp)) {
-        g_object_set( G_OBJECT(tag1), "background-gdk", &cp, NULL);
-        g_object_set( G_OBJECT(tag4), "background-gdk", &cp, NULL);
+      if (gdk_rgba_parse (&cp, newColor)) {
+        g_object_set( G_OBJECT(tag1), "background-rgba", &cp, NULL);
+        g_object_set( G_OBJECT(tag4), "background-rgba", &cp, NULL);     
       }
       g_free(newColor);
     }
@@ -1104,25 +1250,21 @@ void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gcha
 void unrealizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   GtkTextView *textview;
-  if (getResultsViewHorizontal(widget)) {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
-  } else {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
-  }
+ 
+  textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
   gchar *newColor;
-  GdkColor *cp;
+  GdkRGBA *cp;
   GtkTextBuffer* textBuf = gtk_text_view_get_buffer (textview);
   GtkTextTagTable* tagTable = gtk_text_buffer_get_tag_table(textBuf);
   GtkTextTag* tag = gtk_text_tag_table_lookup(tagTable, "word_highlight");
   
-  g_object_get( G_OBJECT(tag), "background-gdk", &cp, NULL);
-  newColor = gtk_color_selection_palette_to_string(cp, 1);
+  g_object_get( G_OBJECT(tag), "background-rgba", &cp, NULL);
+  newColor = gdk_rgba_to_string(cp);
   
   g_key_file_set_string (keyString, group, name, newColor);
-  gdk_color_free(cp);
+  gdk_rgba_free (cp);
   g_free(newColor);
 }
-
 
 
 /*
@@ -1134,8 +1276,10 @@ void realizeComboModel(GtkListStore *store, GKeyFile *keyString, const gchar *gr
     gsize length;
     gint i;
     GtkTreeIter iter;
-    
-    g_assert(store != NULL);
+
+    if(store==NULL)
+      return;
+   // g_assert(store != NULL);
     
     if (g_key_file_has_key(keyString, group, name, NULL)) {
         tmpString = g_key_file_get_string_list (keyString, group, name, &length, NULL);
@@ -1380,6 +1524,9 @@ void unrealizeTreeview(GtkWidget *widget, GKeyFile *keyString, const gchar *grou
 void realizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name, gboolean autoColumnWidth)
 {
   GtkTreeView *treeview;
+  gint column_count=0;
+  gint column_with=0;
+
   if (getResultsViewHorizontal(widget)) {
     treeview = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
   } else {
@@ -1399,13 +1546,50 @@ void realizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gchar
   allColumns = g_list_first(allColumns);
   do {
     column =  allColumns->data;
+    column_count++;
     if (autoColumnWidth) {
       gtk_tree_view_column_set_resizable (column, FALSE);
-      if (strcmp(gtk_tree_view_column_get_title(column), _("Location")) == 0) {
-        gtk_tree_view_column_set_min_width (column, 350);
-      } else {
-        gtk_tree_view_column_set_min_width (column, -1);
-      }
+      switch(column_count)
+        {
+          case 1:/* icon */
+            {
+              column_with = ICON_COLUMN_WIDTH;
+              break;
+            }
+          case 2:/* name */
+            {
+              column_with = 180;
+              break;
+            }
+          case 3:/* location */
+            {
+               column_with = 350;
+              break;
+            }
+          case 4:/* size */
+            {
+              column_with = 90;
+              break;
+            }
+          case 5:/* type */
+            {
+              column_with = 140;
+              break;
+            }
+          case 6:/* modified */
+            {
+              column_with = 200;
+              break;
+            }
+          case 7:/* hits */
+            {
+              column_with = 90;
+              break;
+            }   
+          default:
+            {column_with = 180;}         
+        }/* end switch */
+      gtk_tree_view_column_set_min_width (column, column_with);         
       gtk_tree_view_column_set_max_width (column, -1);
       gtk_tree_view_column_set_fixed_width (column, 1);
       gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
