@@ -2,7 +2,7 @@
 
 
 void
-on_window1_destroy                     (GtkObject       *object,
+on_window1_destroy                     (GtkWidget       *object,
                                         gpointer         user_data);
 
 void
@@ -65,9 +65,6 @@ void
 on_copy2_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
-void
-on_toolbar2_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
 
 void
 on_status_bar1_activate                (GtkMenuItem     *menuitem,
@@ -140,7 +137,47 @@ on_playButton_clicked                  (GtkButton       *button,
 void
 on_stopButton_clicked                  (GtkButton       *button,
                                         gpointer         user_data);
+void
+on_radiobuttonAll_toggled      (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_radiobuttonToday_toggled      (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_radiobuttonAfter_toggled      (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_radiobuttonBefore_toggled      (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_radiobuttonInterval_toggled      (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_radiobuttonSince_toggled      (GtkButton       *button,
+                                        gpointer         user_data);
 
+void
+on_afterCalenderBtn_clicked            (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_beforeCalendatBtn_clicked           (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_IntervalStartBtn_clicked            (GtkButton       *button,
+                                        gpointer         user_data);
+void
+on_IntervalEndBtn_clicked            (GtkButton       *button,
+                                        gpointer         user_data);
+gboolean
+on_sinceUnits_focus_out_event         (GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data);
+gboolean 
+on_entrySince_value_changed_event   (GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data);
+/************************* tempo -----------------------------*/
 void
 on_Question_clicked                    (GtkButton       *button,
                                         gpointer         user_data);
@@ -330,11 +367,6 @@ on_midTreeView_drag_end                (GtkWidget       *widget,
                                         GdkDragContext  *drag_context,
                                         gpointer         user_data);
 
-void
-on_notebook2_switch_page               (GtkNotebook     *notebook,
-                                        GtkNotebookPage *page,
-                                        guint            page_num,
-                                        gpointer         user_data);
 
 void
 on_configDialog_realize                (GtkWidget       *widget,
@@ -408,33 +440,12 @@ void
 on_vertical_results1_activate          (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
-void
-on_importCriteria_clicked              (GtkToolButton   *toolbutton,
-                                        gpointer         user_data);
 
-void
-on_exportCriteria_clicked              (GtkToolButton   *toolbutton,
-                                        gpointer         user_data);
-
-void
-on_saveResults_clicked                 (GtkToolButton   *toolbutton,
-                                        gpointer         user_data);
-
-void
-on_printResults_clicked                (GtkToolButton   *toolbutton,
-                                        gpointer         user_data);
 
 void
 on_newInstance2_clicked                (GtkToolButton   *toolbutton,
                                         gpointer         user_data);
 
-void
-on_playButton2_clicked                 (GtkToolButton   *toolbutton,
-                                        gpointer         user_data);
-
-void
-on_stopButton2_clicked                 (GtkToolButton   *toolbutton,
-                                        gpointer         user_data);
 
 void
 on_aboutSearchmonkey_response          (GtkDialog       *dialog,
@@ -459,7 +470,6 @@ on_containingText_changed              (GtkComboBox     *combobox,
 
 void
 on_searchNotebook_switch_page          (GtkNotebook     *notebook,
-                                        GtkNotebookPage *page,
                                         guint            page_num,
                                         gpointer         user_data);
 
@@ -495,13 +505,6 @@ void
 on_regularExpressionRadioFile_clicked  (GtkButton       *button,
                                         gpointer         user_data);
 
-void
-on_afterCalenderBtn_clicked            (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_beforeCalendatBtn_clicked           (GtkButton       *button,
-                                        gpointer         user_data);
 
 gboolean
 on_regexp_focus_out_event              (GtkWidget       *widget,
@@ -557,4 +560,8 @@ gboolean
 on_MoreThanSize_focus_out_event         (GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data);
-
+void expander_callback (GObject    *object,
+                   GParamSpec *param_spec,
+                   gpointer    user_data);
+void on_advancedMode_event(GtkSwitch *widget,
+               gpointer   user_data);
