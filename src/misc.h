@@ -2,6 +2,7 @@
  * File: misc.c header
  * Description: Contains helpere functions, and everything that doesn't fit elsewhere
  */
+#include <stdint.h>
 #ifndef MISC_H
 #define MISC_H
 
@@ -28,4 +29,7 @@ void changeModel(GtkWidget *widget, const gchar *from, const gchar *to);
 gchar * getDate(const gchar *curDate, GtkWidget *win);
 gboolean test_regexp(gchar *regexp, guint flags, gchar *error);
 gboolean validate_folder(const gchar *folderName);
+uint16_t getshort(unsigned char *buffer,int offset);
+int32_t getlong(unsigned char *buffer,int offset);
+uint32_t getulong(unsigned char *buffer,int offset);
 #endif /* MISC_H */

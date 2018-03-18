@@ -6,7 +6,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-
+#include <stdlib.h>
+#include <stdint.h>
+#include <assert.h>
 #include <gtk/gtk.h>
 #include <glib.h>
 
@@ -528,3 +530,24 @@ gboolean validate_folder(const gchar *folderName) {
   }
   return TRUE;
 }
+
+/********************************************************************/
+/* Reads 2-byte LSB  int from buffer at given offset platfom-indepent
+ * way - from catdoc utility !
+ *********************************************************************/ 
+uint16_t getshort(unsigned char *buffer,int offset) {
+	return (unsigned short int)buffer[offset]|((unsigned short int)buffer[offset+1]<<8);
+}  
+/********************************************************************/
+/* Reads 4-byte LSB  int from buffer at given offset almost platfom-indepent
+ * way
+ *********************************************************************/ 
+int32_t getlong(unsigned char *buffer,int offset) {
+	return (long)buffer[offset]|((long)buffer[offset+1]<<8L)
+		|((long)buffer[offset+2]<<16L)|((long)buffer[offset+3]<<24L);
+}  
+
+uint32_t getulong(unsigned char *buffer,int offset) {
+	return (unsigned long)buffer[offset]|((unsigned long)buffer[offset+1]<<8L)
+		|((unsigned long)buffer[offset+2]<<16L)|((unsigned long)buffer[offset+3]<<24L);
+}  
