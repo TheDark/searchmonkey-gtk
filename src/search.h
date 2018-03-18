@@ -123,7 +123,8 @@ typedef struct { /* Structure to store each match result before being displayed 
   gchar *pLocation; /* pointer to the location */
   gchar *pMDate; /* pointer to the modified date */
   gchar *pFileSize; /* pointer to the file size */
-  gchar *pFileType; /* pointer to the file size */
+  gchar *pFileType; /* pointer to the file type */
+  gchar *pShortFileType; /* DOS style file type, for example .ODT */
   long int mDate; /* modified date as an integer */
   unsigned int fileSize; /* filesize as an integer */
 } textMatch;
@@ -149,6 +150,7 @@ typedef struct { /* Structure to store all results together */
   GStringChunk *fileSizeChunk; /* Mass storage for all of the file sizes */
   GStringChunk *mDateChunk; /* Mass storage for all of the modified dates */
   GStringChunk *fileTypeChunk; /* Mass storage for all of the file types */
+  GStringChunk *shortfileTypeChunk;/* Mass storage for all DOS style extensions - Luc A. March 2018 */
   GStringChunk *textMatchChunk; /* Mass storage for all of the matched lines */
   GtkListStore *store; /* Pointer to the data store */ 
   GtkTreeIter *iter; /* Malloc Iter */

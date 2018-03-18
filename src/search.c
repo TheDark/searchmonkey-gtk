@@ -1747,6 +1747,7 @@ void getFileType(searchData *mSearchData, textMatch *newMatch)
       tmpChar++;
       tmpString = g_strdup_printf (_("%s-type"), tmpChar);
       newMatch->pFileType = (g_string_chunk_insert_const(mSearchData->fileTypeChunk, tmpString));
+      newMatch->pShortFileType = (g_string_chunk_insert_const(mSearchData->shortfileTypeChunk, g_strdup_printf ("%s", tmpChar)));/* Luc A March 2018 */
       g_free(tmpString);
       return;
     } else {
@@ -1756,6 +1757,7 @@ void getFileType(searchData *mSearchData, textMatch *newMatch)
     }
   }
   newMatch->pFileType = (g_string_chunk_insert_const(mSearchData->fileTypeChunk, _("Unknown")));
+  newMatch->pShortFileType = (g_string_chunk_insert_const(mSearchData->shortfileTypeChunk, _("?")));
 }
 
 
@@ -1911,7 +1913,7 @@ void displayMatch(searchControl *mSearchControl, searchData *mSearchData)
                       MATCH_INDEX_COLUMN, newMatch->matchIndex,
                       MODIFIED_COLUMN, newMatch->pMDate,
                       INT_MODIFIED_COLUMN, newMatch->mDate,
-                      TYPE_COLUMN, newMatch->pFileType,
+                      TYPE_COLUMN, newMatch->pShortFileType,
                       MATCHES_COUNT_STRING_COLUMN, tmpStr,
                       -1);
   gdk_threads_leave ();
@@ -2008,6 +2010,7 @@ void createSearchData(GObject *object, const gchar *dataName)
   mSearchData->fileSizeChunk = g_string_chunk_new(MAX_FILENAME_STRING + 1);
   mSearchData->mDateChunk = g_string_chunk_new(MAX_FILENAME_STRING + 1);
   mSearchData->fileTypeChunk = g_string_chunk_new(MAX_FILENAME_STRING + 1);
+  mSearchData->shortfileTypeChunk = g_string_chunk_new(MAX_FILENAME_STRING + 1);/* Luc A march 2018 */
   mSearchData->textMatchChunk = g_string_chunk_new(MAX_FILENAME_STRING + 1);
 
 //  mSearchData->store = NULL;
