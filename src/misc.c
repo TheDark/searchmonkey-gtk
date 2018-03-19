@@ -18,6 +18,66 @@
 #include <regex.h>
 
 /******************************************
+  function to recognize the file type
+  entry = path to file
+  output = a gint code to switch
+*****************************************/
+gint get_file_type_by_signature(gchar *path_to_file)
+{
+  FILE *inputFile;
+  gint retval = iUnknownFile;
+  gchar *buffer;
+  glong fileSize;
+  gchar rtf_sign[]="{\\rtf";
+  gchar start_sign[]={0x00, 0xD9, 0x00, 0x00, 0x00, 0x00};
+  gchar old_word_sign[]={0xdb,0xa5,0};
+  gchar write_sign[]={0x31,0xBE,0};
+  gchar ole_sign[]={0xD0,0xCF,0x11,0xE0,0xA1,0xB1,0x1A,0xE1,0};
+  gchar zip_sign[]="PK\003\004";
+  gchar abiword_sign[]={0x3C,0x3F,0x78,0x6D,0};
+  gchar pdf_sign[]={0x25, 0x50, 0x44, 0x46, 0};
+
+  inputFile = fopen(path_to_file,"rb");
+  if(inputFile==NULL) {
+          printf("* ERROR : impossible to open ABW file:%s *\n", path_to_file);
+          return NULL;
+  }
+  /* we compute the size before dynamically allocate buffer */
+   glong prev = ftell(inputFile);   
+   fseek(inputFile, 0L, SEEK_END);
+   glong sz = ftell(inputFile);
+   fseek(inputFile, prev, SEEK_SET);
+   if(sz>127)
+     sz = 127;
+   /* we allocate the buffer */
+   buffer = g_malloc0(128);
+   /* we start the file reading in Binary mode : it's better for future parsing */
+   fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
+   fclose(inputFile);
+   /* now we attempt to recognize signature */
+   if (strncmp(buffer,&write_sign,2)==0)
+      return iMsWriteFile;
+   if (strncmp(buffer,&old_word_sign,2)==0)
+      return iOldMSWordFile;
+   if (strncmp(buffer,&ole_sign,8)==0)
+      return iOleMsWordFile;
+   if (strncmp(buffer,&rtf_sign,4)==0)
+      return iRtfFile;
+   if (strncmp(buffer,&pdf_sign,4)==0)
+      return iPdfFile;
+   if (strncmp(buffer, &zip_sign,4) == 0) {
+     /* two cases : MS XML or Oasis XML */
+     if(strncmp ((const gchar*)buffer+54,(const gchar *)"oasis", 5)==0)
+        return iXmlOdtFile;
+     else
+        return iXmlMsWordFile;
+   }
+   if (strncmp(buffer, &abiword_sign,4) == 0)
+      return iAbiwordFile;
+   return retval;
+}
+
+/******************************************
  get a human readable string for the 
  modified date datas in order to
  be used whith the MAIN button in the GUI
@@ -533,7 +593,7 @@ gboolean validate_folder(const gchar *folderName) {
 
 /********************************************************************/
 /* Reads 2-byte LSB  int from buffer at given offset platfom-indepent
- * way - from catdoc utility !
+ * way
  *********************************************************************/ 
 uint16_t getshort(unsigned char *buffer,int offset) {
 	return (unsigned short int)buffer[offset]|((unsigned short int)buffer[offset+1]<<8);
