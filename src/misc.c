@@ -73,7 +73,8 @@ gint get_file_type_by_signature(gchar *path_to_file)
         return iXmlMsWordFile;
    }
    if (strncmp(buffer, &abiword_sign,4) == 0)
-      return iAbiwordFile;
+      if(strncmp ((const gchar*)buffer+0x31,(const gchar *)"abiwo", 5)==0)
+           return iAbiwordFile;
    return retval;
 }
 
