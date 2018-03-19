@@ -83,7 +83,147 @@ static t_symstruct lookuptable[] = {
 // please update in search.h the #define MAX_FORMAT_LIST according to the size of this table - Luc A 1 janv 2018
 #define NKEYS ( sizeof (lookuptable)/ sizeof(t_symstruct) )
 
+/*********************************************
+  Abiword ABW non-compress text files
 
+  With Abiword, it's simple to parse the XML 
+  file :
+<p  indicates the starting of a paragraph
+ end </p> the end of the paragraph
+*********************************************/
+gchar *ABWCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+   gboolean fIsParagraph = FALSE;
+   FILE *outputFile, *inputFile;
+   gchar *pBufferRead, *str, c, *tmpfileToExtract = NULL, *buffer;
+   glong  i, fileSize = 0, j=1; 
+   
+   /* the ABW file isn't compressed, so it can be opened as a basic plain text file */
+   inputFile = fopen(path_to_file,"rb");
+   if(inputFile==NULL) {
+          printf("* ERROR : impossible to open ABW file:%s *\n", path_to_file);
+          return NULL;
+   }
+
+   /* we compute the size before dynamically allocate buffer */
+   glong prev = ftell(inputFile);   
+   fseek(inputFile, 0L, SEEK_END);
+   glong sz = ftell(inputFile);
+   fseek(inputFile, prev, SEEK_SET);
+
+   /* we allocate the buffer */
+   buffer = g_malloc0(sz*sizeof(gchar)+sizeof(gchar));
+   /* we start the file reading in Binary mode : it's better for future parsing */
+   fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
+   fclose(inputFile);
+
+   /* now, the parsing itself */
+   outputFile = fopen(path_to_tmp_file,"w");
+   if(outputFile==NULL) {
+           g_free(buffer);           
+           printf("* ERROR : impossible to open temporary file:%s in order to parse ABW*\n", path_to_tmp_file);
+           return NULL;
+   }
+   /* first memory allocation */
+   str = (gchar*)g_malloc(sizeof(gchar));
+   str[0] = '\0';
+   i=0;
+   while(i<fileSize)
+        {
+         if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"<", sizeof(gchar))  == 0)
+            {
+              do
+               {
+                 /* is it an end of paragraph ? If yes, we add a \n char to the buffer */
+                 if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"</p>",4*sizeof(gchar))  ==  0 ) {
+                     str = (gchar*)realloc(str, j * sizeof(gchar));
+                     str[j-1] = '\n';
+                     j++;
+                     i = i+4*sizeof(gchar); 
+                     fIsParagraph = FALSE;
+                 }
+                 else{
+                      /* is it an XML section for another thing that a paragraph ? */
+                       if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"<p",2*sizeof(gchar))  ==  0 ) {
+                             i = i+2*sizeof(gchar); 
+                             fIsParagraph = TRUE;                    
+                       }
+                    else{
+                        if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"</foot",6*sizeof(gchar))  ==  0 ) {/* yes, it's a strange way but it works ! after a footnote's end we start a paragraph*/
+                             i = i+6*sizeof(gchar); 
+                             fIsParagraph = TRUE;                    
+                        }
+                       }/* elseif footnotes */
+                          
+                 }/* else paragraph end */
+                i= i+sizeof(gchar);     
+               }
+              while ( g_ascii_strncasecmp ((gchar*)  &buffer[i],">", sizeof(gchar))  !=0);
+              i= i+sizeof(gchar); 
+            }/* if */
+          else 
+           {
+             /* is it a special string ? */
+              if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"&amp;",5*sizeof(gchar))  ==  0 ) { 
+                   str = (gchar*)realloc(str, j * sizeof(gchar));
+                   str[j-1] = '&';
+                   j++;
+                   i = i+5*sizeof(gchar); 
+              }
+              else
+                 if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"&apos;",6* sizeof(gchar))  ==  0 ) {
+                     str = (gchar*)realloc(str, j * sizeof(gchar));
+                     str[j-1] = '\'';
+                     j++;
+                     i = i+6*sizeof(gchar); 
+                 }
+                 else
+                    if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"&quot;",6* sizeof(gchar))  ==  0 ) {
+                       str = (gchar*)realloc(str, j * sizeof(gchar));
+                       str[j-1] = '"';
+                       j++;
+                       i = i+6*sizeof(gchar); 
+                    }
+                   else
+                      if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"&lt;",4* sizeof(gchar))  ==  0 ) {
+                          str = (gchar*)realloc(str, j * sizeof(gchar));
+                          str[j-1] = '<';
+                          j++;
+                          i = i+4*sizeof(gchar); 
+                      }
+                      else
+                        if(g_ascii_strncasecmp ((gchar*)  &buffer[i],"&gt;",4* sizeof(gchar))  ==  0 ) {
+                             str = (gchar*)realloc(str, j * sizeof(gchar));
+                             str[j-1] = '>';
+                             j++;
+                             i = i+4*sizeof(gchar); 
+                        }
+                        else {
+                           c = (gchar )buffer[i];            
+                           if((c!='\n') && ( fIsParagraph)){
+                             str = (gchar*)realloc(str, j * sizeof(gchar));
+                             str[j-1] = c; 
+                             //i= i+sizeof(gchar);
+                           j++; 
+                        }/* else */
+                  i= i+sizeof(gchar);
+               }
+            // i= i+sizeof(gchar);              
+         }/* else */           
+      }/* wend i*/
+   /* we have to add the nULL char at end of str */
+   str[j-2]='\0';
+   g_free(buffer);
+   printf("g free OK \n");
+   /* we dump the parsed file */
+   printf("longueur chaine :%d\n", strlen(str));
+   fwrite(str , sizeof(gchar), strlen(str), outputFile);
+   fclose(outputFile);
+   tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
+   if(strlen(str)>0) 
+          g_free(str);     
+   return(tmpfileToExtract);
+}
 
 /*****************************
  function to obtain infos 
@@ -1381,52 +1521,50 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
     tmpFileName = g_strdup_printf("%s", (gchar*)g_ptr_array_index(mSearchData->fullNameArray, i) );/* modifyed Luc A janv 2018 */
     /* We must check the type-file in order to manage non pure text files like Office files 
        Luc A. 7 janv 2018 */
- //   printf("* Phase 2 : je teste le fichier :%s\n", tmpFileName);
-
-// !!!! pnser à mettre une fonction qui renvoit un code et après faire un switch(code) 
-
-   /* DOCX from MSWord 2007 and newer ? */
-    if( g_ascii_strncasecmp (&tmpFileName[strlen(tmpFileName)-4],"docx", 4)  == 0  )
-     {
+  
+   switch(get_file_type_by_signature(tmpFileName)) {
+     case iXmlOdtFile: { /* OPenDocument Text ? */
+       tmpExtractedFile = ODTCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {  
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+       break;
+     }
+     case iXmlMsWordFile: {/* DOCX from MSWord 2007 and newer ? */
        tmpExtractedFile = DocXCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;
            fIsOffice = TRUE;
           }
+       break;
      }
-   /* OPenDocument Text ? */
-   if( g_ascii_strncasecmp (&tmpFileName[strlen(tmpFileName)-3],"odt", 3)  == 0  )
-     {
-       /* thus we must change the location of tmpFileName : 
-         we unzip the original, and get a new location (in TMPDIR) 
-         to a plain text file extracted from the ODT */
-       tmpExtractedFile = ODTCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+     case iAbiwordFile: {/* DOCX from MSWord 2007 and newer ? */
+       tmpExtractedFile = ABWCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
-           // printf("No problemo ODT :%s \n", tmpExtractedFile);
-           /* now, we swap the current 'searchmonkey' mode for filename to the parsed pure text produced by the above function 
-            It's for this reason that I've changed Adam's code, where Adam only swapped pointers */
            fDeepSearch = TRUE;
            fIsOffice = TRUE;
           }
+       break;
      }
-  /* Acrobat PDF  ? */
-   if( g_ascii_strncasecmp (&tmpFileName[strlen(tmpFileName)-3],"pdf", 3)  == 0  )
-     {
-      // printf("* Phase 2 : fichier pdf ou ~pdf extension :%s<\n", &tmpFileName[strlen(tmpFileName)-3]);
-
+     case iPdfFile: {  /* Acrobat PDF  ? */
        tmpExtractedFile = PDFCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;
            fIsOffice = TRUE;
-          //if(tmpFileName!=NULL)
-            // g_free(tmpFileName);
-          // tmpFileName = g_strdup_printf("%s", tmpExtractedFile);
-          // g_free(tmpExtractedFile);
           }
+       break;
      }
+     default :{
+       printf("other file signature=%d\n", get_file_type_by_signature(tmpFileName));
+     }
+   }/* end switch */
+   
+  
   /* Update the status bar */
     gdk_threads_enter ();
     g_snprintf(status->constantString, MAX_FILENAME_STRING, _("Phase 2 searching %s"), tmpFileName);
