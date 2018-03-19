@@ -84,6 +84,66 @@ static t_symstruct lookuptable[] = {
 #define NKEYS ( sizeof (lookuptable)/ sizeof(t_symstruct) )
 
 /*********************************************
+ Old Ms Write for Windows files
+ the issue is that they uses two code pages :
+ CP437
+ CP850
+ I haven't doc, so I've found that One Byte
+ seems to indicates CP850
+*********************************************/
+gchar *WRICheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+  FILE *outputFile, *inputFile;
+  gchar *buffer = NULL, *str=NULL;
+  gboolean fIsCP850 = FALSE;
+  GError **error;
+  glong bytes_written, bytes_read, msWordLength, fileSize;
+
+   /* the WRITE file is binary */
+   inputFile = fopen(path_to_file,"rb");
+   if(inputFile==NULL) {
+          printf("* ERROR : impossible to open MS Write file:%s *\n", path_to_file);
+          return NULL;
+   }
+  /* we compute the size before dynamically allocate buffer */
+  glong prev = ftell(inputFile);   
+  fseek(inputFile, 0L, SEEK_END);
+  glong sz = ftell(inputFile);
+  fseek(inputFile, prev, SEEK_SET);
+  /* we allocate the buffer */
+  buffer = g_malloc0(sz*sizeof(gchar)+sizeof(gchar));
+  /* we start the file reading in Binary mode : it's better for future parsing */
+  fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
+  fclose(inputFile);
+  /* we save the MsWrite content - very basic, I haven't documentation */
+  outputFile = fopen(path_to_tmp_file, "w"); 
+  if(outputFile==NULL) {
+        g_free(buffer);
+        return NULL;
+  }
+  /* it seems that the end of text is coded in bytes[14-15] - Luc A 17 march 2018 */
+  msWordLength = getshort(buffer,14)-128;
+
+  if(buffer[20]==0x14)/* it's an hypothesis - Luc A 17 march 2018 */
+        fIsCP850 =TRUE;
+  if(msWordLength<0) {
+      g_free(buffer);
+      return NULL;
+  }
+
+  if(fIsCP850)
+        str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "CP437",
+                                           NULL, &bytes_read, &bytes_written, &error);
+  else
+        str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "WINDOWS-1252",
+                                           NULL, &bytes_read, &bytes_written, &error);
+  fwrite(str , sizeof(gchar), strlen(str), outputFile);
+  fclose(outputFile);
+  g_free(str);
+  g_free(buffer);
+  return path_to_tmp_file;
+}
+/*********************************************
   Abiword ABW non-compress text files
 
   With Abiword, it's simple to parse the XML 
@@ -1541,8 +1601,17 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
           }
        break;
      }
-     case iAbiwordFile: {/* DOCX from MSWord 2007 and newer ? */
+     case iAbiwordFile: {/* Abiword ? */
        tmpExtractedFile = ABWCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+       break;
+     }
+     case iMsWriteFile: {/* Old Ms Write for 90's ? */
+       tmpExtractedFile = WRICheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;
