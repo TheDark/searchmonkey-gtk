@@ -83,6 +83,107 @@ static t_symstruct lookuptable[] = {
 // please update in search.h the #define MAX_FORMAT_LIST according to the size of this table - Luc A 1 janv 2018
 #define NKEYS ( sizeof (lookuptable)/ sizeof(t_symstruct) )
 
+
+
+/***********************************************
+ OLD WinWord files
+**********************************************/
+gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+  FILE *outputFile, *inputFile;
+  gint flags,charset;
+  glong textstart,textlen, fileSize, i=0, j=0;
+  gchar *buffer, c, *str=NULL, buf_hexa[32];
+  GError **error = NULL;
+  glong bytes_written, bytes_read;
+
+  /* the Winword file is binary */
+   inputFile = fopen(path_to_file,"rb");
+   if(inputFile==NULL) {
+          printf("* ERROR : impossible to open MS Winword file:%s *\n", path_to_file);
+          return NULL;
+   }
+  /* we compute the size before dynamically allocate buffer */
+  glong prev = ftell(inputFile);   
+  fseek(inputFile, 0L, SEEK_END);
+  glong sz = ftell(inputFile);
+  fseek(inputFile, prev, SEEK_SET);
+  /* we allocate the buffer */
+  buffer = g_malloc0(sz*sizeof(gchar)+sizeof(gchar));
+  /* we start the file reading in Binary mode : it's better for future parsing */
+  fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
+  fclose(inputFile);
+  /* various analysis */
+  flags = getshort(buffer,10);
+  if (flags & fExtChar) {
+			printf ("File uses extended character set\n");
+
+	} else 
+		if (buffer[18]) {
+			printf("File created on Macintosh\n");
+		} else {
+			printf("File created on Windows\n");
+		} 
+
+  if (flags & fEncrypted) {
+		fprintf(stderr,"[File is encrypted. Encryption key = %08lx]\n",
+				getlong(buffer,14));
+		return -1;
+	}
+
+  charset=getshort(buffer,20);
+  if (charset&&charset !=256) {
+			printf("Using character set %d\n",charset);
+		} else {
+			printf("Using default character set\n");
+		}
+  /* skipping to textstart and computing textend */
+  textstart=getlong(buffer,24);
+  textlen=getlong(buffer,28)-textstart-20;
+  if((textstart<0) || (textlen<0) || (textlen<textstart)) {
+    g_free(buffer);
+    return NULL;
+  }
+  /* now we read and convert datas */
+  i = textstart;
+  outputFile = fopen(path_to_tmp_file, "w"); 
+  if(outputFile==NULL) {
+    g_free(buffer);
+    return NULL;
+  }
+
+  while((i<fileSize) && (j<textlen)) {
+    c = buffer[i];     
+    switch(c) {
+      case 0: case 0x0D: {j++;break;}
+      case '\n': {
+        fwrite((gchar*)"\n",sizeof(gchar), 1, outputFile);
+        j++;
+        break;
+      }
+      default:{
+        if(((gint)c<128) && (c>31)){
+          fwrite(&buffer[i], sizeof(gchar), sizeof(gchar), outputFile);
+          j++;
+        }
+        else {
+         if((guint)(c)>127) {                
+            buf_hexa[0] = (guint)c;
+            buf_hexa[1] = 0;
+            str= g_convert_with_fallback ((gchar *)buf_hexa, -1, "UTF8", "ISO-8859-1",
+                                           NULL, &bytes_read, &bytes_written, &error);
+            fwrite(str, sizeof(gchar), strlen(str), outputFile);
+            g_free(str);
+            j++;
+         }
+        }
+      }/* default */
+    }/* end switch */    
+    i++;
+  }/* wend */
+  fclose(outputFile);
+  return path_to_tmp_file;
+}
 /*********************************************
  Old Ms Write for Windows files
  the issue is that they uses two code pages :
@@ -1610,8 +1711,17 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
           }
        break;
      }
-     case iMsWriteFile: {/* Old Ms Write for 90's ? */
+     case iMsWriteFile: {/* Old Ms Write from 90's ? */
        tmpExtractedFile = WRICheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+       break;
+     }
+     case iOldMSWordFile: {/* Old Ms WinWord from 90's ? */
+       tmpExtractedFile = WRDCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;
