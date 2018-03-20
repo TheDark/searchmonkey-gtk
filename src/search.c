@@ -83,7 +83,200 @@ static t_symstruct lookuptable[] = {
 // please update in search.h the #define MAX_FORMAT_LIST according to the size of this table - Luc A 1 janv 2018
 #define NKEYS ( sizeof (lookuptable)/ sizeof(t_symstruct) )
 
+/*********************************************
+ms-RTF parser
+*********************************************/
+gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+  FILE *outputFile, *inputFile;
+  gint  i, j, fileSize = 0, openedBraces = 0;
+  gchar *buffer = NULL;
+  gboolean fParagraph = FALSE;
+  GError **error;
+  glong bytes_written, bytes_read;
+  gint hexa_char;
+  gchar buf_hexa[32];
+  GString *str=g_string_new("");
 
+  inputFile = fopen(path_to_file,"rb");
+  if(inputFile==NULL) {
+          printf("* ERROR : can't open RTF file:%s *\n", path_to_file);
+          return NULL;
+  }
+  /* we compute the size before dynamically allocate buffer */
+  glong prev = ftell(inputFile);   
+  fseek(inputFile, 0L, SEEK_END);
+  glong sz = ftell(inputFile);
+  fseek(inputFile, prev, SEEK_SET);
+
+  /* we allocate the buffer */
+  buffer = g_malloc0(sz*sizeof(gchar)+sizeof(gchar));
+  /* we start the file reading in Binary mode : it's better for future parsing */
+  fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
+  fclose(inputFile);
+  i=0;
+  /* we try to open the output file */
+   outputFile = fopen(path_to_tmp_file, "w"); 
+   if(outputFile==NULL)
+     return NULL;
+   while(i<=fileSize) {
+    /* is it a command char ? */
+    switch(buffer[i])
+     {
+       case '\\':{
+         i++;/* next char */        
+         switch(buffer[i])
+          {
+            case '*':{openedBraces = 1;
+               while( (i<fileSize)&&(openedBraces>0)){
+                /* we skip all chars */
+                i++;
+                        if(buffer[i]=='}')
+                           openedBraces--;
+                        if(buffer[i]=='{')
+                           openedBraces++;
+               }
+              i--;
+              break;           
+            }
+            case '~':{
+              str= g_string_append(str, " ");
+              break;
+            }
+            case '\\':{
+              str= g_string_append (str, "\\");
+              break;
+            }
+            case '{':{
+              str= g_string_append (str, "{");
+              break;
+            }
+            case '}':{
+              str= g_string_append (str, "}");
+              break;
+            }
+            case '-': case '_':{
+              str= g_string_append (str, "-");
+              break;
+            }
+            case '\'':{/* char >127 in Hexa mode */
+                          buf_hexa[0] = buffer[i+1];
+                          buf_hexa[1] = buffer[i+2];
+                          buf_hexa[2]=0;
+                          buf_hexa[3]=0;
+                          sscanf(buf_hexa, "%x", &hexa_char);
+                          buf_hexa[0] = hexa_char;
+                          buf_hexa[1]=0;   
+                          str= g_string_append (str,  g_convert_with_fallback ((gchar *)buf_hexa, 1, "UTF8", "WINDOWS-1252",
+                                           NULL, &bytes_read, &bytes_written, &error));                    
+                          i=i+2;
+
+              break;
+            }
+            case 'u':{/* char >127 in decimal mode */
+                         i++;
+                         j=0;
+                         while((i<fileSize) && ( (buffer[i]>='0') && (buffer[i]<='9')))
+                           {
+                             buf_hexa[j]= buffer[i];
+                             i++;
+                             j++;
+                         }/* wend digits in U chars */
+                         if(j>0) {
+                           buf_hexa[j]=0;
+                           sscanf(buf_hexa, "%d", &hexa_char);
+                           if(hexa_char>255) {
+                               buf_hexa[0]= hexa_char-(256*(hexa_char/256));
+                               buf_hexa[1]= hexa_char/256;
+                               buf_hexa[2]=0;
+                               buf_hexa[3]=0;
+                               buf_hexa[4]=0;
+                               if(j>0) {
+                                  str= g_string_append (str, g_convert_with_fallback ((gchar *)buf_hexa, 2, "UTF8", "UTF16",
+                                           NULL, &bytes_read, &bytes_written, &error));
+                               }
+
+                           }/* >255 */
+                           else {
+                             buf_hexa[0] = hexa_char;/* be careful for chars >255 !!! */
+                             buf_hexa[1]=0;
+                             if(j>0) {
+                                str= g_string_append (str, g_convert_with_fallback ((gchar *)buf_hexa, 1, "UTF8", "WINDOWS-1252",
+                                           NULL, &bytes_read, &bytes_written, &error));
+                             }
+                           }/* <256 */
+                           /* we now check if there is an alternate coding */
+                           if(i<fileSize-2) {
+                             if((buffer[i]=='\\') && (buffer[i+1]=='\'')){
+                              i=i+4;/* warning works only for 8 bits Hex values  */
+                             }
+                           }
+                         }
+                         else {
+                            while( (i<fileSize)&&(buffer[i]!=' ')&&(buffer[i]!='\\')&&(buffer[i]!='}')&&(buffer[i]!='{')) {
+                               i++;
+                            }
+                         }      
+              i--;
+              break;
+            }
+            default:{/* ? a true control ? */
+              /* at least, we must check if it's a paragraph command */
+              if( g_ascii_strncasecmp ((gchar*)&buffer[i],"pard",4*sizeof(gchar))==0) {
+                      i=i+4;
+                      fParagraph = TRUE;
+              }
+              else
+                if(g_ascii_strncasecmp ((gchar*)&buffer[i],"par",3*sizeof(gchar))==0) {
+                      i=i+3;
+                      fParagraph = FALSE;
+                      str= g_string_append (str, "\n");
+                }
+                /* we must add the case of \pict controls ! */
+                else
+                  if(g_ascii_strncasecmp ((gchar*)&buffer[i],"pict",4*sizeof(gchar))==0){
+                     /* 2 cases ; simple picture, then no braces in other cases we have \* and braces */
+                     i=i+4;
+                     openedBraces = 1;
+                     while((i<fileSize)&&(openedBraces>=0)) {
+                        /* we skip all picture's hexa codes */
+                        i++;
+                        if(buffer[i]=='}')
+                           openedBraces--;
+                        if(buffer[i]=='{')
+                           openedBraces++;
+                     }/* wend */
+                   }
+                   else {
+                        while((i<fileSize)&&(buffer[i]!=' ')&&(buffer[i]!='\\')&&(buffer[i]!='}')&&(buffer[i]!='{') &&(buffer[i]!='\n')) {
+                        /* we skip all chars */
+                        i++;
+                        }/* wend */
+                   }/* elseif */
+             i--;
+            }/* case default */
+          }/* end switch first char after control */
+         break;
+       }
+       case '{':
+       case '}':
+       case '\n':{/* a Parser MUST ignore LF */
+         break;
+       }      
+       default:{
+        if(fParagraph) {
+            str= g_string_append_c (str, buffer[i]);
+        }
+       }
+     }/* end switch */
+    i++;
+   }/* wend all along the file */   
+ g_free(buffer);
+ fwrite(str->str,sizeof(gchar), strlen(str->str), outputFile);
+ fclose(outputFile);
+ g_string_free(str, TRUE);
+ return path_to_tmp_file;
+}
 
 /***********************************************
  OLD WinWord files
@@ -1731,6 +1924,15 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
      }
      case iPdfFile: {  /* Acrobat PDF  ? */
        tmpExtractedFile = PDFCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+       break;
+     }
+     case iRtfFile: {  /* Rich Text Format - RTF  ? */
+       tmpExtractedFile = RTFCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;
