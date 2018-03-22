@@ -224,7 +224,7 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
        {    
          addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
        }
-
+  gtk_widget_set_tooltip_text (GTK_WIDGET(tmpCombo),gtk_combo_box_text_get_active_text (tmpCombo)); 
   /* file(s) name parameters = parameter2 from command line - Luc A janv 2018 */
   tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
   g_assert(tmpCombo != NULL);
