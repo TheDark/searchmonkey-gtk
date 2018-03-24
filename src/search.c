@@ -83,6 +83,446 @@ static t_symstruct lookuptable[] = {
 // please update in search.h the #define MAX_FORMAT_LIST according to the size of this table - Luc A 1 janv 2018
 #define NKEYS ( sizeof (lookuptable)/ sizeof(t_symstruct) )
 
+/********************************************
+  convert a non-UTF8 string using 
+  Glib functions
+  Dirty : all chars <32 are removed
+ ********************************************/
+gchar *MSWordconvert_str(unsigned char *buffer, gint fromCP, glong len)
+{
+  glong i, count;
+  GError **error;
+  glong bytes_written, bytes_read;
+  gchar *sRetVal=NULL;
+  GString *str=g_string_new("");
+
+  count = 1;
+  if(fromCP==iCpUtf16)
+    count = 2;
+  i=0;
+  while(i<len) {
+    /* we have to switch between 8bits or 16 bits chars codings */
+     if(buffer[i]<32) {
+       switch(buffer[i]) {
+         case 0x0D:
+         case 12:/* page break */
+         case 14:/* column break */
+         case 11:{
+           str= g_string_append (str,"\n");
+           break;
+         }
+         case 0x19:{
+           str= g_string_append (str,"'");
+           break;
+         }
+         case 31:
+         case 30:{
+           str= g_string_append (str,"-");
+           break;
+         }
+         default:{
+           str= g_string_append (str," ");
+         }
+       }/* end switch <32 */          
+     }
+     else {
+       if(fromCP==iCpUtf16)
+         str= g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 2, 
+                                    "UTF8", "UTF16", NULL, &bytes_read, &bytes_written, &error));
+       else
+           str= g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 1, 
+                                    "UTF8", "WINDOWS-1252", NULL, &bytes_read, &bytes_written, &error));         
+     }
+    i=i+count;
+  }/* wend i */
+  sRetVal = g_strdup_printf("%s", str->str);
+  g_string_free(str, TRUE);
+  return sRetVal;
+}
+/*********************************************
+ms-Word OLE (W6/98/97>>2003 parser
+*********************************************/
+gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
+{
+  FILE *outputFile, *inputFile;
+  GError **error;
+  glong fileSize, bytes_written, bytes_read;
+  const gint MSAT_ORIG_SIZE = 436;
+  gint i, j, k, fWordFlags, typeEntry, charset, wordVersion;
+  glong currentID, count, rootDirectorySectId, WordDocumentSectId, tmpSecId, tmpByteslength, fileOffset, SATValue;
+  unsigned char *SAT = NULL, *SSAT = NULL;
+  unsigned char *SSCS = NULL, *directoryChain = NULL, *WordDocument = NULL, *clx = NULL, *pieceTable = NULL;
+  unsigned char *tableStream = NULL, pieceDescriptor[8];
+  gchar *str=NULL, *buffer;
+  gint countDirectoryChain =0,sectId1TableStream = -10, sectId0TableStream = -10, sectIdTableStream=-10; /* arbitrary for me */
+  glong WordDocumentStreamLen, fcClx=0, lcbClx=0, lcbPieceTable =0, usedSect, secIdDirectoryStream, minSizeSectorStream, secIdFirstSSAT;
+  glong ssat_size, secIdFirstSectorMSAT, msat_size, textstart, textlen, fcValue, fcOffset;
+  gint fTableStream = -1, TableStreamLen = 0, sectorSize,  shortSectorSize, pieceCount, offsetPieceDescriptor;
+  gboolean goOn = TRUE, fWordDocument = FALSE,fCreatedMac = FALSE;
+
+
+  printf("MsWord OLE Parser =%s\n",path_to_file );
+  /* the Winword file is binary */
+  inputFile = fopen(path_to_file,"rb");
+  if(inputFile==NULL) {
+          printf("* ERROR : impossible to open MS Winword file:%s *\n", path_to_file);
+          return NULL;
+  }
+  /* we compute the size before dynamically allocate buffer */
+  glong prev = ftell(inputFile);   
+  fseek(inputFile, 0L, SEEK_END);
+  glong sz = ftell(inputFile);
+  fseek(inputFile, prev, SEEK_SET);
+  /* we allocate the buffer */
+  if(sz<=0)
+    return NULL;
+  buffer = g_malloc0(sz*sizeof(gchar)+sizeof(gchar));
+  if(buffer==NULL)
+    return NULL;
+  /* we start the file reading in Binary mode : it's better for future parsing */
+  fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
+  fclose(inputFile);
+  /* the word coding MUST be in little endian ! */
+  if(!(buffer[28]=0xFE)&&(buffer[29]==0xFF)) {
+        printf("* can't proceed : file coded in Big endian mode ! \n");
+        g_free(buffer);
+        return NULL;
+  }
+  /* sizes */
+  msat_size=getlong(buffer,0x48);
+  ssat_size = getlong(buffer, 0x40);
+  if((msat_size<0) || (ssat_size<0)) {
+          g_free(buffer);
+          return NULL;
+  }
+  sectorSize = 1<<getshort(buffer,0x1e);
+  shortSectorSize=1<<getshort(buffer,0x20);
+  usedSect = getulong(buffer,44);
+  /* we allocate memory to store all the SAT used */
+  SAT = g_malloc0(usedSect*sectorSize);
+  /* directory */
+  secIdDirectoryStream = getulong(buffer,48);
+  /* SSAT */
+  minSizeSectorStream = getulong(buffer, 56);
+  secIdFirstSSAT = getlong(buffer, 0x3C);
+  /* we allocate memory for the SSAT */
+  SSAT = g_malloc0(ssat_size*sectorSize);
+  secIdFirstSectorMSAT = getlong(buffer,0x44);
+
+  /* first sector starts at offset 512 */
+  /* we must build the Sector Allocation Table (SAT) by reading the MSAT and the sectors pointed by the MSAT */
+  i=usedSect;
+  count = 76;
+  j=0;
+  while(i>0) {
+          currentID = getlong(buffer, count);
+          memcpy (SAT+(j*sectorSize), buffer+512+sectorSize*currentID, sectorSize);
+          i--;
+          j++;
+          count = count+4;
+  }/* wend msat_size */
+  /* secIdFirstSSAT = first sector of SSAT but the chains is stored in the MAIN sat at secIdFirstSSAT position ! */
+  i = ssat_size;
+  j = 0;
+  count = secIdFirstSSAT;
+  while(i>0) {
+          memcpy (SSAT+j*sectorSize, buffer+512+count*sectorSize, sectorSize);
+          currentID = getlong(SAT, 4*count); 
+          count = currentID;
+          i--;
+          j++;        
+  }/* wend ssat_size */
+  /* we build the directory chain  */
+  if((secIdDirectoryStream<1) || (secIdDirectoryStream>usedSect*sectorSize)) {
+          g_free(SAT);
+          g_free(SSAT);
+          g_free(buffer);
+          return NULL;
+  }
+
+  SATValue = secIdDirectoryStream;                         
+  while((SATValue!=-2) && (SATValue!=0)) {
+            directoryChain = g_realloc(directoryChain, (countDirectoryChain+1)*sectorSize);
+            memcpy (directoryChain+(countDirectoryChain*sectorSize),buffer+512+(sectorSize*SATValue), sectorSize);
+            countDirectoryChain++;
+            SATValue = getlong(SAT, 4*SATValue);
+  }/* wend satvalue */
+  /* we check if the directory chain contains required streams */
+  for(i=0; i<countDirectoryChain*4; i++) {
+              k = 0x00FF & getshort(directoryChain, 66+(i*128));
+              switch(k) {
+                case 5:{ 
+                   rootDirectorySectId = getlong(directoryChain, 116+(i*128));
+                   if(rootDirectorySectId<1) {
+                      g_free(SAT);
+                      g_free(SSAT);
+                      g_free(directoryChain);
+                      g_free(buffer);
+                      return NULL;
+                   }
+                   /* now we can build the SSCS */                   
+                   j=0;
+                   count = 0;
+                   tmpSecId = rootDirectorySectId;
+                   while(tmpSecId!=-2) {
+                     SSCS = g_realloc(SSCS, (count+1)*sectorSize);
+                     memcpy(SSCS+(count*sectorSize),buffer+512+ (tmpSecId*sectorSize) , sectorSize);
+                     tmpSecId = getlong(SAT, tmpSecId*4);
+                     count++;
+                   }
+                   break;
+                }/* end case 5 */
+                case 2: case 1:{
+                   str = g_convert_with_fallback ((gchar *)(directoryChain)+(i*128), 64, "UTF8", "UTF16",
+                                           NULL, &bytes_read, &bytes_written, &error);
+                   tmpSecId = getlong(directoryChain, 116+(i*128));
+                   tmpByteslength = getlong(directoryChain, 120+(i*128));
+                   if(g_ascii_strncasecmp (str,"1Table",12*sizeof(gchar))==0 ) {
+                     sectId1TableStream = tmpSecId;
+                     sectIdTableStream = tmpSecId;
+                     fTableStream = 1;
+                     TableStreamLen = tmpByteslength;
+                   }
+                   if(g_ascii_strncasecmp (str,"0Table",12*sizeof(gchar))==0 ) {
+                     sectId0TableStream = tmpSecId;
+                     sectIdTableStream = tmpSecId;
+                     fTableStream =0;
+                     TableStreamLen = tmpByteslength;
+                   }
+                   if(g_ascii_strncasecmp (str,"WordDocument",12*sizeof(gchar))==0 ) {
+                     fWordDocument = TRUE;
+                     WordDocumentSectId = tmpSecId;
+                     WordDocumentStreamLen = tmpByteslength;
+                   }
+                   g_free(str);
+                   break;
+                }
+                default:;                   
+              }/* end switch */         
+  }/* next i */
+
+  /* we build the WordDocument stream */
+  count = 0;
+  /* if fWordDocument is in the SSCS ? */
+  if(WordDocumentStreamLen<minSizeSectorStream) {
+     while(WordDocumentSectId!=-2) {
+         WordDocument = g_realloc(WordDocument, (count+1)*shortSectorSize);       
+         memcpy(WordDocument+count*shortSectorSize, SSCS+(WordDocumentSectId*shortSectorSize), shortSectorSize);
+         WordDocumentSectId = getlong(SSAT, WordDocumentSectId*4);
+         count++;
+     }/* wend */
+  }
+  else {/* datas in the SAT */
+       while(WordDocumentSectId!=-2) {
+            WordDocument = g_realloc(WordDocument, (count+1)*sectorSize);
+            memcpy(WordDocument+count*sectorSize, buffer+512+(WordDocumentSectId*sectorSize), sectorSize);
+            WordDocumentSectId = getlong(SAT, WordDocumentSectId*4);
+            count++;
+       }/*wend*/
+  }
+
+  wordVersion = getshort(WordDocument,0);   
+  fWordFlags = getshort(WordDocument,10);
+
+  if((WordDocument==NULL) || ((wordVersion!=fWord6 ) && (wordVersion!=fWord95) && (wordVersion!=fWord97) )) {
+                             if(WordDocument)
+                                g_free(WordDocument);
+                             g_free(SAT);
+	                     g_free(SSAT);
+                             g_free(directoryChain);
+                             g_free(SSCS);
+                             g_free(buffer);
+                             return NULL;
+  }
+
+  if((wordVersion==fWord97)&&(fTableStream<0)){  
+                             g_free(SAT);
+	                     g_free(SSAT);
+                             g_free(directoryChain);
+                             g_free(SSCS);
+                             g_free(WordDocument);
+                             g_free(buffer);
+                             return NULL;
+  }
+
+  /* now we have a W6/95/97 document */
+  textstart=getlong(WordDocument,24);/* fib.fcMin */
+  textlen=getlong(WordDocument,28)-textstart;/* fib.fcMac */
+  if((wordVersion ==fWord6) ||  (wordVersion==fWord95)) {
+            if (fWordFlags & fComplex) {
+             /* if the file has been 'fast saved' we must access to the piece table */
+             /* we get infos for 'fast saved' documents because they have various 'pieces' of datas - 
+                thanks to the antiword ideas ! in W6/95, there isn't any PieceTable stream, but the equivalent starts at offset */
+                  fcClx = getlong(WordDocument, 0x160);/* fcClx in W6/7 docs - ile of offset of beginning of information 
+                          for   complex files. Consists of an encoding of all of the prms quoted by the document 
+                          followed by the plcpcd (piece table) for the document. */
+                  lcbClx = getlong(WordDocument, 0x164);/* lcbClx - count of bytes of complex file information. == 0 if file is non-complex.*/
+                  /* now we get the clx array - be carreful, ONLY for fast saved docs ! */  
+                  clx = g_malloc0(lcbClx);
+                  memcpy(clx, WordDocument+fcClx, lcbClx);
+                  /* now we are looking for the Piecetable structures */
+                  count =0;
+                  goOn = TRUE;
+                  while(goOn) {
+                     typeEntry = clx[count];
+                     if(typeEntry==2) {
+                        goOn = FALSE;
+                        lcbPieceTable = getshort(clx, count+1);
+                        pieceTable = g_malloc0(lcbPieceTable);
+                        memcpy(pieceTable, clx+count+5, lcbPieceTable);
+                        pieceCount = (lcbPieceTable-4)/12;
+                        /* here we must build the big-block in order to merge all pieces */
+                        unsigned char *BBOT = NULL; /* Big Block Of Text */
+                        BBOT = g_malloc0 (getlong(WordDocument, 52) ); /* we hope it's only ANSI chars ! */
+                        outputFile = fopen(path_to_tmp_file, "w");
+                        for(i=0;i<pieceCount;i++) {
+                        /* text block position - text block descriptor */
+                          offsetPieceDescriptor = ((pieceCount+1)*4)+(i*8);
+                          memcpy(pieceDescriptor, pieceTable+offsetPieceDescriptor, 8);
+                          fcValue = getlong(pieceDescriptor,2) & 0x40000000;                                                       
+                          fcOffset = getlong(pieceDescriptor,2) & 0xBFFFFFFF;
+                          textstart = getlong(pieceTable, i*4);
+                          textlen = getlong(pieceTable, i*4+4);
+                          /* warning, UNICODE bad detected !!! */
+                          if(textlen<getlong(WordDocument, 52))
+                                 memcpy(BBOT+textstart, (gchar *)(WordDocument)+fcOffset,textlen -textstart);
+                                        
+                        }/* next i */
+                        //str = MSWordconvert_str((gchar *)BBOT, "WINDOWS-1252", "UTF8", getlong(WordDocument, 52) );
+                        str = MSWordconvert_str((gchar *)BBOT, iCpW1252, getlong(WordDocument, 52) );
+                        fwrite(str,sizeof(gchar), strlen(str), outputFile);                    
+                        g_free(str);   
+                        fclose(outputFile);
+                        g_free(pieceTable);
+                        g_free(BBOT);
+                     }/* typentry =2*/
+                     else if(typeEntry==1) {
+                            count = count+1+1+clx[count+1]+1;
+                          }
+                     else if(typeEntry==0) {
+                            count=count+2;
+                          }
+                     else {
+                       goOn = FALSE;
+                     }/* other entry */
+                  }/* wend goOn */ 
+                  g_free(clx);
+            }/* fast saved */    
+           else {
+                   outputFile = fopen(path_to_tmp_file, "w");
+                   str = MSWordconvert_str((gchar *)WordDocument+textstart, iCpW1252, textlen );
+                   //str=  g_convert_with_fallback ((gchar *)(WordDocument)+textstart, textlen, 
+                     // "UTF8", "WINDOWS-1252", NULL, &bytes_read, &bytes_written, &error);
+                   fwrite(str,sizeof(gchar), strlen(str), outputFile);
+                   g_free(str);               
+                   fclose(outputFile);
+           }/* else not fast saved */        
+           /* we clean the memory */
+           g_free(directoryChain);
+           g_free(WordDocument);
+           g_free(SAT);  
+           g_free(SSAT);
+           g_free(SSCS);
+           g_free(buffer);
+           return path_to_tmp_file; 
+  }/* word 6-95 */
+
+  /* here we continue with W97+ files */
+  /* we read the csw value just after the fubbase structure - MUST BE 0x000E */
+  fileOffset = 32;/* fibBase has a length of 32 bytes */
+  /* thus we can skip the fibRgW structure - 28 bytes */
+  fileOffset = fileOffset+28+2;
+  /* thus we can skip the fibRgLw structure = 88 bytes */
+  fileOffset = fileOffset+88+2;
+  /* we read the cbRgFcLcb - it has various pre-defined values */
+  fileOffset = fileOffset+2;
+  /* we have an offset on the top of the FibRgFcLcb97 structure (744 bytes) now we are looking for 
+     FibRgFcLcb97.fcClx which is an offset on the table  fcClx is the 67th 64 bits value and lcbClx the 68th*/
+  /* here, fileOffset is at byte 154, e.g. the start of FibRgFcLcb97 structure */
+  fcClx = getlong(WordDocument,fileOffset+(4*66));
+  lcbClx = getlong(WordDocument,fileOffset+(4*67));
+  /* now we build the xx Table stream in memory */
+  if( fTableStream>=0) {
+          count = 0;
+          tableStream = NULL; 
+          if(TableStreamLen<minSizeSectorStream) {
+                while(sectIdTableStream!=-2) {
+                  tableStream = g_realloc(tableStream, (count+1)*shortSectorSize);
+                  memcpy(tableStream+count*shortSectorSize, SSCS+(sectIdTableStream*shortSectorSize), shortSectorSize);
+                  sectIdTableStream = getlong(SSAT, sectIdTableStream*4);
+                  count++;
+                }/* wend */
+          }
+          else{
+                while(sectIdTableStream!=-2) {
+                  tableStream = g_realloc(tableStream, (count+1)*sectorSize);
+                  memcpy(tableStream+count*sectorSize, buffer+512+(sectIdTableStream*sectorSize), sectorSize);
+                  sectIdTableStream = getlong(SAT, sectIdTableStream*4);
+                  count++;
+                }/* wend */ 
+          }/* elseif SAT */
+         /* now we get the clx array */  
+         clx = g_malloc0(lcbClx);
+         memcpy(clx, tableStream+fcClx, lcbClx);
+        /* now we are looking for the Piecetable structures */
+         count =0;
+         goOn = TRUE;
+         while(goOn) {
+           typeEntry = clx[count];
+           if(typeEntry==2) {
+             goOn = FALSE;
+             lcbPieceTable = getlong(clx, count+1);
+             pieceTable = g_malloc0(lcbPieceTable);
+             memcpy(pieceTable, clx+count+5, lcbPieceTable);
+             pieceCount = (lcbPieceTable-4)/12;
+             outputFile = fopen(path_to_tmp_file, "w");
+             for(i=0;i<pieceCount;i++) {
+               /* text block position ,  text block descriptor */
+               offsetPieceDescriptor = ((pieceCount+1)*4)+(i*8);
+               memcpy(pieceDescriptor, pieceTable+offsetPieceDescriptor, 8);
+               fcValue = getlong(pieceDescriptor, 2) & 0x40000000;                                                       
+               fcOffset = getlong(pieceDescriptor, 2) & 0xBFFFFFFF;
+               textstart = getlong(pieceTable, i*4);
+               textlen = getlong(pieceTable, i*4+4);
+               if((fcValue==0x40000000)==FALSE) {/* char codage : Unicode 2 bytes by char */
+                 // str = MSWordconvert_str((gchar *)(WordDocument)+fcOffset, "UTF16", "UTF8", 2*(textlen -textstart ));
+                 str = MSWordconvert_str((gchar *)(WordDocument)+fcOffset, iCpUtf16, 2*(textlen -textstart ));
+                 //str=  g_convert_with_fallback ((gchar *)(WordDocument)+fcOffset, 2*(textlen -textstart), 
+                   //   "UTF8", "UTF16", NULL, &bytes_read, &bytes_written, &error);
+                 fwrite(str,sizeof(gchar), strlen(str), outputFile);
+                 g_free(str);
+               }
+               else {/* chars codage : WINDOWS-1252 1 byte by char */
+                 str = MSWordconvert_str((gchar *)(WordDocument)+fcOffset/2, iCpW1252, textlen -textstart );
+               //  str=  g_convert_with_fallback ((gchar *)(WordDocument)+fcOffset/2, textlen-textstart, 
+                 //     "UTF8", "WINDOWS-1252", NULL, &bytes_read, &bytes_written, &error);
+                 fwrite(str,sizeof(gchar), strlen(str), outputFile);
+                 g_free(str);
+               }
+             }/* next */
+             fclose(outputFile);
+           }
+           else if(typeEntry==1) {
+             count = count+1+1+clx[count+1];
+           }
+           else {
+             goOn = FALSE;
+           }
+         }/* wend */  
+         g_free(clx);
+         g_free(tableStream); 
+         g_free(pieceTable);
+       }/* if fTableStream */
+  /* we clean the memory */
+  g_free(directoryChain);
+  g_free(WordDocument);
+  g_free(SAT);  
+  g_free(SSAT);
+  g_free(SSCS);
+  g_free(buffer);
+  return path_to_tmp_file;
+}
+
 /*********************************************
 ms-RTF parser
 *********************************************/
@@ -1895,8 +2335,8 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
           }
        break;
      }
-     case iAbiwordFile: {/* Abiword ? */
-       tmpExtractedFile = ABWCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+     case iOleMsWordFile: {/* Ms Word 6/95/97>>2003 ? */
+       tmpExtractedFile = OLECheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;
@@ -1924,6 +2364,15 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
      }
      case iPdfFile: {  /* Acrobat PDF  ? */
        tmpExtractedFile = PDFCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
+       if(tmpExtractedFile!=NULL)
+          {
+           fDeepSearch = TRUE;
+           fIsOffice = TRUE;
+          }
+       break;
+     }
+     case iAbiwordFile: {/* Abiword ? */
+       tmpExtractedFile = ABWCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
           {
            fDeepSearch = TRUE;

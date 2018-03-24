@@ -3341,7 +3341,7 @@ GtkWidget *create_aboutSearchmonkey (void)
       gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), aboutSearchmonkey_icon_pixbuf);
       g_object_unref(G_OBJECT(aboutSearchmonkey_icon_pixbuf ));
     }
-  gtk_about_dialog_set_version (GTK_ABOUT_DIALOG(dialog),"0.9");
+  gtk_about_dialog_set_version (GTK_ABOUT_DIALOG(dialog),"0.9.0");
   gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), _("Copyright (c) 2006-2018 Adam Cottrell"));
   gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), 
      _("Regular expression power search utility written in GTK+ and licensed under GPL v.3"));

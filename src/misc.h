@@ -31,6 +31,9 @@ from catdoc and me ;-)
 #define iRtfFile 6
 #define iPdfFile 7
 #define iAbiwordFile 8
+/* for code pages conversions */
+#define iCpUtf16 1
+#define iCpW1252 2
 
 extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
 
