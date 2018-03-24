@@ -704,7 +704,29 @@ create_window1 (void)
   gtk_widget_set_name(lookIn, "lookIn");
   gtk_grid_attach(GTK_GRID(table7), lookIn, 1, 0, 1, 1);
   gtk_widget_set_can_focus (lookIn, TRUE);
+//GtkCellArea *area = gtk_cell_layout_get_area((GtkCellLayout *)lookIn);
+//GList *renderers = gtk_cell_layout_get_cells((GtkCellLayout *)lookIn);
+//GtkCellRendererText *cell = g_list_first(renderers)->data;
+//gtk_cell_renderer_set_fixed_size((GtkCellRenderer *)cell, 250, 25);
+//g_object_set((GtkCellRenderer *)cell, "ellipsize", PANGO_ELLIPSIZE_START, NULL);
 
+  /* now we modifiy PangO layout */
+//PangoContext *pango_lookIn = gtk_widget_get_pango_context ( GTK_ENTRY(gtk_bin_get_child((GTK_WIDGET(lookIn)))));
+// PangoLayout *pango_layout_lookIn= gtk_entry_create_layout(GTK_ENTRY(gtk_bin_get_child((lookIn))));
+//pango_layout_set_width (pango_layout_lookIn, 50);
+// pango_layout_set_ellipsize (pango_layout_lookIn, PANGO_ELLIPSIZE_END );
+
+  PangoAttribute *attr_bold;
+  PangoAttrList *attr_list;
+// g_object_set((GtkCellRenderer *)cell, "ellipsize", PANGO_ELLIPSIZE_MIDDLE, NULL);
+  attr_bold = pango_attr_weight_new (PANGO_WEIGHT_BOLD);
+  attr_list = pango_attr_list_new ();
+  pango_attr_list_insert (attr_list, attr_bold);
+  gtk_entry_set_attributes (GTK_ENTRY(gtk_bin_get_child(lookIn)), attr_list);
+  pango_attr_list_unref (attr_list);
+
+// g_object_unref(pango_layout_lookIn);
+/* end pango */
   searchSubfoldersCheck = gtk_check_button_new_with_mnemonic (_("Recurse Folders"));
   gtk_widget_show (searchSubfoldersCheck);/* position modifyed - Luc A. 29 dec 2017 */
   gtk_grid_attach(GTK_GRID(table7), searchSubfoldersCheck, 1, 1, 1, 1);
@@ -3374,6 +3396,13 @@ create_calendarDialog (GtkWidget *win)
   GtkWidget *dialog_action_area11;
   GtkWidget *cancelbutton5;
   GtkWidget *okbutton6;
+  GtkWidget *grid1;
+  GtkWidget *labelCurrentDay;
+  GtkWidget *labelToday;
+  GtkWidget *labelCurrentMonth;
+  GtkWidget *labelCurrentYear;
+  GtkWidget *labelSpace;
+
 
   calendarDialog = gtk_dialog_new ();
   gtk_window_set_title (GTK_WINDOW (calendarDialog), _("Select Date..."));
@@ -3388,7 +3417,34 @@ create_calendarDialog (GtkWidget *win)
   //dialog_vbox11 = GTK_DIALOG (calendarDialog)->vbox;
   dialog_vbox11 = gtk_dialog_get_content_area (GTK_DIALOG (calendarDialog));
   gtk_widget_show (dialog_vbox11);
-
+  grid1 = gtk_grid_new();
+  gtk_widget_show (grid1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox11), grid1, TRUE, TRUE, 0);
+  /* labels */
+  /* we must get current date */
+  GDateTime *currentDateTime= g_date_time_new_now_local ();
+  /* we display day of the month/year in a stylish way */
+  labelToday = gtk_label_new(_("<b>Today :</b>"));
+  gtk_widget_show (labelToday);
+  gtk_label_set_use_markup (GTK_LABEL (labelToday), TRUE);
+  gtk_grid_attach (GTK_GRID (grid1), labelToday, 0, 0, 1, 2);
+  labelCurrentDay = gtk_label_new(  
+                    g_strdup_printf("<span font=\"36\" color=\"#8DB5EE\"><b><i> %d </i></b></span>",   
+                    g_date_time_get_day_of_month(currentDateTime ) ) );
+  gtk_widget_show (labelCurrentDay);
+  gtk_label_set_use_markup (GTK_LABEL (labelCurrentDay), TRUE);
+  gtk_grid_attach (GTK_GRID (grid1), labelCurrentDay, 1, 0, 1, 2);
+  labelCurrentMonth = gtk_label_new( g_strdup_printf("<span  color=\"#EB7D23\"><b><u>%s</u></b></span>", 
+                      g_date_time_format(currentDateTime, "%B") ) );
+  gtk_widget_show (labelCurrentMonth);
+  gtk_label_set_use_markup (GTK_LABEL (labelCurrentMonth), TRUE);
+  gtk_grid_attach (GTK_GRID (grid1), labelCurrentMonth, 2, 0, 1, 1);
+  labelCurrentYear = gtk_label_new(g_strdup_printf("<span  font=\"18\" color=\"#f00101\"><b>%d</b></span>", 
+                                  g_date_time_get_year(currentDateTime)));
+  gtk_widget_show (labelCurrentYear);
+  gtk_label_set_use_markup (GTK_LABEL (labelCurrentYear), TRUE);
+  gtk_grid_attach (GTK_GRID (grid1), labelCurrentYear, 2, 1, 1, 1);
+  g_date_time_unref (currentDateTime);
   calendar1 = gtk_calendar_new ();
   gtk_widget_show (calendar1);
   gtk_box_pack_start (GTK_BOX (dialog_vbox11), calendar1, TRUE, TRUE, 0);
