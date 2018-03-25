@@ -302,7 +302,15 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                 default:;                   
               }/* end switch */         
   }/* next i */
-
+  if( !fWordDocument) {
+     printf("* OLE file, but NOT a Word File ! *\n");
+     g_free(SAT);
+     g_free(SSAT);
+     g_free(directoryChain);
+     g_free(SSCS);
+     g_free(buffer);
+     return NULL;
+  }
   /* we build the WordDocument stream */
   count = 0;
   /* if fWordDocument is in the SSCS ? */
