@@ -716,14 +716,14 @@ create_window1 (void)
 //pango_layout_set_width (pango_layout_lookIn, 50);
 // pango_layout_set_ellipsize (pango_layout_lookIn, PANGO_ELLIPSIZE_END );
 
-  PangoAttribute *attr_bold;
-  PangoAttrList *attr_list;
+//  PangoAttribute *attr_bold;
+//  PangoAttrList *attr_list;
 // g_object_set((GtkCellRenderer *)cell, "ellipsize", PANGO_ELLIPSIZE_MIDDLE, NULL);
-  attr_bold = pango_attr_weight_new (PANGO_WEIGHT_BOLD);
-  attr_list = pango_attr_list_new ();
-  pango_attr_list_insert (attr_list, attr_bold);
-  gtk_entry_set_attributes (GTK_ENTRY(gtk_bin_get_child(lookIn)), attr_list);
-  pango_attr_list_unref (attr_list);
+//  attr_bold = pango_attr_weight_new (PANGO_WEIGHT_BOLD);
+//  attr_list = pango_attr_list_new ();
+//  pango_attr_list_insert (attr_list, attr_bold);
+//  gtk_entry_set_attributes (GTK_ENTRY(gtk_bin_get_child(lookIn)), attr_list);
+//  pango_attr_list_unref (attr_list);
 
 // g_object_unref(pango_layout_lookIn);
 /* end pango */

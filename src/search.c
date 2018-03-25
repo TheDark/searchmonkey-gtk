@@ -273,7 +273,9 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                    break;
                 }/* end case 5 */
                 case 2: case 1:{
-                   str = g_convert_with_fallback ((gchar *)(directoryChain)+(i*128), 64, "UTF8", "UTF16",
+                   if(directoryChain[i*128]<32)
+                       break; 
+                   str = g_convert_with_fallback ((gchar *)(directoryChain)+(i*128), 32, "UTF8", "UTF16",
                                            NULL, &bytes_read, &bytes_written, &error);
                    tmpSecId = getlong(directoryChain, 116+(i*128));
                    tmpByteslength = getlong(directoryChain, 120+(i*128));
