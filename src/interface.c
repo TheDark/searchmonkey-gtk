@@ -198,6 +198,7 @@ create_window1 (void)
 /* css provider as inline datas */
  GtkCssProvider* css_provider = gtk_css_provider_new();
   const char css[] = 
+"                GtkGrid#gridCalendar {background-color: #005BAE;color: white;}\n"
 "                GtkLabel#label_expander {background-color: #005BAE;color: white;}\n"
 "                GtkImage#iconExpander  {background-color: #005BAE;}\n"
 "                /* font operate on entire GtkTreeView not for selected row */\n"
@@ -219,7 +220,7 @@ create_window1 (void)
 "                /* next line only border action operate */\n"
 "                GtkTreeView#treeview2:selected{background-color: #B4D0ED; border-width: 1px; border-color: #B4D0ED;}\n"
 "                /* next line for Gtk.TreeViewColumn */\n"
-"                GtkTreeView#treeview2 column-header .button{font-weight: bold; color: black; background: #BFBFBF; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
+"                GtkTreeView#treeview2 column-header .button{font-weight: bold; background: #005BAE;color: white; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
 "                .expander,.expander:active,.expander:prelight {background-size: 21px 21px;border-width: 1px; border-style: solid;border-color: #484848;   color: #484848; background-color: #484848;}\n"
 "                GtkComboBox.combobox-entry#fileName .entry{ border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-style: solid; border-width: 1px;}\n"
 "                GtkComboBox.combobox-entry#containingText .entry{ border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-style: solid; border-width: 1px;}\n"
@@ -717,9 +718,9 @@ create_window1 (void)
 // pango_layout_set_ellipsize (pango_layout_lookIn, PANGO_ELLIPSIZE_END );
 
 //  PangoAttribute *attr_bold;
-//  PangoAttrList *attr_list;
+ // PangoAttrList *attr_list;
 // g_object_set((GtkCellRenderer *)cell, "ellipsize", PANGO_ELLIPSIZE_MIDDLE, NULL);
-//  attr_bold = pango_attr_weight_new (PANGO_WEIGHT_BOLD);
+ // attr_bold = pango_attr_weight_new (PANGO_WEIGHT_BOLD);
 //  attr_list = pango_attr_list_new ();
 //  pango_attr_list_insert (attr_list, attr_bold);
 //  gtk_entry_set_attributes (GTK_ENTRY(gtk_bin_get_child(lookIn)), attr_list);
@@ -3396,7 +3397,7 @@ create_calendarDialog (GtkWidget *win)
   GtkWidget *dialog_action_area11;
   GtkWidget *cancelbutton5;
   GtkWidget *okbutton6;
-  GtkWidget *grid1;
+  GtkWidget *gridCalendar;
   GtkWidget *labelCurrentDay;
   GtkWidget *labelToday;
   GtkWidget *labelCurrentMonth;
@@ -3417,9 +3418,10 @@ create_calendarDialog (GtkWidget *win)
   //dialog_vbox11 = GTK_DIALOG (calendarDialog)->vbox;
   dialog_vbox11 = gtk_dialog_get_content_area (GTK_DIALOG (calendarDialog));
   gtk_widget_show (dialog_vbox11);
-  grid1 = gtk_grid_new();
-  gtk_widget_show (grid1);
-  gtk_box_pack_start (GTK_BOX (dialog_vbox11), grid1, TRUE, TRUE, 0);
+  gridCalendar = gtk_grid_new();
+  gtk_widget_set_name(gridCalendar,"gridCalendar");
+  gtk_widget_show (gridCalendar);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox11), gridCalendar, TRUE, TRUE, 0);
   /* labels */
   /* we must get current date */
   GDateTime *currentDateTime= g_date_time_new_now_local ();
@@ -3427,23 +3429,23 @@ create_calendarDialog (GtkWidget *win)
   labelToday = gtk_label_new(_("<b>Today :</b>"));
   gtk_widget_show (labelToday);
   gtk_label_set_use_markup (GTK_LABEL (labelToday), TRUE);
-  gtk_grid_attach (GTK_GRID (grid1), labelToday, 0, 0, 1, 2);
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelToday, 0, 0, 1, 2);
   labelCurrentDay = gtk_label_new(  
                     g_strdup_printf("<span font=\"36\" color=\"#8DB5EE\"><b><i> %d </i></b></span>",   
                     g_date_time_get_day_of_month(currentDateTime ) ) );
   gtk_widget_show (labelCurrentDay);
   gtk_label_set_use_markup (GTK_LABEL (labelCurrentDay), TRUE);
-  gtk_grid_attach (GTK_GRID (grid1), labelCurrentDay, 1, 0, 1, 2);
-  labelCurrentMonth = gtk_label_new( g_strdup_printf("<span  color=\"#EB7D23\"><b><u>%s</u></b></span>", 
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentDay, 1, 0, 1, 2);
+  labelCurrentMonth = gtk_label_new( g_strdup_printf("<b><u>%s</u></b>", 
                       g_date_time_format(currentDateTime, "%B") ) );
   gtk_widget_show (labelCurrentMonth);
   gtk_label_set_use_markup (GTK_LABEL (labelCurrentMonth), TRUE);
-  gtk_grid_attach (GTK_GRID (grid1), labelCurrentMonth, 2, 0, 1, 1);
-  labelCurrentYear = gtk_label_new(g_strdup_printf("<span  font=\"18\" color=\"#f00101\"><b>%d</b></span>", 
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentMonth, 2, 0, 1, 1);
+  labelCurrentYear = gtk_label_new(g_strdup_printf("<span  font=\"18\"><b>%d</b></span>", 
                                   g_date_time_get_year(currentDateTime)));
   gtk_widget_show (labelCurrentYear);
   gtk_label_set_use_markup (GTK_LABEL (labelCurrentYear), TRUE);
-  gtk_grid_attach (GTK_GRID (grid1), labelCurrentYear, 2, 1, 1, 1);
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentYear, 2, 1, 1, 1);
   g_date_time_unref (currentDateTime);
   calendar1 = gtk_calendar_new ();
   gtk_widget_show (calendar1);
