@@ -568,3 +568,9 @@ void on_advancedMode_event(GtkSwitch *widget,
 gboolean on_folder_focus_out_event(GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data);
+gboolean on_folder_query_tooltip_event(GtkWidget  *widget,
+               gint        x,
+               gint        y,
+               gboolean    keyboard_mode,
+               GtkTooltip *tooltip,
+               gpointer    user_data);

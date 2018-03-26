@@ -1593,6 +1593,25 @@ gboolean on_folder_focus_out_event(GtkWidget       *widget,
  return FALSE;
 }
 
+gboolean  on_folder_query_tooltip_event(GtkWidget  *widget,
+               gint        x,
+               gint        y,
+               gboolean    keyboard_mode,
+               GtkTooltip *tooltip,
+               gpointer    user_data)
+{
+ gchar *filename;
+
+ filename = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
+ /* we must change the tooltip */
+ gtk_tooltip_set_text (GTK_TOOLTIP(tooltip),filename ); 
+ gtk_tooltip_set_icon_from_icon_name (GTK_TOOLTIP(tooltip),
+                                     "gtk-open",
+                                     GTK_ICON_SIZE_DIALOG);
+ 
+ return TRUE;
+}
+
 gboolean
 on_regexp_focus_out_event              (GtkWidget       *widget,
                                         GdkEventFocus   *event,
@@ -1724,7 +1743,7 @@ gboolean on_entrySince_value_changed_event   (GtkWidget       *widget,
 {
 
   gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(GTK_WIDGET(widget), "sinceUnits")));
-printf("inits ds value changed=%s\n", test);
+
   g_free(test);
   return FALSE;
 }
@@ -1742,7 +1761,7 @@ on_sinceUnits_focus_out_event         (GtkWidget       *widget,
   gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
 
   /* now we modifiy the preview area */
-printf("inits ds focus out =%s\n", test);
+
 
   g_free(test);
   return FALSE;

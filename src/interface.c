@@ -705,6 +705,7 @@ create_window1 (void)
   gtk_widget_set_name(lookIn, "lookIn");
   gtk_grid_attach(GTK_GRID(table7), lookIn, 1, 0, 1, 1);
   gtk_widget_set_can_focus (lookIn, TRUE);
+  g_object_set (lookIn,"has-tooltip", TRUE,NULL);
 //GtkCellArea *area = gtk_cell_layout_get_area((GtkCellLayout *)lookIn);
 //GList *renderers = gtk_cell_layout_get_cells((GtkCellLayout *)lookIn);
 //GtkCellRendererText *cell = g_list_first(renderers)->data;
@@ -1258,7 +1259,10 @@ create_window1 (void)
   g_signal_connect ((gpointer) lookIn, "changed",
                     G_CALLBACK (on_folder_focus_out_event),
                     NULL);
-
+  /* we connect the tooltip callback */
+  g_signal_connect ((gpointer) lookIn, "query-tooltip",
+                    G_CALLBACK (on_folder_query_tooltip_event),
+                    NULL);
   g_signal_connect ((gpointer) regExpWizard1, "clicked",
                     G_CALLBACK (on_regExpWizard1_clicked),
                     NULL);
