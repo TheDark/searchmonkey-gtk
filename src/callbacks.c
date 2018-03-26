@@ -407,21 +407,22 @@ on_about1_activate                     (GtkMenuItem     *menuitem,
   
   gtk_dialog_run(GTK_DIALOG (aboutDialog));  
   gtk_widget_destroy(GTK_DIALOG (aboutDialog));
-return;
+  return;
+}
   /* Set searchmonkey version text and font size */
-  tmpWidget = lookup_widget(aboutDialog, "aboutVersion");
-  tmpString = g_strdup_printf(_("searchmonkey %s"), VERSION);/* defined in "configure" line 1644 - luc A 3 janv 2018 */
-  gtk_label_set_text(GTK_LABEL(tmpWidget), tmpString);
-  g_free(tmpString);
-  list = pango_attr_list_new(); /* Create list with 1 reference */
-  attr = pango_attr_scale_new(PANGO_SCALE_X_LARGE);
-  pango_attr_list_change(list, attr); /* pango_attr_list_insert */
-  gtk_label_set_attributes(GTK_LABEL(tmpWidget), list);
-  pango_attr_list_unref(list); /* Destroy 1 attribute, plus list */
+//  tmpWidget = lookup_widget(aboutDialog, "aboutVersion");
+ // tmpString = g_strdup_printf(_("searchmonkey %s"), VERSION);/* defined in "configure" line 1644 - luc A 3 janv 2018 */
+ // gtk_label_set_text(GTK_LABEL(tmpWidget), tmpString);
+ // g_free(tmpString);
+//  list = pango_attr_list_new(); /* Create list with 1 reference */
+ // attr = pango_attr_scale_new(PANGO_SCALE_X_LARGE);
+ // pango_attr_list_change(list, attr); /* pango_attr_list_insert */
+ // gtk_label_set_attributes(GTK_LABEL(tmpWidget), list);
+ // pango_attr_list_unref(list); /* Destroy 1 attribute, plus list */
 
   /* Start widget */
-  gtk_widget_show(aboutDialog);
-}
+ // gtk_widget_show(aboutDialog);
+
 
 
 void
@@ -448,8 +449,7 @@ on_containingText_changed              (GtkComboBox     *combobox,
   GtkToggleButton *checkBox;
 
  
-    checkBox = GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(combobox), "containingTextCheck"));
- 
+  checkBox = GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(combobox), "containingTextCheck"));
 
   gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combobox));
 
@@ -579,7 +579,7 @@ on_treeview1_button_press_event        (GtkWidget       *widget,
      }/* if test path at pos OK */   
     else return FALSE;
    }/* endif right-click */ 
-/* capture double-click */
+ /* capture double-click */
  if ((event->button == 1) && (event->type == GDK_2BUTTON_PRESS) && (gtk_tree_selection_count_selected_rows(selection)==1 )) 
    {
      if (gtk_tree_view_get_path_at_pos (treeview,event->x, event->y,
@@ -595,7 +595,7 @@ on_treeview1_button_press_event        (GtkWidget       *widget,
       }/* endif at pos */
     }/* endif double-click */
    
-/* capture simple-left-click, i.e. select a row */
+ /* capture simple-left-click, i.e. select a row */
  if ((event->button == 1) && (event->type == GDK_BUTTON_PRESS)  && (gtk_tree_selection_count_selected_rows(selection)==1 )) 
    {
      if (gtk_tree_view_get_path_at_pos (treeview,event->x, event->y,
@@ -607,9 +607,7 @@ on_treeview1_button_press_event        (GtkWidget       *widget,
                gtk_tree_selection_select_path (selection, path);
                if (path!=NULL) 
                 {
-		 // printf("* avant libère mémoire *\n");
-                 gtk_tree_path_free(path);
-                 // printf("* après libère mémoire *\n");
+                 gtk_tree_path_free(path);                 
                 }    
               return TRUE;
              }
@@ -655,8 +653,7 @@ void
 on_copy3_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  copyFile(GTK_WIDGET(menuitem));
-    
+  copyFile(GTK_WIDGET(menuitem));    
   detachMenu(menuitem);
 }
 
@@ -1340,18 +1337,6 @@ on_stopButton_clicked                  (GtkButton       *button,
 }
 
 
-void
-on_searchNotebook_switch_page          (GtkNotebook     *notebook,
-                                        guint            page_num,
-                                        gpointer         user_data)
-{
-printf("je veux switch dans cb l 1398 \n");
-  guint old_page_num = gtk_notebook_get_current_page(notebook);
-  
- 
-}
-
-
 
 void
 on_autosize_columns_activate           (GtkMenuItem     *menuitem,
@@ -1604,7 +1589,7 @@ gboolean  on_folder_query_tooltip_event(GtkWidget  *widget,
 
  filename = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
  /* we must change the tooltip */
- gtk_tooltip_set_text (GTK_TOOLTIP(tooltip),filename ); 
+ gtk_tooltip_set_markup (GTK_TOOLTIP(tooltip),g_strconcat(_("<b><u>Look in :</u></b>\n") ,filename, NULL) ); 
  gtk_tooltip_set_icon_from_icon_name (GTK_TOOLTIP(tooltip),
                                      "gtk-open",
                                      GTK_ICON_SIZE_DIALOG);
@@ -1676,19 +1661,6 @@ on_showLinesCheckResults_toggled       (GtkToggleButton *togglebutton,
   gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "show_line_contents_hbox"), active);
 }
 
-
-gboolean
-on_searchNotebook_focus_out_event      (GtkWidget       *widget,
-                                        GdkEventFocus   *event,
-                                        gpointer         user_data)
-{
-  GtkWidget *notebook = lookup_widget(widget, "hboxSearchmonkey");
-printf("je veux switch dans cb l 1656 \n");
-  guint old_page_num = gtk_notebook_get_current_page(GTK_NOTEBOOK(notebook));
-  
- 
-  return FALSE;
-}
 
 
 void

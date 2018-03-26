@@ -469,11 +469,6 @@ on_containingText_changed              (GtkComboBox     *combobox,
                                         gpointer         user_data);
 
 void
-on_searchNotebook_switch_page          (GtkNotebook     *notebook,
-                                        guint            page_num,
-                                        gpointer         user_data);
-
-void
 on_basic_mode1_toggled                 (GtkCheckMenuItem *checkmenuitem,
                                         gpointer         user_data);
 
@@ -539,10 +534,6 @@ void
 on_showLinesCheckResults_toggled       (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
-gboolean
-on_searchNotebook_focus_out_event      (GtkWidget       *widget,
-                                        GdkEventFocus   *event,
-                                        gpointer         user_data);
 
 void
 on_limitContentsCheckResults_toggled   (GtkToggleButton *togglebutton,
