@@ -1255,6 +1255,10 @@ create_window1 (void)
   g_signal_connect ((gpointer) fileName, "focus_out_event",
                     G_CALLBACK (on_regexp_focus_out_event),
                     NULL);
+  g_signal_connect ((gpointer) lookIn, "changed",
+                    G_CALLBACK (on_folder_focus_out_event),
+                    NULL);
+
   g_signal_connect ((gpointer) regExpWizard1, "clicked",
                     G_CALLBACK (on_regExpWizard1_clicked),
                     NULL);

@@ -565,3 +565,6 @@ void expander_callback (GObject    *object,
                    gpointer    user_data);
 void on_advancedMode_event(GtkSwitch *widget,
                gpointer   user_data);
+gboolean on_folder_focus_out_event(GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data);

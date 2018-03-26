@@ -1581,6 +1581,17 @@ on_MoreThanSize_focus_out_event         (GtkWidget       *widget,
   return FALSE;
 }
 
+gboolean on_folder_focus_out_event(GtkWidget       *widget,
+                                        GdkEventFocus   *event,
+                                        gpointer         user_data)
+{
+ gchar *filename;
+
+ filename = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
+ /* we must change the tooltip */
+ gtk_widget_set_tooltip_text (GTK_WIDGET(lookup_widget(GTK_WIDGET(widget), "lookIn")),filename ); 
+ return FALSE;
+}
 
 gboolean
 on_regexp_focus_out_event              (GtkWidget       *widget,
