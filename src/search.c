@@ -276,7 +276,7 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                    if(directoryChain[i*128]<32)
                        break; 
                    str = g_convert_with_fallback ((gchar *)(directoryChain)+(i*128), 32, "UTF8", "UTF16",
-                                           NULL, &bytes_read, &bytes_written, &error);
+                                           NULL, &bytes_read, &bytes_written, &error);/* with a maxlen of 32, we are sure that it wil not be any mismatch, with, for example, PPT streams */
                    tmpSecId = getlong(directoryChain, 116+(i*128));
                    tmpByteslength = getlong(directoryChain, 120+(i*128));
                    if(g_ascii_strncasecmp (str,"1Table",12*sizeof(gchar))==0 ) {
@@ -302,7 +302,7 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                 default:;                   
               }/* end switch */         
   }/* next i */
-  if( !fWordDocument) {
+  if( (!fWordDocument)|| (WordDocumentStreamLen>fileSize)) {
      printf("* OLE file, but NOT a Word File ! *\n");
      g_free(SAT);
      g_free(SSAT);
@@ -1635,11 +1635,11 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
   }
 
   /* Read date strings */
-     
+  //   printf("date mode =%d\n", date_mode);
   switch(date_mode )
     {
       case 1:
-       {printf("date mode Today \n");
+       {//printf("date mode Today \n");
         /* we get the current date */
         time ( &rawtime );
         strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
@@ -1651,7 +1651,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
         break;
        }
       case 2:
-       {printf("date mode After \n");
+       {//printf("date mode After \n");
          if ((fAfterCheck) &&
             ((after != NULL) && (after != '\0'))) {
            g_date_set_parse(&DateAfter, after);
@@ -1668,7 +1668,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
         break;
        }
       case 3:
-       {printf("date mode Before \n");
+       {//printf("date mode Before \n");
          if ((fBeforeCheck) &&
             ((before != NULL) && (before != '\0'))) {
           g_date_set_parse(&DateBefore, before);
@@ -1678,6 +1678,11 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
           }
           if (g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateBefore) > 0) {/* !!!!!! ddoit être revu */
              }
+          /* cool hack : before must be interpreted like this <=date, so, it's easy to add ONE day ;-) to do that */
+
+          g_date_add_days (&DateBefore,1);
+          g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateBefore);
+          //printf("date before nouvelle=%s\n", buffer);
           setTimeFromDate(&tptr, &DateBefore);
           mSearchControl->before = mktime(&tptr);
           mSearchControl->flags |= SEARCH_BEFORE_SET;
@@ -1685,7 +1690,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
         break;
        }
       case 4:
-       {printf("date mode Interval \n");
+       {//printf("date mode Interval \n");
         /* the dates are previously checked in Dialog box, so we can take our risks ;-) */
         g_date_set_parse(&DateBefore,intervalEnd );
         g_date_set_parse(&DateAfter,intervalStart );
@@ -1693,6 +1698,9 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
              miscErrorDialog(widget,_("<b>Error!</b>\n\nInvalid 'Interval'date(s) - format as dd/mm/yyyy or dd mmm yy."));
              return;
            }
+         g_date_add_days (&DateBefore,1);
+          g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &DateBefore);
+         // printf("date before nouvelle=%s\n", buffer);
         setTimeFromDate(&tptr, &DateBefore);
         mSearchControl->before = mktime(&tptr);
         mSearchControl->flags |= SEARCH_BEFORE_SET;
@@ -1702,7 +1710,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
         break;
        }
       case 5:
-       {printf("date mode Since \n");
+       {//printf("date mode Since \n");
         time ( &rawtime );
         strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
         g_date_set_parse(&previous_date, buffer);
@@ -1723,7 +1731,7 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
              default:;
            }/* end switch */
        g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &previous_date);
-       printf("date passée=%s\n", buffer);
+      // printf("date passée=%s\n", buffer);
         setTimeFromDate(&tptr, &previous_date);
         mSearchControl->after = mktime(&tptr); 
         mSearchControl->flags |= SEARCH_AFTER_SET;
@@ -1731,7 +1739,9 @@ void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
         time ( &rawtime );
         strftime(buffer, 80, "%x", localtime(&rawtime));/* don't change parameter %x */
         g_date_set_parse(&current_date, buffer);
-      printf("date courante=%s\n", buffer);
+        g_date_add_days (&current_date,1);
+        g_date_strftime(buffer, MAX_FILENAME_STRING, _("%x"), &current_date);
+       // printf("date courante=%s\n", buffer);
         setTimeFromDate(&tptr, &current_date);
         mSearchControl->before = mktime(&tptr);
         mSearchControl->flags |= SEARCH_BEFORE_SET;
@@ -2936,7 +2946,7 @@ void displayQuickMatch(searchControl *mSearchControl, searchData *mSearchData)
                       INT_SIZE_COLUMN, newMatch->fileSize,
                       MODIFIED_COLUMN, newMatch->pMDate,
                       INT_MODIFIED_COLUMN, newMatch->mDate,
-                      TYPE_COLUMN, newMatch->pFileType,
+                      TYPE_COLUMN, newMatch->pShortFileType,
                       MATCHES_COUNT_STRING_COLUMN, tmpStr,
                       -1);
   if (pixbuf!=NULL) 
