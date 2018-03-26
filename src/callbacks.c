@@ -1860,7 +1860,6 @@ void expander_callback (GObject    *object,
 
   if (gtk_expander_get_expanded (expander))
     {
-      printf("expander ouvert \n");
       /* we draw the title horizontally */
       gtk_label_set_angle(label, 0);
       /* we move the image */
@@ -1871,7 +1870,6 @@ void expander_callback (GObject    *object,
     }
   else
     {
-       printf("expander fermé \n");
       /* we draw the title vertically */
        gtk_label_set_angle(label, 90);
      /* we move the image */
