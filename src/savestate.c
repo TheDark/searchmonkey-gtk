@@ -565,13 +565,13 @@ void realize_searchNotebook (GtkWidget *widget)
        g_key_file_set_string (keyString, "configuration", "anyDateCheck", "true");
        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(widget, "anyDateCheck")), TRUE);
      }
-printf("passé 1\n");
+//printf("passé 1\n");
  /* get from config.ini file and store file size options to corresponding widgets  */
   realize_FileSizeDialog(widget);
-printf("passé 2\n");
+//printf("passé 2\n");
   /* get from config.ini file and store modified date options to corresponding widgets  */
   realize_FileModifiedDialog(widget);
-printf("passé \n");
+//printf("passé \n");
   /* Store notebook global settings */
  // realizeNotebook(widget, keyString, "history", "hboxSearchmonkey");  
 }
