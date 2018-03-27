@@ -31,16 +31,21 @@ from catdoc and me ;-)
 #define iRtfFile 6
 #define iPdfFile 7
 #define iAbiwordFile 8
+#define iXmlOdpFile 9
+#define iXmlOdsFile 10
+#define iXmlMsXlsFile 11
+#define iXmlMsPptFile 12
 /* for code pages conversions */
 #define iCpUtf16 1
 #define iCpW1252 2
+#define iCpIbm437 3
+#define iCpIso8859_1 4
 
 extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
 
 void miscErrorDialog(GtkWidget *widget, const gchar* msg);
 gchar *misc_combo_index_to_size_units(gint index);
-gchar *misc_get_modified_after_search(gint index, gchar *str1, gchar *str2);
-gchar *misc_get_modified(GKeyFile *keyString);
+
 gint convertRegexGtk(size_t offset, const gchar *contents);
 gchar *getFullFileName(GtkTreeView *treeView, gint columnNumber);
 void initComboBox2(GtkWidget *comboBox);

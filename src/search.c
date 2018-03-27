@@ -126,12 +126,25 @@ gchar *MSWordconvert_str(unsigned char *buffer, gint fromCP, glong len)
        }/* end switch <32 */          
      }
      else {
-       if(fromCP==iCpUtf16)
-         str= g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 2, 
+       switch(fromCP) {
+         case iCpUtf16: {
+            str= g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 2, 
                                     "UTF8", "UTF16", NULL, &bytes_read, &bytes_written, &error));
-       else
+            break;
+         }
+         case iCpIbm437: {
+            str = g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 1, "UTF8", "CP437",
+                                           NULL, &bytes_read, &bytes_written, &error));
+            break;
+         }
+         case iCpIso8859_1: {
+            break;
+         }
+         default: {
            str= g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 1, 
                                     "UTF8", "WINDOWS-1252", NULL, &bytes_read, &bytes_written, &error));         
+         }
+       }/* end switch */
      }
     i=i+count;
   }/* wend i */
@@ -741,11 +754,11 @@ gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   glong bytes_written, bytes_read;
 
   /* the Winword file is binary */
-   inputFile = fopen(path_to_file,"rb");
-   if(inputFile==NULL) {
+  inputFile = fopen(path_to_file,"rb");
+  if(inputFile==NULL) {
           printf("* ERROR : impossible to open MS Winword file:%s *\n", path_to_file);
           return NULL;
-   }
+  }
   /* we compute the size before dynamically allocate buffer */
   glong prev = ftell(inputFile);   
   fseek(inputFile, 0L, SEEK_END);
@@ -839,16 +852,16 @@ gchar *WRICheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 {
   FILE *outputFile, *inputFile;
   gchar *buffer = NULL, *str=NULL;
-  gboolean fIsCP850 = FALSE;
+  gboolean fIsCP437 = FALSE;
   GError **error;
   glong bytes_written, bytes_read, msWordLength, fileSize;
 
-   /* the WRITE file is binary */
-   inputFile = fopen(path_to_file,"rb");
-   if(inputFile==NULL) {
+  /* the WRITE file is binary */
+  inputFile = fopen(path_to_file,"rb");
+  if(inputFile==NULL) {
           printf("* ERROR : impossible to open MS Write file:%s *\n", path_to_file);
           return NULL;
-   }
+  }
   /* we compute the size before dynamically allocate buffer */
   glong prev = ftell(inputFile);   
   fseek(inputFile, 0L, SEEK_END);
@@ -869,18 +882,20 @@ gchar *WRICheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   msWordLength = getshort(buffer,14)-128;
 
   if(buffer[20]==0x14)/* it's an hypothesis - Luc A 17 march 2018 */
-        fIsCP850 =TRUE;
+        fIsCP437 =TRUE;
   if(msWordLength<0) {
       g_free(buffer);
       return NULL;
   }
 
-  if(fIsCP850)
-        str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "CP437",
-                                           NULL, &bytes_read, &bytes_written, &error);
+  if(fIsCP437)
+        str = MSWordconvert_str((gchar *)buffer+128, iCpIbm437, getshort(buffer,14)-128 );
+        //str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "CP437",
+          //                                 NULL, &bytes_read, &bytes_written, &error);
   else
-        str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "WINDOWS-1252",
-                                           NULL, &bytes_read, &bytes_written, &error);
+        str = MSWordconvert_str((gchar *)buffer+128, iCpW1252, getshort(buffer,14)-128 );
+       // str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "WINDOWS-1252",
+         //                                  NULL, &bytes_read, &bytes_written, &error);
   fwrite(str , sizeof(gchar), strlen(str), outputFile);
   fclose(outputFile);
   g_free(str);
@@ -1018,9 +1033,9 @@ gchar *ABWCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    /* we have to add the nULL char at end of str */
    str[j-2]='\0';
    g_free(buffer);
-   printf("g free OK \n");
+   //printf("g free OK \n");
    /* we dump the parsed file */
-   printf("longueur chaine :%d\n", strlen(str));
+   //printf("longueur chaine :%d\n", strlen(str));
    fwrite(str , sizeof(gchar), strlen(str), outputFile);
    fclose(outputFile);
    tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
@@ -1110,6 +1125,8 @@ gchar *PDFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 &   &amp
 
 for example, to keep " in the resulting text, we must search and replace every &quot; found
+NOTE : this function can also parse ODP and ODS files, but I've noticed that, in ODP files, some chars aren't in the same
+phrase so the user must search for part of words in ODP files
  ***/
 gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 {
@@ -1137,14 +1154,13 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
         }
  
   nto = zip_get_num_entries(archive, ZIP_FL_UNCHANGED); 
-  // printf("l'archive contient:%d fichiers\n", nto);
 
   exist_document_xml = zip_name_locate(archive, "content.xml" ,0);
   if(exist_document_xml>-1)
-     printf("* XML ODT document present in position:%d *\n", exist_document_xml);
+     printf("* XML ODF document present in position:%d *\n", exist_document_xml);
   else
    {  
-     printf("* Error ! %s isn't an ODT file ! *\n", path_to_file);
+     printf("* Error ! %s isn't an ODF file ! *\n", path_to_file);
      return NULL;
    }
   /* now we must open document.xml with this index number*/
@@ -1254,15 +1270,16 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                                 }
           }/* else */
    }/* wend */
-// printf("j=%d strlen =%d \n", j, strlen(str));
-//  str[j-1] = '\0'; // at the end append null character to mark end of string
 
+  str = (gchar*)realloc(str, j * sizeof(gchar));
+  str[j-1] = '\0'; /* at the end append null character to mark end of string mandatory with ODP files */
 
   fwrite(str , sizeof(gchar), strlen(str), outputFile);
 
  /* close the parsed file and clean datas*/
   tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
   fclose(outputFile); 
+
   if(str!=NULL)
      {    
         g_free(str);
@@ -1272,10 +1289,8 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
      g_free (pBufferRead) ; /* discharge the datas of document.xml from memory */
   zip_fclose(fpz);/* close access to file in archive */
   zip_close(archive); /* close the doc-x file itself */
- return tmpfileToExtract;
+  return tmpfileToExtract;
 }
-
-
 
 
 /* Doc-X files : read a supposed docx file, unzip it, check if contains the stuff for a Doc-X word file 
@@ -2337,6 +2352,8 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
        Luc A. 7 janv 2018 */
   
    switch(get_file_type_by_signature(tmpFileName)) {
+     case iXmlOdpFile: /* Impress */
+     case iXmlOdsFile: /* calc */ 
      case iXmlOdtFile: { /* OPenDocument Text ? */
        tmpExtractedFile = ODTCheckFile((gchar*)tmpFileName,  GetTempFileName("monkey")  );
        if(tmpExtractedFile!=NULL)
@@ -2410,7 +2427,7 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
        break;
      }
      default :{
-       printf("other file signature=%d\n", get_file_type_by_signature(tmpFileName));
+       fIsOffice = FALSE;
      }
    }/* end switch */
    

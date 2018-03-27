@@ -39,7 +39,7 @@ gint get_file_type_by_signature(gchar *path_to_file)
 
   inputFile = fopen(path_to_file,"rb");
   if(inputFile==NULL) {
-          printf("* ERROR : impossible to open ABW file:%s *\n", path_to_file);
+          printf("* ERROR : impossible to open file:%s to check signature *\n", path_to_file);
           return NULL;
   }
   /* we compute the size before dynamically allocate buffer */
@@ -67,10 +67,21 @@ gint get_file_type_by_signature(gchar *path_to_file)
       return iPdfFile;
    if (strncmp(buffer, &zip_sign,4) == 0) {
      /* two cases : MS XML or Oasis XML */
-     if(strncmp ((const gchar*)buffer+54,(const gchar *)"oasis", 5)==0)
-        return iXmlOdtFile;
-     else
+     if(strncmp ((const gchar*)buffer+54,(const gchar *)"oasis", 5)==0) {
+        /* now we switch between OASIS files signatures */
+       if(strncmp ((const gchar*)buffer+73,(const gchar *)"textPK", 6)==0) {
+          return iXmlOdtFile;}
+       if(strncmp ((const gchar*)buffer+73,(const gchar *)"presen", 6)==0){
+          return iXmlOdpFile;}
+       if(strncmp ((const gchar*)buffer+73,(const gchar *)"spread", 6)==0){
+          return iXmlOdsFile;}
+       else
+          return iUnknownFile;
+     }
+     else {/* dirty */
+        /* it's a good Idea to switch between DOC-X, PPT-X and XLS-X */
         return iXmlMsWordFile;
+     }
    }
    if (strncmp(buffer, &abiword_sign,4) == 0)
       if(strncmp ((const gchar*)buffer+0x31,(const gchar *)"abiwo", 5)==0)
@@ -78,73 +89,7 @@ gint get_file_type_by_signature(gchar *path_to_file)
    return retval;
 }
 
-/******************************************
- get a human readable string for the 
- modified date datas in order to
- be used whith the MAIN button in the GUI
-mandatory if we want to keep the original
-Adam's idea in module search.c
-******************************************/
-gchar *misc_get_modified_after_search(gint index, gchar *str1, gchar *str2)
-{
- gchar *str = NULL;
 
- switch(index)
-  {
-   case 0:
-     { str=g_strconcat(_("Since "), str1, str2,NULL);break;}
-   case 1:
-     {str=g_strconcat(_("After"), str1, _(" and before "), str2, NULL);break;}
-   case 2:
-     { str=g_strconcat(_("Before "), str1, NULL) ;break;}
-   case 3:
-     { str=g_strconcat(_("After "),str1, NULL);break;}
-   case 4:
-     { str=g_strconcat(_("Today"),NULL);break;}
-   case 5:
-     { str=g_strconcat(_("Any date"),NULL) ;break;}
-  }/* end switch */
- return str;
-}
-
-
-/******************************************
- get a human readable string for the 
- modified date datas in order to
- be used whith the button in the GUI
-******************************************/
-gchar *misc_get_modified(GKeyFile *keyString)
-{
- gchar *str = NULL;
- gchar *str2 = NULL;
- gchar *str3 = NULL;
-
- if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "sinceCheck", NULL),"true", 4)  == 0 )
-     {
-       switch( atoi(g_key_file_get_string (keyString, "configuration", "sinceUnits-active", NULL) ))
-        {
-         case 0:{str2 = g_strdup_printf("%s",_("Day(s)"));break;}
-         case 1:{str2 = g_strdup_printf("%s",_("Week(s)"));break;}
-         case 2:{str2 = g_strdup_printf("%s",_("Month(s)"));break;}
-         case 3:{str2 = g_strdup_printf("%s",_("Year(s)"));break;}
-        }
-       str3 = g_strdup_printf("%s", g_key_file_get_string (keyString, "history", "entrySince", NULL));
-       str=g_strconcat(_("Since "), str3," ",str2, NULL);
-       g_free(str2);
-       g_free(str3);
-     }
- if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "beforeCheck", NULL),"true", 4)  == 0 )
-     {str=g_strconcat(_("Before "), g_key_file_get_string (keyString, "history", "beforeEntry", NULL) ,NULL);}
- if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "afterCheck", NULL),"true", 4)  == 0 )
-     {str=g_strconcat(_("After "), g_key_file_get_string (keyString, "history", "afterEntry", NULL),NULL);}
- if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "intervalCheck", NULL),"true", 4)  == 0 )
-     {str=g_strconcat(_("After "),  g_key_file_get_string (keyString, "history", "intervalStartEntry", NULL), _(" and before  "),  g_key_file_get_string (keyString, "history", "intervalEndEntry", NULL),NULL);}
- if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "todayCheck", NULL),"true", 4)  == 0 )
-     {str=g_strconcat(_("Today"),NULL);}
- if(g_ascii_strncasecmp (g_key_file_get_string (keyString, "configuration", "anyDateCheck", NULL),"true", 4)  == 0 )
-     {str=g_strconcat(_("Any date"),NULL);}
- return str;
-}
 /******************************************
  get a human readable string for size units
 gint index :
@@ -178,7 +123,7 @@ GtkWidget *dialog;
    dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW(widget),
                                            GTK_DIALOG_DESTROY_WITH_PARENT,
                                            GTK_MESSAGE_ERROR,
-                                           GTK_BUTTONS_CLOSE,
+                                           GTK_BUTTONS_CLOSE,"%s", 
                                            msg);
    gtk_dialog_run (GTK_DIALOG (dialog));
    gtk_widget_destroy (dialog);
