@@ -960,7 +960,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), label1009, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label1009), 5, 0);
 
-  showLinesSpinResults_adj = gtk_adjustment_new (0, 0, 20, 1, 5, 0);
+  showLinesSpinResults_adj = gtk_adjustment_new (0, 1, 20, 1, 5, 0);
   showLinesSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (showLinesSpinResults_adj), 1, 0);
   gtk_widget_show (showLinesSpinResults);
   gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), showLinesSpinResults, TRUE, TRUE, 2);
