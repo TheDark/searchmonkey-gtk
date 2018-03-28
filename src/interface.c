@@ -3434,26 +3434,29 @@ create_calendarDialog (GtkWidget *win)
   /* we must get current date */
   GDateTime *currentDateTime= g_date_time_new_now_local ();
   /* we display day of the month/year in a stylish way */
+  labelSpace = gtk_label_new("  ");
+  gtk_widget_show(labelSpace);
+  gtk_grid_attach(GTK_GRID (gridCalendar), labelSpace, 0, 0, 1, 2);
   labelToday = gtk_label_new(_("<b>Today :</b>"));
   gtk_widget_show (labelToday);
   gtk_label_set_use_markup (GTK_LABEL (labelToday), TRUE);
-  gtk_grid_attach (GTK_GRID (gridCalendar), labelToday, 0, 0, 1, 2);
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelToday, 1, 0, 1, 2);
   labelCurrentDay = gtk_label_new(  
                     g_strdup_printf("<span font=\"36\" color=\"#8DB5EE\"><b><i> %d </i></b></span>",   
                     g_date_time_get_day_of_month(currentDateTime ) ) );
   gtk_widget_show (labelCurrentDay);
   gtk_label_set_use_markup (GTK_LABEL (labelCurrentDay), TRUE);
-  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentDay, 1, 0, 1, 2);
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentDay, 2, 0, 1, 2);
   labelCurrentMonth = gtk_label_new( g_strdup_printf("<b><u>%s</u></b>", 
                       g_date_time_format(currentDateTime, "%B") ) );
   gtk_widget_show (labelCurrentMonth);
   gtk_label_set_use_markup (GTK_LABEL (labelCurrentMonth), TRUE);
-  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentMonth, 2, 0, 1, 1);
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentMonth, 3, 0, 1, 1);
   labelCurrentYear = gtk_label_new(g_strdup_printf("<span  font=\"18\"><b>%d</b></span>", 
                                   g_date_time_get_year(currentDateTime)));
   gtk_widget_show (labelCurrentYear);
   gtk_label_set_use_markup (GTK_LABEL (labelCurrentYear), TRUE);
-  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentYear, 2, 1, 1, 1);
+  gtk_grid_attach (GTK_GRID (gridCalendar), labelCurrentYear, 3, 1, 1, 1);
   g_date_time_unref (currentDateTime);
   calendar1 = gtk_calendar_new ();
   gtk_widget_show (calendar1);

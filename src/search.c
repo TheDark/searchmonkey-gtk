@@ -138,6 +138,8 @@ gchar *MSWordconvert_str(unsigned char *buffer, gint fromCP, glong len)
             break;
          }
          case iCpIso8859_1: {
+            str = g_string_append (str,g_convert_with_fallback ((gchar *)buffer+i, 1, "UTF8", "ISO-8859-1",
+                                           NULL, &bytes_read, &bytes_written, &error));
             break;
          }
          default: {
@@ -153,7 +155,7 @@ gchar *MSWordconvert_str(unsigned char *buffer, gint fromCP, glong len)
   return sRetVal;
 }
 /*********************************************
-ms-Word OLE (W6/98/97>>2003 parser
+  ms-Word OLE (W6/98/97>>2003 parser
 *********************************************/
 gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 {
@@ -547,7 +549,7 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 }
 
 /*********************************************
-ms-RTF parser
+   ms-RTF parser
 *********************************************/
 gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 {
@@ -751,7 +753,6 @@ gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   glong textstart,textlen, fileSize, i=0, j=0;
   gchar *buffer, c, *str=NULL, buf_hexa[32];
   GError **error = NULL;
-  glong bytes_written, bytes_read;
 
   /* the Winword file is binary */
   inputFile = fopen(path_to_file,"rb");
@@ -808,36 +809,10 @@ gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
     return NULL;
   }
 
-  while((i<fileSize) && (j<textlen)) {
-    c = buffer[i];     
-    switch(c) {
-      case 0: case 0x0D: {j++;break;}
-      case '\n': {
-        fwrite((gchar*)"\n",sizeof(gchar), 1, outputFile);
-        j++;
-        break;
-      }
-      default:{
-        if(((gint)c<128) && (c>31)){
-          fwrite(&buffer[i], sizeof(gchar), sizeof(gchar), outputFile);
-          j++;
-        }
-        else {
-         if((guint)(c)>127) {                
-            buf_hexa[0] = (guint)c;
-            buf_hexa[1] = 0;
-            str= g_convert_with_fallback ((gchar *)buf_hexa, -1, "UTF8", "ISO-8859-1",
-                                           NULL, &bytes_read, &bytes_written, &error);
-            fwrite(str, sizeof(gchar), strlen(str), outputFile);
-            g_free(str);
-            j++;
-         }
-        }
-      }/* default */
-    }/* end switch */    
-    i++;
-  }/* wend */
+  str = MSWordconvert_str((gchar *)buffer+i, iCpIso8859_1, textlen );
+  fwrite(str, sizeof(gchar), strlen(str), outputFile);
   fclose(outputFile);
+  g_free(str);
   return path_to_tmp_file;
 }
 /*********************************************
@@ -854,7 +829,7 @@ gchar *WRICheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   gchar *buffer = NULL, *str=NULL;
   gboolean fIsCP437 = FALSE;
   GError **error;
-  glong bytes_written, bytes_read, msWordLength, fileSize;
+  glong msWordLength, fileSize;
 
   /* the WRITE file is binary */
   inputFile = fopen(path_to_file,"rb");
