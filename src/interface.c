@@ -202,24 +202,24 @@ create_window1 (void)
 "                GtkLabel#label_expander {background-color: #005BAE;color: white;}\n"
 "                GtkImage#iconExpander  {background-color: #005BAE;}\n"
 "                /* font operate on entire GtkTreeView not for selected row */\n"
-"                GtkTreeView#treeview1 row:nth-child(even) {\n"
-"                	color: black; background-color: #EBEEFF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: white;\n"
-"                }\n"
-"                GtkTreeView#treeview1 row:nth-child(odd) {\n"
-"                	color: black; background-color: #FFFCCF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: black;\n"
-"                }\n"
-"                /* next line only border action operate */\n"
-"                GtkTreeView#treeview1:selected{background-color: #B4D0ED; border-width: 1px; border-color: #B4D0ED;}\n"
-"                GtkTreeView#treeview1 column-header .button{font-weight: bold; color: black; background: #BFBFBF; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
-"                GtkTreeView#treeview2 row:nth-child(even) {\n"
-"                	color: black; background-color: #EBEEFF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: white;\n"
-"                }\n"
-"                GtkTreeView#treeview2 row:nth-child(odd) {\n"
-"                	color: black; background-color: #FFFCCF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: black;\n"
-"                }\n"
-"                /* next line only border action operate */\n"
-"                GtkTreeView#treeview2:selected{background-color: #B4D0ED; border-width: 1px; border-color: #B4D0ED;}\n"
-"                /* next line for Gtk.TreeViewColumn */\n"
+//"                GtkTreeView#treeview1 row:nth-child(even) {\n"
+//"                	color: black; background-color: #EBEEFF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: white;\n"
+//"                }\n"
+//"                GtkTreeView#treeview1 row:nth-child(odd) {\n"
+//"                	color: black; background-color: #FFFCCF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: black;\n"
+//"                }\n"
+//"                /* next line only border action operate */\n"
+//"                GtkTreeView#treeview1:selected{background-color: #B4D0ED; border-width: 1px; border-color: #B4D0ED;}\n"
+//"                GtkTreeView#treeview1 column-header .button{font-weight: bold; color: black; background: #BFBFBF; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
+//"                GtkTreeView#treeview2 row:nth-child(even) {\n"
+//"                	color: black; background-color: #EBEEFF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: white;\n"
+//"                }\n"
+//"                GtkTreeView#treeview2 row:nth-child(odd) {\n"
+//"                	color: black; background-color: #FFFCCF; border-width: 1px; border-left-style: none; border-right-style: dotted; border-color: black;\n"
+//"                }\n"
+//"                /* next line only border action operate */\n"
+//"                GtkTreeView#treeview2:selected{background-color: #B4D0ED; border-width: 1px; border-color: #B4D0ED;}\n"
+//"                /* next line for Gtk.TreeViewColumn */\n"
 "                GtkTreeView#treeview2 column-header .button{font-weight: bold; background: #005BAE;color: white; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
 "                .expander,.expander:active,.expander:prelight {background-size: 21px 21px;border-width: 1px; border-style: solid;border-color: #484848;   color: #484848; background-color: #484848;}\n"
 "                GtkComboBox.combobox-entry#fileName .entry{ border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-style: solid; border-width: 1px;}\n"
@@ -1016,7 +1016,7 @@ create_window1 (void)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (resultsScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   treeview1 = gtk_tree_view_new ();
 /* modifyed by Luc A., 27 dec 2017 - be careful, it's deprecated under GTK3 ! */
-  gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview1), TRUE);
+ // gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview1), TRUE);
 /* end modif Luc A. */
   gtk_widget_show (treeview1);
   gtk_widget_set_name(treeview1, "treeview1");
@@ -1055,7 +1055,7 @@ create_window1 (void)
 
   treeview2 = gtk_tree_view_new ();
 /* modifyed by Luc A., 27 dec 2017 - be careful, it's deprecated under GTK3 ! */
-  gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
+ // gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
 /* end modif Luc A. */
   gtk_widget_show (treeview2);
   gtk_widget_set_name(treeview2, "treeview2");
