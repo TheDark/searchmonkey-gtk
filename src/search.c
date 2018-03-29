@@ -174,7 +174,7 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   glong ssat_size, secIdFirstSectorMSAT, msat_size, textstart, textlen, fcValue, fcOffset;
   gint fTableStream = -1, TableStreamLen = 0, sectorSize,  shortSectorSize, pieceCount, offsetPieceDescriptor;
   gboolean goOn = TRUE, fWordDocument = FALSE,fCreatedMac = FALSE;
-
+  gchar end_sign[]={0x0a,0};
 
   printf("MsWord OLE Parser =%s\n",path_to_file );
   /* the Winword file is binary */
@@ -417,6 +417,9 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                         str = MSWordconvert_str((gchar *)BBOT, iCpW1252, getlong(WordDocument, 52) );
                         fwrite(str,sizeof(gchar), strlen(str), outputFile);                    
                         g_free(str);   
+ 
+                        fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
+
                         fclose(outputFile);
                         g_free(pieceTable);
                         g_free(BBOT);
@@ -439,7 +442,8 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                    //str=  g_convert_with_fallback ((gchar *)(WordDocument)+textstart, textlen, 
                      // "UTF8", "WINDOWS-1252", NULL, &bytes_read, &bytes_written, &error);
                    fwrite(str,sizeof(gchar), strlen(str), outputFile);
-                   g_free(str);               
+                   g_free(str);    
+                   fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile);            
                    fclose(outputFile);
            }/* else not fast saved */        
            /* we clean the memory */
@@ -525,6 +529,7 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                  g_free(str);
                }
              }/* next */
+             fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
              fclose(outputFile);
            }
            else if(typeEntry==1) {
@@ -738,6 +743,8 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    }/* wend all along the file */   
  g_free(buffer);
  fwrite(str->str,sizeof(gchar), strlen(str->str), outputFile);
+ gchar end_sign[]={0x0a,0};
+ fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
  fclose(outputFile);
  g_string_free(str, TRUE);
  return path_to_tmp_file;
@@ -753,6 +760,7 @@ gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   glong textstart,textlen, fileSize, i=0, j=0;
   gchar *buffer, c, *str=NULL, buf_hexa[32];
   GError **error = NULL;
+  glong bytes_written, bytes_read;
 
   /* the Winword file is binary */
   inputFile = fopen(path_to_file,"rb");
@@ -809,10 +817,42 @@ gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
     return NULL;
   }
 
-  str = MSWordconvert_str((gchar *)buffer+i, iCpIso8859_1, textlen );
-  fwrite(str, sizeof(gchar), strlen(str), outputFile);
+ // str = MSWordconvert_str((gchar *)buffer+i, iCpIso8859_1, textlen );
+ // fwrite(str, sizeof(gchar), strlen(str), outputFile);
+  //fwrite("\0", sizeof(gchar), 1, outputFile);
+  while((i<fileSize) && (j<textlen-1)) {
+    c = buffer[i];     
+    switch(c) {
+      case 0: case 0x0D: {j++;break;}
+      case '\n': {
+        fwrite((gchar*)"\n",sizeof(gchar), 1, outputFile);
+        j++;
+        break;
+      }
+      default:{
+        if(((gint)c<128) && (c>31)){
+          fwrite(&buffer[i], sizeof(gchar), sizeof(gchar), outputFile);
+          j++;
+        }
+        else {
+         if((guint)(c)>127) {                
+            buf_hexa[0] = (guint)c;
+            buf_hexa[1] = 0;
+            str= g_convert_with_fallback ((gchar *)buf_hexa, -1, "UTF8", "ISO-8859-1",
+                                           NULL, &bytes_read, &bytes_written, &error);
+            fwrite(str, sizeof(gchar), strlen(str), outputFile);
+            g_free(str);
+            j++;
+         }
+        }
+      }/* default */
+    }/* end switch */    
+    i++;
+  }/* wend */
+  gchar end_sign[]={0x0a,0};
+  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
   fclose(outputFile);
-  g_free(str);
+  //g_free(str);
   return path_to_tmp_file;
 }
 /*********************************************
@@ -872,6 +912,8 @@ gchar *WRICheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
        // str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "WINDOWS-1252",
          //                                  NULL, &bytes_read, &bytes_written, &error);
   fwrite(str , sizeof(gchar), strlen(str), outputFile);
+  gchar end_sign[]={0x0a,0};
+  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
   fclose(outputFile);
   g_free(str);
   g_free(buffer);
@@ -1012,6 +1054,8 @@ gchar *ABWCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    /* we dump the parsed file */
    //printf("longueur chaine :%d\n", strlen(str));
    fwrite(str , sizeof(gchar), strlen(str), outputFile);
+   gchar end_sign[]={0x0a,0};
+   fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
    fclose(outputFile);
    tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
    if(strlen(str)>0) 
@@ -1077,9 +1121,10 @@ gchar *PDFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
     fputc('\n', outputFile);
     g_object_unref(page);
    }
-
- tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
+ gchar end_sign[]={0x0a,0};
+ fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
  fclose(outputFile);
+ tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
 
  return tmpfileToExtract;
 }
@@ -1250,6 +1295,8 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   str[j-1] = '\0'; /* at the end append null character to mark end of string mandatory with ODP files */
 
   fwrite(str , sizeof(gchar), strlen(str), outputFile);
+  gchar end_sign[]={0x0a,0};
+  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
 
  /* close the parsed file and clean datas*/
   tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
@@ -1382,6 +1429,8 @@ gchar *DocXCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 
   tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);// pourquoi plantage ici ????
 
+  gchar end_sign[]={0x0a,0};
+  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
 
   fclose(outputFile); 
 
