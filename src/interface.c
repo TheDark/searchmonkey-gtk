@@ -1016,7 +1016,7 @@ create_window1 (void)
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (resultsScroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   treeview1 = gtk_tree_view_new ();
 /* modifyed by Luc A., 27 dec 2017 - be careful, it's deprecated under GTK3 ! */
- // gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview1), TRUE);
+  gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview1), TRUE);
 /* end modif Luc A. */
   gtk_widget_show (treeview1);
   gtk_widget_set_name(treeview1, "treeview1");
@@ -1055,7 +1055,7 @@ create_window1 (void)
 
   treeview2 = gtk_tree_view_new ();
 /* modifyed by Luc A., 27 dec 2017 - be careful, it's deprecated under GTK3 ! */
- // gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
+  gtk_tree_view_set_rules_hint        (GTK_TREE_VIEW(treeview2),TRUE);
 /* end modif Luc A. */
   gtk_widget_show (treeview2);
   gtk_widget_set_name(treeview2, "treeview2");
