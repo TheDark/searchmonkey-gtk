@@ -31,53 +31,56 @@ static GMutex mutex_Control; /* Global mutex used by savestate.c too*/
 
 /* it's very easy to improve the quality by changing the field icon_file_name */
 static t_symstruct lookuptable[] = {
-    { "txt-type", "icon-text-generic.png", FORMAT_TXT }, 
-    { "odt-type", "icon-odt.png", FORMAT_OFFICE_TEXT }, 
-    { "docx-type","icon-doc.png", FORMAT_OFFICE_TEXT }, 
-    { "rtf-type", "icon-word-processor.png", FORMAT_OFFICE_TEXT },
-    { "doc-type", "icon-doc.png", FORMAT_OFFICE_TEXT }, /* 5 */
-    { "abw-type", "icon-word-processor.png", FORMAT_OFFICE_TEXT },
-    { "ods-type", "icon-ods.png", FORMAT_OFFICE_SHEET }, 
-    { "xlsx-type", "icon-xls.png", FORMAT_OFFICE_SHEET }, 
-    { "xls-type", "icon-xls.png", FORMAT_OFFICE_SHEET },
-    { "odb-type", "icon-odb.png", FORMAT_OFFICE_BASE },/* 10*/ 
-    { "png-type", "icon-image.png", FORMAT_IMAGE },  
-    { "jpg-type", "icon-image.png", FORMAT_IMAGE }, 
-    { "jpeg-type", "icon-image.png", FORMAT_IMAGE }, 
-    { "xcf-type", "icon-image.png", FORMAT_IMAGE },
-    { "pdf-type", "icon-pdf.png", FORMAT_PDF },/* 15 */
-    { "svg-type", "icon-drawing.png", FORMAT_SVG },
-    { "odg-type", "icon-odg.png", FORMAT_ODG },
-    { "csv-type", "icon-spreadsheet.png", FORMAT_CSV },
-    { "zip-type", "icon-archive.png", FORMAT_ZIP },
-    { "wav-type", "icon-audio.png", FORMAT_WAV },/* 20*/
-    { "mp3-type", "icon-audio.png", FORMAT_MP3 },
-    { "mp4-type", "icon-video.png", FORMAT_MP4 },
-    { "avi-type", "icon-video.png", FORMAT_AVI },
-    { "mkv-type", "icon-video.png", FORMAT_MKV },
-    { "otf-type", "icon-font.png", FORMAT_OTF },/* 25 */
-    { "ttf-type", "icon-font.png", FORMAT_TTF },
-    { "bz2-type", "icon-archive.png", FORMAT_BZ2 },
-    { "ppt-type", "icon-ppt.png", FORMAT_PPT },
-    { "deb-type", "icon-archive.png", FORMAT_DEB },
-    { "gz-type", "icon-archive.png", FORMAT_GZ },/* 30 */
-    { "rpm-type", "icon-archive.png", FORMAT_RPM },
-    { "sh-type", "icon-java.png", FORMAT_SH },
-    { "c-type", "icon-c.png", FORMAT_C },
-    { "xml-type", "icon-htm.png", FORMAT_XML },
-    { "htm-type", "icon-htm.png", FORMAT_HTML },/* 35 */
-    { "jar-type", "icon-java.png", FORMAT_JAR },
-    { "java-type", "icon-java.png", FORMAT_JAVA },
-    { "h-type", "icon-h.png", FORMAT_H },
-    { "rar-type", "icon-archive.png", FORMAT_RAR },
-    { "tif-type", "icon-image.png", FORMAT_TIFF }, /* 40*/
-    { "dng-type", "icon-image.png", FORMAT_DNG },
-    { "gif-type", "icon-image.png", FORMAT_GIF },
-    { "odp-type", "icon-odp.png", FORMAT_ODP },
-    { "js-type", "icon-java.png", FORMAT_JS },
-    { "css-type", "icon-htm.png", FORMAT_CSS },/* 45 */
-    { "tgz-type", "icon-archive.png", FORMAT_TGZ },
-    { "xpm-type", "icon-image.png", FORMAT_XPM },
+    { "txt-", "icon-text-generic.png", FORMAT_TXT }, 
+    { "odt-", "icon-odt.png", FORMAT_OFFICE_TEXT }, 
+    { "docx","icon-doc.png", FORMAT_OFFICE_TEXT }, /* we keep only 4 first chars */
+    { "rtf-", "icon-word-processor.png", FORMAT_OFFICE_TEXT },
+    { "doc-", "icon-doc.png", FORMAT_OFFICE_TEXT }, /* 5 */
+    { "abw-", "icon-word-processor.png", FORMAT_OFFICE_TEXT },
+    { "ods-", "icon-ods.png", FORMAT_OFFICE_SHEET }, 
+    { "xlsx", "icon-xls.png", FORMAT_OFFICE_SHEET }, 
+    { "xls-", "icon-xls.png", FORMAT_OFFICE_SHEET },
+    { "odb-", "icon-odb.png", FORMAT_OFFICE_BASE },/* 10*/ 
+    { "png-", "icon-image.png", FORMAT_IMAGE },  
+    { "jpg-", "icon-image.png", FORMAT_IMAGE }, 
+    { "jpeg", "icon-image.png", FORMAT_IMAGE }, 
+    { "xcf-", "icon-image.png", FORMAT_IMAGE },
+    { "pdf-", "icon-pdf.png", FORMAT_PDF },/* 15 */
+    { "svg-", "icon-drawing.png", FORMAT_SVG },
+    { "odg-", "icon-odg.png", FORMAT_ODG },
+    { "csv-", "icon-spreadsheet.png", FORMAT_CSV },
+    { "zip-", "icon-archive.png", FORMAT_ZIP },
+    { "wav-", "icon-audio.png", FORMAT_WAV },/* 20*/
+    { "mp3-", "icon-audio.png", FORMAT_MP3 },
+    { "mp4-", "icon-video.png", FORMAT_MP4 },
+    { "avi-", "icon-video.png", FORMAT_AVI },
+    { "mkv-", "icon-video.png", FORMAT_MKV },
+    { "otf-", "icon-font.png", FORMAT_OTF },/* 25 */
+    { "ttf-", "icon-font.png", FORMAT_TTF },
+    { "bz2-", "icon-archive.png", FORMAT_BZ2 },
+    { "ppt-", "icon-ppt.png", FORMAT_PPT },
+    { "deb-", "icon-archive.png", FORMAT_DEB },
+    { "gz-t", "icon-archive.png", FORMAT_GZ },/* 30 */
+    { "rpm-", "icon-archive.png", FORMAT_RPM },
+    { "sh-t", "icon-java.png", FORMAT_SH },
+    { "c-ty", "icon-c.png", FORMAT_C },
+    { "xml-", "icon-htm.png", FORMAT_XML },
+    { "htm-", "icon-htm.png", FORMAT_HTML },/* 35 */
+    { "jar-", "icon-java.png", FORMAT_JAR },
+    { "java", "icon-java.png", FORMAT_JAVA },
+    { "h-ty", "icon-h.png", FORMAT_H },
+    { "rar-", "icon-archive.png", FORMAT_RAR },
+    { "tif-", "icon-image.png", FORMAT_TIFF }, /* 40*/
+    { "dng-", "icon-image.png", FORMAT_DNG },
+    { "gif-", "icon-image.png", FORMAT_GIF },
+    { "odp-", "icon-odp.png", FORMAT_ODP },
+    { "js-t", "icon-java.png", FORMAT_JS },
+    { "css-", "icon-htm.png", FORMAT_CSS },/* 45 */
+    { "tgz-", "icon-archive.png", FORMAT_TGZ },
+    { "xpm-", "icon-image.png", FORMAT_XPM },
+    { "cpp-", "icon-c.png", FORMAT_C },
+    { "html", "icon-htm.png", FORMAT_HTML },
+    { "sql-", "icon-odb.png", FORMAT_OFFICE_BASE }, /* 50 */
     { "unknown-type", "icon-unknown.png", FORMAT_OTHERS }
 };
 // please update in search.h the #define MAX_FORMAT_LIST according to the size of this table - Luc A 1 janv 2018
@@ -155,7 +158,7 @@ gchar *MSWordconvert_str(unsigned char *buffer, gint fromCP, glong len)
   return sRetVal;
 }
 /*********************************************
-  ms-Word OLE (W6/98/97>>2003 parser
+  ms-Word OLE (W6/95/97>>2003 parser
 *********************************************/
 gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 {
@@ -743,9 +746,7 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    }/* wend all along the file */   
  g_free(buffer);
  fwrite(str->str,sizeof(gchar), strlen(str->str), outputFile);
- gchar end_sign[]={0x0a,0};
- fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
- fclose(outputFile);
+ misc_close_file(outputFile);
  g_string_free(str, TRUE);
  return path_to_tmp_file;
 }
@@ -849,10 +850,7 @@ gchar *WRDCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
     }/* end switch */    
     i++;
   }/* wend */
-  gchar end_sign[]={0x0a,0};
-  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
-  fclose(outputFile);
-  //g_free(str);
+  misc_close_file(outputFile);
   return path_to_tmp_file;
 }
 /*********************************************
@@ -912,9 +910,7 @@ gchar *WRICheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
        // str = g_convert_with_fallback ((gchar *)buffer+128, getshort(buffer,14)-128, "UTF8", "WINDOWS-1252",
          //                                  NULL, &bytes_read, &bytes_written, &error);
   fwrite(str , sizeof(gchar), strlen(str), outputFile);
-  gchar end_sign[]={0x0a,0};
-  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
-  fclose(outputFile);
+  misc_close_file(outputFile);
   g_free(str);
   g_free(buffer);
   return path_to_tmp_file;
@@ -1054,9 +1050,7 @@ gchar *ABWCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    /* we dump the parsed file */
    //printf("longueur chaine :%d\n", strlen(str));
    fwrite(str , sizeof(gchar), strlen(str), outputFile);
-   gchar end_sign[]={0x0a,0};
-   fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
-   fclose(outputFile);
+   misc_close_file(outputFile);
    tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
    if(strlen(str)>0) 
           g_free(str);     
@@ -1121,9 +1115,7 @@ gchar *PDFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
     fputc('\n', outputFile);
     g_object_unref(page);
    }
- gchar end_sign[]={0x0a,0};
- fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
- fclose(outputFile);
+ misc_close_file(outputFile);
  tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
 
  return tmpfileToExtract;
@@ -1295,12 +1287,10 @@ gchar *ODTCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
   str[j-1] = '\0'; /* at the end append null character to mark end of string mandatory with ODP files */
 
   fwrite(str , sizeof(gchar), strlen(str), outputFile);
-  gchar end_sign[]={0x0a,0};
-  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
+  misc_close_file(outputFile);
 
  /* close the parsed file and clean datas*/
   tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
-  fclose(outputFile); 
 
   if(str!=NULL)
      {    
@@ -1429,10 +1419,7 @@ gchar *DocXCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 
   tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);// pourquoi plantage ici ????
 
-  gchar end_sign[]={0x0a,0};
-  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
-
-  fclose(outputFile); 
+  misc_close_file(outputFile);
 
   if(str!=NULL) /* il y a un pb sur str dans certains cas ! */
      g_free(str);
@@ -1453,17 +1440,12 @@ gint keyfromstring(gchar *key2)
 {
  gint i, i_comp;
 
- for(i=0;i<MAX_FORMAT_LIST;i++)
-  {
-    i_comp = g_ascii_strncasecmp (lookuptable[i].key,
-                                 key2,
-                                3);
-    if(i_comp==0)
-      {
-       // printf("trouvé matching contenu tableau %s format :%s \n",lookuptable[i].key, key2);
+ for(i=0;i<MAX_FORMAT_LIST;i++) {
+    i_comp = g_ascii_strncasecmp (lookuptable[i].key, key2,4);
+    if(i_comp==0) {
        return i;
-      }
-  }
+    }
+ }
  return FORMAT_OTHERS;
 }
 
@@ -1479,30 +1461,24 @@ Luc A. - Janv 2018
 *****************************************************/
 GdkPixbuf *get_icon_for_display(gchar *stype)
 {
-  GdkPixbuf     *icon = NULL; /* Luc A - 1 janv 2018 */
-  GError        *error = NULL;
-  gchar *str_lowcase = NULL;
-  gchar *str_icon_file = NULL;
+  GdkPixbuf *icon = NULL; /* Luc A - 1 janv 2018 */
+  GError *error = NULL;
+  gchar *str_lowcase = NULL, *str_icon_file = NULL;
   gint i;
 
-  /* we must insure that stype is in low case, and we remove the 5 last chars */
+  i = keyfromstring(stype);/* the g_ascii_strn() function is case independant */
 
- //  str_lowcase = g_ascii_strdown (stype, -1);
-   i = keyfromstring(stype);/* the g_ascii_strn() function is case independant */
- //  g_free(str_lowcase);
-   str_icon_file = g_strconcat(PACKAGE_DATA_DIR, "/pixmaps/", PACKAGE, "/", 
+  str_icon_file = g_strconcat(PACKAGE_DATA_DIR, "/pixmaps/", PACKAGE, "/", 
                                lookuptable[i].icon_file_name, NULL);
-   icon = gdk_pixbuf_new_from_file(str_icon_file, &error);
+  icon = gdk_pixbuf_new_from_file(str_icon_file, &error);
   
-   if (error)
-    {
+  if (error) {
       g_warning ("Could not load icon: %s\n", error->message);
       g_error_free(error);
       error = NULL;
-    }
+  }
   g_free(str_icon_file);
-  /* luc A. */
- return icon;
+  return icon;
 }
 
 
@@ -1512,26 +1488,20 @@ widget = mainAppWindow !!!
  */
 void getSearchExtras(GtkWidget *widget, searchControl *mSearchControl)
 {
-  gchar *tmpString;
-  gint multiplierLess, multiplierMore =0;
-  gboolean fMoreThanCheck = FALSE;
-  gboolean fLessThanCheck = FALSE;
-  gboolean fBeforeCheck = FALSE;
-  gboolean fAfterCheck = FALSE;
-  gboolean fIntervalCheck = FALSE;
-  gboolean fSinceCheck = FALSE;
+  gchar *tmpString, *endChar;
+  gint i, multiplierLess, multiplierMore =0;
+  gboolean fMoreThanCheck = FALSE, fLessThanCheck = FALSE;
+  gboolean fBeforeCheck = FALSE, fAfterCheck = FALSE;
+  gboolean fIntervalCheck = FALSE, fSinceCheck = FALSE;
   gboolean fTodayCheck = FALSE;
   gint date_mode = 0;
   gdouble tmpDouble, tmpMultiplierLess, tmpMultiplierMore, tmpMoreThan =0, tmpLessThan=0;
-  gint i;
   GDate DateAfter, DateBefore;
   gchar buffer[MAX_FILENAME_STRING + 1];
   struct tm tptr;
-  gchar *endChar;
   time_t rawtime; 
   GDate current_date, previous_date;
-  gint current_since_unit = 0;
-  gint current_since_value = 1;
+  gint current_since_unit = 0, current_since_value = 1;
 
   GKeyFile *keyString = getGKeyFile(GTK_WIDGET(lookup_widget(widget, "window1")));
 
@@ -1884,8 +1854,7 @@ void start_search_thread(GtkWidget *widget)
   GObject *window1 = G_OBJECT(mainWindowApp);
   gchar *tmpChar;
   guint tmpInt;
-  gchar buffer[MAX_FILENAME_STRING + 1];
-  gchar *tmpStr;
+  gchar buffer[MAX_FILENAME_STRING + 1], *tmpStr;
   GKeyFile *keyString = getGKeyFile(widget);
   GtkWidget *dialog;
   GtkTreeView *listView;
@@ -2087,17 +2056,14 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gchar *tmpFullFileName; /* Pointer to the full filename or directory provided by */
   regex_t searchRegEx;
   GPatternSpec *searchGlob;
-  gchar *tString;
+  gchar *tString, *pStrChunk;
   glong matchCount = 0;
   GTimeVal phaseOneStartTime, phaseOneMidTime;
   GtkProgressBar *pbar = GTK_PROGRESS_BAR(lookup_widget(GTK_WIDGET(mainWindowApp), "progressbar1"));
-  gint i = 0;
+  gint i = 0, Icount = 0, result;
   gdouble deltaTime;
-  gint Icount = 0;
   gboolean stopSearch;
-  gint result;
   gboolean symlink = FALSE; /* TRUE if file currently being tested is a symlink */
-  gchar *pStrChunk;
   GError *dirOpenError = NULL;
   char *pCurDirStack;
 
@@ -2126,7 +2092,6 @@ glong phaseOneSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
                      g_string_chunk_insert(status->statusbarChunk, status->constantString));
   gdk_threads_leave ();
-
   
   g_mutex_lock(&mutex_Control);
   stopSearch = mSearchControl->cancelSearch;
@@ -2307,22 +2272,19 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
 {
   GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(mSearchControl->widget, "statusbar1"));
   glong matchCount=0;
-  gint i;
+  gint i, spinButtonValue = 0;
   gsize length;
   gchar *tmpFileName, *contents;
   regex_t search;
   textMatch *newMatch;
   GtkProgressBar *pbar = GTK_PROGRESS_BAR(lookup_widget(GTK_WIDGET(mainWindowApp), "progressbar1"));
   gint pbarNudge;
-  gdouble pbarNudgeCount = 0;
-  gdouble pbarIncrement;
+  gdouble pbarNudgeCount = 0, pbarIncrement;
   gchar pbarNudgeCountText[6]; /* Stores "100%" worst case.. */
   gboolean stopSearch;
-  gint spinButtonValue = 0;
   gchar *tmpExtractedFile = NULL; /* the gchar* to switch the filenames if it's an Office File */
   gboolean fDeepSearch = FALSE; /* special flag armed when we search inside complex files like Docx, ODT, PDF ... in order to keep the "true" filename for status bar */
   gboolean fIsOffice=FALSE; /* flag if we found an office style file */
-
 
   
   if (mSearchData->fullNameArray->len > 100) 
@@ -2635,8 +2597,7 @@ void dereferenceAbsolutes(searchData *mSearchData, gchar *contents, gsize length
   gsize absMatchStart = newLineMatch->offsetStart;
   gsize absMatchEnd = newLineMatch->offsetEnd;
   gint i = 0;
-  gchar* displayStartPtr = NULL;
-  gchar* displayEndPtr = NULL;
+  gchar *displayStartPtr = NULL, *displayEndPtr = NULL;
 
   /* Loop through whole file contents, one char at a time */
   while (currentOffset < length) { 
@@ -3184,3 +3145,4 @@ void ptr_array_free_cb(gpointer data, gpointer user_data)
 {
   g_free(data);
 }
+ 

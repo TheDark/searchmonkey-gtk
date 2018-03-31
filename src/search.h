@@ -18,7 +18,7 @@ extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. 
 /* added by Luc A. - 1 janv 2018 - idea here : answer #22 URL = https://stackoverflow.com/questions/4014827/best-way-to-switch-on-a-string-in-c
  please note that FORMAT_OTHERS must be equal to MAX_FORMAT_LIST !!!!
 */
-#define FORMAT_OTHERS 47
+#define FORMAT_OTHERS 50
 #define FORMAT_TXT 1
 #define FORMAT_OFFICE_TEXT 2
 #define FORMAT_OFFICE_SHEET 3
@@ -62,7 +62,8 @@ extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. 
 #define FORMAT_CSS 41
 #define FORMAT_TGZ 42
 #define FORMAT_XPM 43
-#define MAX_FORMAT_LIST 47
+ 
+#define MAX_FORMAT_LIST 50
 /*
  * Global/miscillaneous constants
  */

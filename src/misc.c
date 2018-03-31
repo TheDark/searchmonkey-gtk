@@ -17,6 +17,15 @@
 #include "misc.h"
 #include <regex.h>
 
+/*****************************************
+ close file parsed with a correct trailer
+******************************************/
+void misc_close_file(FILE *outputFile)
+{
+  gchar end_sign[]={0x0a,0};
+  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
+  fclose(outputFile);
+}
 /******************************************
   function to recognize the file type
   entry = path to file
