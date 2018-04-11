@@ -2003,7 +2003,7 @@ void *walkDirectories(void *args)
     textView = GTK_TEXT_VIEW(lookup_widget(mSearchControl->widget, "textview4"));
   }
   textBuffer = gtk_text_view_get_buffer (textView);
-  gtk_text_buffer_set_text(textBuffer, "", -1); /* Clear text! */
+  // gtk_text_buffer_set_text(textBuffer, "", -1); /* Clear text! */
   sortedModel = GTK_LIST_STORE(gtk_tree_model_sort_get_model(GTK_TREE_MODEL_SORT(gtk_tree_view_get_model(listView))));
   g_assert(sortedModel != NULL);
   mSearchData->store = sortedModel;
