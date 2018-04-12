@@ -45,14 +45,12 @@ int main (int argc, char *argv[])
 #endif
 
   /* Handle GTK command line options and the locale settings */
- /* gtk_set_locale (); useless with Gtk 3 */
+
   gtk_init (&argc, &argv);
 
- /* Initiate threads */
-//  if(!g_thread_supported()) /* Luc A janv 2018 ; useless if gtk >=2.32*/
-  //   g_thread_init (NULL);/* deprecated since 2.32 */
-  gdk_threads_init ();/* deprecated since gtk 3.6 */
-  gdk_threads_enter ();/* id */
+  /* Initiate threads */
+  gdk_threads_init();/* deprecated since gtk 3.6 */
+  gdk_threads_enter();/* id */
 
   /* Create main window, and load (create) ini config file */
   add_pixmap_directory (PACKAGE_DATA_DIR "/pixmaps/" PACKAGE); /* New location for all pixmaps */
@@ -116,7 +114,7 @@ int main (int argc, char *argv[])
   gtk_main ();
 
   /* Clean exit */
-  gdk_threads_leave ();/* deprecated since gtk 3.6 */
+  gdk_threads_leave();/* deprecated since gtk 3.6 */
   return 0;
 }
 
