@@ -25,6 +25,8 @@
 #include "systemio.h" /* System stuff, file import and export code */
 #include "misc.h" /* Everything else */
 
+/* external global var sorry */
+extern gboolean fStartedSearch;
 /*mutexes for searchdata and searchControl->cancelSearch */
 static GMutex mutex_Data; /* Global mutex used by savestate.c too */
 static GMutex mutex_Control; /* Global mutex used by savestate.c too*/
@@ -1834,6 +1836,8 @@ void start_search_thread(GtkWidget *widget)
   GtkTreeView *listView;
   GtkListStore *sortedModel;
 
+  /* clear flag */
+  fStartedSearch = TRUE;
   /* Clear results prior to resetting data */
   if (getResultsViewHorizontal(widget)) {
     listView = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
@@ -1914,6 +1918,7 @@ void stop_search_thread(GtkWidget *widget)
   searchControl *mSearchControl;
   GObject *window1 = G_OBJECT(lookup_widget(widget, "window1"));
   
+  fStartedSearch = FALSE;
   mSearchControl = g_object_get_data(window1, MASTER_SEARCH_CONTROL);
 
   g_mutex_lock(&mutex_Control);
@@ -2006,7 +2011,7 @@ void *walkDirectories(void *args)
       gtk_widget_set_sensitive(lookup_widget(mSearchControl->widget, "save_results1"), TRUE);
   }
   gdk_threads_leave ();
-  
+  fStartedSearch = FALSE;
   g_mutex_unlock(&mutex_Data);
   g_thread_exit (GINT_TO_POINTER(0));
 }

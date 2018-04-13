@@ -215,10 +215,6 @@ on_afterCheck_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);
 
 void
-on_expertUserCheck_toggled             (GtkToggleButton *togglebutton,
-                                        gpointer         user_data);
-
-void
 on_treeview1_realize                   (GtkWidget       *widget,
                                         gpointer         user_data);
 

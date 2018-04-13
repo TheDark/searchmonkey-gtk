@@ -531,22 +531,6 @@ on_afterCheck_toggled                  (GtkToggleButton *togglebutton,
 }
 
 
-void
-on_expertUserCheck_toggled             (GtkToggleButton *togglebutton,
-                                        gpointer         user_data)
-{
-  GtkWidget *menuitem;
-
-printf("expert user checks \n");
-return;
-  if (gtk_toggle_button_get_active(togglebutton)) { /* Set expert mode */
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(lookup_widget(GTK_WIDGET(togglebutton), "hboxSearchmonkey")), 1);
-  } else { /* Set basic mode */
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(lookup_widget(GTK_WIDGET(togglebutton), "hboxSearchmonkey")), 0);
-  }
-}
-
-
 gboolean
 on_treeview1_button_press_event        (GtkWidget       *widget,
                                         GdkEventButton  *event,

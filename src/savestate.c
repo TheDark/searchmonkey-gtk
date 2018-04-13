@@ -28,9 +28,8 @@
 extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
 extern GMutex mutex_Data; /* Created in search.c to control access to search results data. */
 extern GMutex mutex_Control; /* Created in search.c to control access to search controls. */
-
-
-
+/* external global var sorry */
+extern gboolean fStartedSearch;
 
 /**************************************************************
  *    Keyfile interface commands
@@ -1737,7 +1736,10 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   g_assert(tmpStr != NULL);
   g_assert(selection != NULL);
 
-
+  if(fStartedSearch) {
+    //printf("search launched - no update \n");
+    return;
+  }
   fLimitHitsHighlighting = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON((g_object_get_data(G_OBJECT(mainWindowApp), 
                                        "limitContentsCheckResults"))));
  

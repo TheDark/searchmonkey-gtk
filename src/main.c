@@ -24,7 +24,7 @@
 
 GtkWidget *mainWindowApp = NULL; /* Holds pointer to the main window (global) */
 gchar *gConfigFile = NULL; /* created by main(), destroyed by destroyGKeyFile() */
-
+gboolean fStartedSearch = FALSE; /* global in order double or triple "changed" events for treeviews */
 /*
  * Searchmonkey entry point
  */
