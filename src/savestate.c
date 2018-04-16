@@ -1711,25 +1711,17 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   lineMatch *newTextMatch, *prevTextMatch = NULL;
   GtkTreeIter iter;
   GtkTreeModel *model;
-  gchar *fullFileName, *size, *mdate, tmpString[MAX_FILENAME_STRING + 1];
-  gchar *tmpString2;
-  GtkTextIter txtIter, tmpIter;
-  GtkTextIter tmpStartIter, tmpEndIter;
-  GtkTextIter start, end;
+  gchar *fullFileName, *size, *mdate, tmpString[MAX_FILENAME_STRING + 1], *tmpString2;
+  GtkTextIter txtIter, tmpIter, tmpStartIter, tmpEndIter, start, end;
   gsize count=0, tmpCount;
-  guint matchIndex;
-  gint i = 0; 
-  gint lineCount = 2; /* Heading, plus options (i.e. 2-lines) */
+  guint matchIndex, totalMatchLines=0, currentMatchLines=0;
+  gint i = 0, lineCount = 2; /* Heading, plus options (i.e. 2-lines) */
   GObject *window1;
-  gboolean setWordWrap;
-  gchar *t1;
+  gboolean setWordWrap, fLimitHitsHighlighting = FALSE;
   gchar *tmpStr = g_object_get_data(G_OBJECT(mainWindowApp), "noContextSearchString");
-  gint errorCount = 0; /* Temp debug */
-  gint a,b;
-  gint tmpStartOffset, tmpEndOffset;
+  gint errorCount = 0, a,b, tmpStartOffset, tmpEndOffset;
   gchar *tmptext = NULL;
   gint count_hits = 0; /* counter INSIDE a line in order to manage the max display hits option for results - Luc A janv 2018 */
-  gboolean fLimitHitsHighlighting = FALSE;
   gint max_count_hits = (gint) gtk_spin_button_get_value( 
                                       GTK_SPIN_BUTTON(g_object_get_data(G_OBJECT(mainWindowApp), 
                                        "maxContentHitsSpinResults")));
@@ -1737,125 +1729,125 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   g_assert(selection != NULL);
 
   if(fStartedSearch) {
-    //printf("search launched - no update \n");
     return;
   }
   fLimitHitsHighlighting = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON((g_object_get_data(G_OBJECT(mainWindowApp), 
                                        "limitContentsCheckResults"))));
  
-if ( gtk_tree_selection_count_selected_rows(selection)== 1)
-{
-// printf("//// salut je suis dans savstat ////\n");
-  if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-// printf("//// passé test selection /////\n");
-    g_assert(model != NULL);
-    if (getResultsViewHorizontal(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)))) {
-      textBox = lookup_widget(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview1");
-    } else {
-      textBox = lookup_widget(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview4");
-    }
+  if ( gtk_tree_selection_count_selected_rows(selection)== 1)
+  {
+   if(gtk_tree_selection_get_selected (selection, &model, &iter)) {
+     g_assert(model != NULL);
+     if (getResultsViewHorizontal(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)))) {
+       textBox = lookup_widget(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview1");
+     } else {
+       textBox = lookup_widget(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview4");
+     }
 
-    window1 = G_OBJECT(lookup_widget(GTK_WIDGET(textBox), "window1"));
-    setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(textBox, "word_wrap1")));
-   /* luc A janv 2018 */
-    GtkWrapMode wrap = GTK_WRAP_NONE;  
-    if(setWordWrap)
+     window1 = G_OBJECT(lookup_widget(GTK_WIDGET(textBox), "window1"));
+     setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(textBox, "word_wrap1")));
+     /* luc A janv 2018 */
+     GtkWrapMode wrap = GTK_WRAP_NONE;  
+     if(setWordWrap)
         wrap = GTK_WRAP_WORD;
 
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textBox), wrap);
-    gtk_text_view_set_justification( GTK_TEXT_VIEW(textBox), GTK_JUSTIFY_LEFT );
-    g_assert(textBox != NULL);
-    g_assert(window1 != NULL);
+     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textBox), wrap);
+     gtk_text_view_set_justification( GTK_TEXT_VIEW(textBox), GTK_JUSTIFY_LEFT );
+     g_assert(textBox != NULL);
+     g_assert(window1 != NULL);
     
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (textBox)); 
-    g_assert(buffer != NULL);
-    gtk_text_buffer_set_text(buffer, "", -1); /* Clear text! */
-    gtk_text_buffer_get_start_iter(buffer, &txtIter); /* Find start iter.. */
-
-    /* Get global data from the text view widget pointer */
+     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (textBox)); 
+     g_assert(buffer != NULL);
+     gtk_text_buffer_set_text(buffer, "", -1); /* Clear text! */
+     gtk_text_buffer_get_start_iter(buffer, &txtIter); /* Find start iter.. */
+     /* Get global data from the text view widget pointer */
 //    g_static_mutex_lock(&mutex_Data);
-    mSearchData = g_object_get_data(window1, MASTER_SEARCH_DATA);
-    g_assert(mSearchData != NULL); 
+     mSearchData = g_object_get_data(window1, MASTER_SEARCH_DATA);
+     g_assert(mSearchData != NULL); 
     //g_static_mutex_unlock(&mutex_Data);
     //g_static_mutex_lock(&mutex_Control);
-    mSearchControl = g_object_get_data(window1, MASTER_SEARCH_CONTROL);
-    g_assert(mSearchControl != NULL);
+     mSearchControl = g_object_get_data(window1, MASTER_SEARCH_CONTROL);
+     g_assert(mSearchControl != NULL);
     //g_static_mutex_unlock(&mutex_Control);
-    gtk_tree_model_get (model, &iter, MATCHES_COUNT_COLUMN, &count, -1);
-    if (count > 0) {
-      gtk_tree_model_get (model, &iter, FULL_FILENAME_COLUMN, &fullFileName,
+     gtk_tree_model_get (model, &iter, MATCHES_COUNT_COLUMN, &count, -1);
+     if (count > 0) {
+       gtk_tree_model_get (model, &iter, FULL_FILENAME_COLUMN, &fullFileName,
                                         SIZE_COLUMN, &size,
                                         MODIFIED_COLUMN, &mdate,
-                                        MATCH_INDEX_COLUMN, &matchIndex,                                      -1);
+                                        MATCH_INDEX_COLUMN, &matchIndex, -1);
 
-      g_assert(fullFileName != NULL);
-      g_assert(size != NULL);
-      g_assert(mdate != NULL);
-      /* affiche le hAUT de la prévisua : chemin vers fichier avec sa date, en noir gras */
-      tmpString2 = g_strconcat(fullFileName, " (", size, " ", mdate, ")\n", NULL);
-      gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "results_header", NULL);
-      g_free(tmpString2);
+       g_assert(fullFileName != NULL);
+       g_assert(size != NULL);
+       g_assert(mdate != NULL);
 
-      /* Add line to describe options applied at run-time in medium grey*/
-
-      tmpString2 = generateContentOptionsString(mSearchControl);
-      gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "no_context", NULL);
-      g_free(tmpString2);
+       tmpString2 = g_strconcat(fullFileName, " (", size, " ", mdate, ")\n", NULL);
+       gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "results_header", NULL);
+       g_free(tmpString2);
+       /* Add line to describe options applied at run-time in medium grey*/
+       tmpString2 = generateContentOptionsString(mSearchControl);
+       gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "no_context", NULL);
+       g_free(tmpString2);
 
       //g_static_mutex_lock(&mutex_Data);
-      /* count = number of text hits inside the current text == all the file buffer*/
-      if ((mSearchControl->flags & SEARCH_EXTRA_LINES)!=0) {
-	for (i=0; i<count; i++) {
-          g_assert((guint)(i+matchIndex) <= (guint)mSearchData->lineMatchArray->len);
-	  newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray,(guint)(i + matchIndex));
-	  g_assert(newTextMatch != NULL);
-	  
-	  if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
-	    /* tmpcount = nbre caractères écrits, tmpstring buffer avec la chaîne, MAX_FILENAME_STRING longueur maxi autorisée, _("line" ) format d'affichage type C classique, nexyexymatch la valeur numérique sui sera passée dans %d */
-            if(newTextMatch->fOfficeFile)
-               tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Paragraph Number: %d\n"),(gint) newTextMatch->lineNum);
-                 else  
-	            tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"),(gint) newTextMatch->lineNum);
+       /* count = number of text hits inside the current text == all the file buffer*/
+       /* here we count the total number of lines with a match */
+       for(i=0; i<count; i++) {
+           g_assert((guint)(i+matchIndex) <= (guint)mSearchData->lineMatchArray->len);
+	   newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray,(guint)(i + matchIndex));
+	   g_assert(newTextMatch != NULL);
+	   if(newTextMatch->lineCountAfter==0)
+               break; 
+	   if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
+             totalMatchLines++;
+	   }
+           prevTextMatch = newTextMatch;
+       }/* next i */
+       prevTextMatch = NULL;
 
-	    gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString, -1, "results_line_number", NULL);
-	    gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, newTextMatch->pLine, -1, "results_text", NULL);
-	    gtk_text_buffer_insert (buffer, &txtIter, "\n", -1);
-	    count_hits = 0; /* reset at every new line/paragraph */
-	    lineCount += newTextMatch->lineCountBefore;
-	  } else {
-	    lineCount -= (prevTextMatch->lineCountAfter + 1);
-	  }
-	  /* Luc A janv 2018 */
-          if(((count_hits<max_count_hits)&&(fLimitHitsHighlighting==TRUE) )|| (fLimitHitsHighlighting==FALSE))
-           {
-             /* display block : only if we have not reached the limit to hits's display - Luc A Janv 2018 */
+       if((mSearchControl->flags & SEARCH_EXTRA_LINES)!=0) {
+	 for(i=0; i<count; i++) {
+           g_assert((guint)(i+matchIndex) <= (guint)mSearchData->lineMatchArray->len);
+	   newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray,(guint)(i + matchIndex));
+	   g_assert(newTextMatch != NULL);
+	  
+	   if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
+	     /* tmpcount = nbre caractères écrits, tmpstring buffer avec la chaîne, MAX_FILENAME_STRING longueur maxi autorisée, _("line" ) format d'affichage type C classique, nexyexymatch la valeur numérique sui sera passée dans %d */
+             if(newTextMatch->fOfficeFile)
+                tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Paragraph Number: %d\n"),(gint) newTextMatch->lineNum);
+                  else  
+	             tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"),(gint) newTextMatch->lineNum);
+             currentMatchLines++;
+	     gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString, -1, "results_line_number", NULL);
+	     gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, newTextMatch->pLine, -1, "results_text", NULL);
+             if(currentMatchLines!=totalMatchLines) {
+	        gtk_text_buffer_insert (buffer, &txtIter, "\n", -1);
+             }
+	     count_hits = 0; /* reset at every new line/paragraph */
+	     lineCount += newTextMatch->lineCountBefore;
+	   } else {
+	     lineCount -= (prevTextMatch->lineCountAfter + 1);
+	   }
+	   /* Luc A janv 2018 */
+           if(((count_hits<max_count_hits)&&(fLimitHitsHighlighting==TRUE) )|| (fLimitHitsHighlighting==FALSE))
+            {  /* display block : only if we have not reached the limit to hits's display - Luc A Janv 2018 */
 	       gtk_text_buffer_get_iter_at_line (buffer, &tmpIter, lineCount);
                gtk_text_buffer_get_iter_at_line (buffer, &tmpStartIter, lineCount); 
                gtk_text_buffer_get_end_iter (buffer, &tmpEndIter);/* get the end of line iter */
                tmptext = gtk_text_buffer_get_text (buffer, &tmpStartIter, &tmpEndIter, FALSE);/* get the text FOR the CURRENT line lineCount*/
-
 	       a = gtk_text_iter_get_chars_in_line(&tmpIter);
 	       b = gtk_text_iter_get_bytes_in_line(&tmpIter);
-               // printf("la ligne d'aff. %d contient %d octets et %d cars \n", lineCount, b,  a);
               /* converts from regex format to Gtk gchar format */
                tmpStartOffset = convertRegexGtk(newTextMatch->offsetStart, tmptext);
                tmpEndOffset = convertRegexGtk(newTextMatch->offsetEnd, tmptext); 	
                g_free(tmptext);
                //  printf("lineCiunt=%d  pline:::\n%s////\n", lineCount, newTextMatch->pLine);  
-	       if (
-	          ((b >= (tmpEndOffset)) &&
-	          (b >= (tmpStartOffset)))) 
-                    {
-                      // printf("off départ =%d corrigé = %d fin =%d corrigé=%d \n",newTextMatch->offsetStart, 
-                      //   tmpStartOffset ,newTextMatch->offsetEnd,tmpEndOffset );
-	              //gtk_text_buffer_get_iter_at_line_offset (buffer, &start, lineCount, (newTextMatch->offsetStart));
-	              //gtk_text_buffer_get_iter_at_line_offset (buffer, &end, lineCount, (newTextMatch->offsetEnd));
+	       if( ((b >= (tmpEndOffset)) &&
+	          (b >= (tmpStartOffset)))) {
                       gtk_text_buffer_get_iter_at_line_offset (buffer, &start, lineCount, tmpStartOffset);
                       gtk_text_buffer_get_iter_at_line_offset (buffer, &end, lineCount, tmpEndOffset);
 	              gtk_text_buffer_apply_tag_by_name(buffer, "word_highlight", &start, &end);
                       count_hits++;
-// printf("***line %d  hits inside =%d ***\n", lineCount, count_hits);
-	            }/* if tests a b */ 
+	       }/* if tests a b */ 
                else {
 	          errorCount ++;
 	          g_printf(_("\nInternal error %d! Unable to highlight line - offset beyond line-end.\n"),(gint) errorCount);
@@ -1866,40 +1858,36 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
 	          g_printf(_("  Debug: %d) '%s'\n"), (gint)newTextMatch->lineNum, newTextMatch->pLine);
 	          if (errorCount > 3) {
 	             break; /* Exit loop as the rest of the file is likely to be corrupt too...*/
-	             }
+	          }
 	        }/* elseif test a b */
-           }/* end display block */
-	  lineCount += (newTextMatch->lineCountAfter + 1);
-	  prevTextMatch = newTextMatch;
-	}	
-      } else { /* Otherise, only display line numbers - no actual file contents */
-	for (i=0; i<count; i++) {
-	  newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray, (i + matchIndex));	  
-	  g_assert(newTextMatch != NULL);
-	  
-	  if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
-	    
-	    tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), (gint)newTextMatch->lineNum);
-	    gtk_text_buffer_insert (buffer, &txtIter, tmpString, -1);
-	    lineCount += newTextMatch->lineCountBefore;
-	  } else {
+            }/* end display block */
+	   lineCount += (newTextMatch->lineCountAfter + 1);
+	   prevTextMatch = newTextMatch;
+	 }	
+       } else { /* Otherise, only display line numbers - no actual file contents */
+	 for (i=0; i<count; i++) {
+	   newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray, (i + matchIndex));	  
+	   g_assert(newTextMatch != NULL);	  
+	   if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {	    
+	     tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), (gint)newTextMatch->lineNum);
+	     gtk_text_buffer_insert (buffer, &txtIter, tmpString, -1);
+	     lineCount += newTextMatch->lineCountBefore;
+	   } else {
 	    lineCount -= (prevTextMatch->lineCountAfter + 1);
-	  }
-	  lineCount += (newTextMatch->lineCountAfter + 1);
-	  prevTextMatch = newTextMatch;
-	}
-      }
+	   }
+	   lineCount += (newTextMatch->lineCountAfter + 1);
+	   prevTextMatch = newTextMatch;
+	 }
+       }
       //g_static_mutex_unlock(&mutex_Data);
-      g_assert(fullFileName != NULL);
-      g_assert(size != NULL);
-      g_assert(mdate != NULL);
-      
-      g_free (fullFileName);
-      g_free (size);
-      g_free (mdate);
-    } 
-     else 
-       { /* Print warning out just to fill the space */
+       g_assert(fullFileName != NULL);
+       g_assert(size != NULL);
+       g_assert(mdate != NULL);      
+       g_free (fullFileName);
+       g_free (size);
+       g_free (mdate);
+     } 
+     else { /* Print warning out just to fill the space */
          gtk_tree_model_get (model, &iter, FULL_FILENAME_COLUMN, &fullFileName, 
                                         SIZE_COLUMN, &size,
                                         MODIFIED_COLUMN, &mdate,
@@ -1908,11 +1896,10 @@ if ( gtk_tree_selection_count_selected_rows(selection)== 1)
          gtk_text_buffer_insert (buffer, &txtIter, tmpString2, -1);
          g_free(tmpString2);      
          gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpStr, -1, "no_context", NULL);
-       }/* elseif */
-  }
-}/* endif test rajouté par moi */
+     }/* elseif */
+   }
+  }/* endif test rajouté par moi */
 }/* end of function */
-
 
 /*
  * Internal helper: returns new string containing a textual description for all content specific options
