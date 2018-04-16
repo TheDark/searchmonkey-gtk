@@ -472,6 +472,7 @@ void realize_searchNotebook (GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
   gint count_error_modified_check = 0;
+  gchar *tmpstring=NULL;
   const gchar *err_msg = _("* warning ! Corrupted config.ini configuration file ; the <<%s>> key is absent. I set up a default value *\n");
 
   /* Store advanced options expander */
@@ -564,18 +565,59 @@ void realize_searchNotebook (GtkWidget *widget)
        g_key_file_set_string (keyString, "configuration", "anyDateCheck", "true");
        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(widget, "anyDateCheck")), TRUE);
      }
-//printf("passé 1\n");
- /* get from config.ini file and store file size options to corresponding widgets  */
+  /* get default file explorer options */
+  if (g_key_file_has_key(keyString, "configuration", "configFileExplorer", NULL)==NULL) {
+      printf(err_msg, " configFileExplorer key ");
+     g_key_file_set_string (keyString, "configuration", "configFileExplorer", "xdg-open");
+    }
+  else {    
+     tmpstring = g_key_file_get_string (keyString, "configuration", "configFileExplorer", NULL);
+     if(strlen(tmpstring)==0) {
+        g_key_file_set_string (keyString, "configuration", "configFileExplorer", "xdg-open");
+     }
+     g_free(tmpstring);
+  }
+  if (g_key_file_has_key(keyString, "configuration", "configFileExplorerAttributes", NULL)==NULL) {
+      printf(err_msg, " configFileExplorerAttributes key ");
+     g_key_file_set_string (keyString, "configuration", "configFileExplorerAttributes", "%d");
+    }
+  else {    
+     tmpstring = g_key_file_get_string (keyString, "configuration", "configFileExplorerAttributes", NULL);
+     if(strlen(tmpstring)==0) {
+        g_key_file_set_string (keyString, "configuration", "configFileExplorerAttributes", "%d");
+     }
+     g_free(tmpstring);
+  }
+  /* get default files associations */
+  if (g_key_file_has_key(keyString, "configuration", "configTextEditor", NULL)==NULL) {
+      printf(err_msg, " configTextEditor key ");
+     g_key_file_set_string (keyString, "configuration", "configTextEditor", "xdg-open");
+    }
+  else {    
+     tmpstring = g_key_file_get_string (keyString, "configuration", "configTextEditor", NULL);
+     if(strlen(tmpstring)==0) {
+        g_key_file_set_string (keyString, "configuration", "configTextEditor", "xdg-open");
+     }
+     g_free(tmpstring);
+  }
+  if (g_key_file_has_key(keyString, "configuration", "configTextEditorAttributes", NULL)==NULL) {
+      printf(err_msg, " configTextEditorAttributes key ");
+     g_key_file_set_string (keyString, "configuration", "configTextEditorAttributes", "%d");
+    }
+  else {    
+     tmpstring = g_key_file_get_string (keyString, "configuration", "configTextEditorAttributes", NULL);
+     if(strlen(tmpstring)==0) {
+        g_key_file_set_string (keyString, "configuration", "configTextEditorAttributes", "%f");
+     }
+     g_free(tmpstring);
+  }
+
+
+  /* get from config.ini file and store file size options to corresponding widgets  */
   realize_FileSizeDialog(widget);
-//printf("passé 2\n");
   /* get from config.ini file and store modified date options to corresponding widgets  */
   realize_FileModifiedDialog(widget);
-//printf("passé \n");
-  /* Store notebook global settings */
- // realizeNotebook(widget, keyString, "history", "hboxSearchmonkey");  
 }
-
-
 /*
  * Callback helper: store all search settings into config.ini
  */
