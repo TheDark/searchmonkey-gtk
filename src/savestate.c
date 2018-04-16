@@ -1770,9 +1770,7 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
   g_assert(tmpStr != NULL);
   g_assert(selection != NULL);
 
-  if(fStartedSearch) {
-    return;
-  }
+
   fLimitHitsHighlighting = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON((g_object_get_data(G_OBJECT(mainWindowApp), 
                                        "limitContentsCheckResults"))));
  
