@@ -56,7 +56,7 @@ void createGKeyFile(GObject *object, const gchar *dataName)
   keyString = g_key_file_new ();
   gchar *tmpStr;
 
-  if (!g_key_file_load_from_file (keyString,
+  if(!g_key_file_load_from_file (keyString,
                                   gConfigFile,
                                   G_KEY_FILE_KEEP_COMMENTS,
                                   NULL)) {
@@ -153,7 +153,6 @@ void storeGKeyFile(GKeyFile *keyString)
   folderName = g_path_get_dirname(gConfigFile);
   outText = g_key_file_to_data (keyString, &length, NULL);
   if (!g_file_set_contents2 (gConfigFile, outText, length, NULL)) {
-
     /* Unable to immediately write to file, so attempt to recreate folders */
     mkFullDir(folderName, S_IRWXU);
     if (!g_file_set_contents2 (gConfigFile, outText, length, &error)) { 
@@ -611,7 +610,12 @@ void realize_searchNotebook (GtkWidget *widget)
      }
      g_free(tmpstring);
   }
-
+  /* set default treeview */
+  if (g_key_file_has_key(keyString, "menuOptions", "horizontal_results1", NULL)==NULL) {
+      printf(err_msg, " horizontal_results1 key ");
+     g_key_file_set_string (keyString, "menuOptions", "horizontal_results1", "false");
+     g_key_file_set_string (keyString, "menuOptions", "vertical_results1", "true");
+    }
 
   /* get from config.ini file and store file size options to corresponding widgets  */
   realize_FileSizeDialog(widget);
@@ -1322,7 +1326,6 @@ void realizeComboModel(GtkListStore *store, GKeyFile *keyString, const gchar *gr
 
     if(store==NULL)
       return;
-   // g_assert(store != NULL);
     
     if (g_key_file_has_key(keyString, group, name, NULL)) {
         tmpString = g_key_file_get_string_list (keyString, group, name, &length, NULL);
@@ -1384,7 +1387,6 @@ void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
       setActive = 0;
     }
   g_free(keyname);
-  // printf("valeur de cette clef:%d\n", setActive);
   gtk_combo_box_set_active (GTK_COMBO_BOX (comboBox),setActive);
 }
 
@@ -1500,7 +1502,7 @@ void unrealizeComboBox2(GtkWidget *widget, GKeyFile *keyString, const gchar *gro
     noregexActive = gtk_combo_box_get_active(comboBox);
   }
 
-  gchar * keyname = g_strconcat(name, "regex", NULL);
+  gchar *keyname = g_strconcat(name, "regex", NULL);
   unrealizeComboModel(GTK_LIST_STORE(g_object_get_data(G_OBJECT(comboBox), "regex")), keyString, group, keyname, regexActive);
   g_free(keyname);
 
