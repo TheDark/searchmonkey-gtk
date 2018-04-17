@@ -221,6 +221,7 @@ create_window1 (void)
 //"                GtkTreeView#treeview2:selected{background-color: #B4D0ED; border-width: 1px; border-color: #B4D0ED;}\n"
 //"                /* next line for Gtk.TreeViewColumn */\n"
 "                GtkTreeView#treeview2 column-header .button{font-weight: bold; background: #005BAE;color: white; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
+"                GtkTreeView#treeview1 column-header .button{font-weight: bold; background: #005BAE;color: white; border-left-style: none; border-right-style: solid;border-right-width: 1px; border-left-width: 1px; border-color: darkgrey;}\n"
 "                .expander,.expander:active,.expander:prelight {background-size: 21px 21px;border-width: 1px; border-style: solid;border-color: #484848;   color: #484848; background-color: #484848;}\n"
 "                GtkComboBox.combobox-entry#fileName .entry{ border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-style: solid; border-width: 1px;}\n"
 "                GtkComboBox.combobox-entry#containingText .entry{ border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-style: solid; border-width: 1px;}\n"
