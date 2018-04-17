@@ -849,7 +849,7 @@ create_window1 (void)
   gtk_widget_set_tooltip_text (regularExpressionRadioFile, _("Use regular expression syntax in file search criteria."));
   gtk_radio_button_set_group (GTK_RADIO_BUTTON (regularExpressionRadioFile), dosExpressionRadioFile_group);
   dosExpressionRadioFile_group = gtk_radio_button_get_group (GTK_RADIO_BUTTON (regularExpressionRadioFile));
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (regularExpressionRadioFile), TRUE);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dosExpressionRadioFile), TRUE);
 
   label13 = gtk_label_new (_("<b>File Name Options</b>"));
   gtk_widget_show (label13);
