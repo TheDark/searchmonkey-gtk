@@ -602,7 +602,7 @@ void realize_searchNotebook (GtkWidget *widget)
   }
   if (g_key_file_has_key(keyString, "configuration", "configTextEditorAttributes", NULL)==NULL) {
       printf(err_msg, " configTextEditorAttributes key ");
-     g_key_file_set_string (keyString, "configuration", "configTextEditorAttributes", "%d");
+     g_key_file_set_string (keyString, "configuration", "configTextEditorAttributes", "%f");
     }
   else {    
      tmpstring = g_key_file_get_string (keyString, "configuration", "configTextEditorAttributes", NULL);
@@ -1172,6 +1172,8 @@ void realizeWindow(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
     }
     g_free(width_height);
   }
+   else /* set a default size for the main window */
+     gtk_window_set_default_size (GTK_WINDOW(lookup_widget(widget,name)), 900, 512);
 }
 
 
