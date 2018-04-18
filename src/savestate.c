@@ -470,6 +470,7 @@ void unrealize_configDialog (GtkWidget *widget)
 void realize_searchNotebook (GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
+  GtkComboBox *combo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
   gint count_error_modified_check = 0;
   gchar *tmpstring=NULL;
   const gchar *err_msg = _("* warning ! Corrupted config.ini configuration file ; the <<%s>> key is absent. I set up a default value *\n");
@@ -477,6 +478,15 @@ void realize_searchNotebook (GtkWidget *widget)
   /* Store advanced options expander */
   realizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
   realizeComboBox2(widget, keyString, "history", "fileName");
+
+  /* check if there isn't any value */
+  if(gtk_combo_box_get_active (GTK_COMBO_BOX_TEXT(combo))==-1 ) {
+     gtk_combo_box_set_active (GTK_COMBO_BOX_TEXT(combo), 0);
+     if(strlen((gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combo)) )==0 ) {
+         gtk_combo_box_text_insert_text (GTK_COMBO_BOX_TEXT(combo), 0,"*.*");
+         gtk_combo_box_set_active (GTK_COMBO_BOX_TEXT(combo), 0);
+     }
+  }
   /* we retrieve last user's mode */
   if (g_key_file_has_key(keyString, "configuration", "advancedMode", NULL)==NULL) {
       g_key_file_set_string (keyString, "configuration", "advancedMode", "false");
@@ -484,9 +494,8 @@ void realize_searchNotebook (GtkWidget *widget)
       gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "expander_options")) , FALSE);   
       gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard1")) , FALSE);
       gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard2")) , FALSE);
-    }
+  }
   realizeSwitch(widget, keyString, "configuration", "advancedMode");
-//  realizeToggle(widget, keyString, "history", "expertUserCheck");
   realizeComboBox(widget, keyString, "history", "containingText");
   realizeToggle(widget, keyString, "history", "containingTextCheck");
   realizeComboBox(widget, keyString, "history", "lookIn");
