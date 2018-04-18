@@ -2259,9 +2259,9 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
   gchar *tmpExtractedFile = NULL; /* the gchar* to switch the filenames if it's an Office File */
   gboolean fDeepSearch = FALSE; /* special flag armed when we search inside complex files like Docx, ODT, PDF ... in order to keep the "true" filename for status bar */
   gboolean fIsOffice=FALSE; /* flag if we found an office style file */
-
+  struct stat buf;
   
-  if (mSearchData->fullNameArray->len > 100) {
+  if(mSearchData->fullNameArray->len > 100) {
      pbarNudge = ((gdouble)mSearchData->fullNameArray->len / 100);  /* Every pbarNudge - increment 1/100 */
      pbarIncrement = (gdouble)pbarNudge / (gdouble)mSearchData->fullNameArray->len;
   } 
@@ -2304,7 +2304,12 @@ glong phaseTwoSearch(searchControl *mSearchControl, searchData *mSearchData, sta
       tmpFileName = g_strdup_printf("%s", (gchar*)g_ptr_array_index(mSearchData->fullNameArray, i) );/* modified Luc A janv 2018 */
       /* We must check the type-file in order to manage non pure text files like Office files 
        Luc A. 7 janv 2018 */
-  
+      /* if filesize > maxfile size we skip phase two, for example for video files, iso files and so on ! */
+      lstat(tmpFileName, &buf); /* Replaces the buggy GLIB equivalent */
+      if(buf.st_size>MAX_FILE_SIZE_PHASE_TWO) { 
+          printf("* File size of %s too large for safe containing search *\n", tmpFileName); 
+          break;
+      }
       switch(get_file_type_by_signature(tmpFileName)) {
        case iXmlOdpFile: /* Impress */
        case iXmlOdsFile: /* calc */ 

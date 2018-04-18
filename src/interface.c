@@ -26,6 +26,8 @@
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
+#define DEFAULT_MAX_HITS 50 /* maximum default number of results */
+
 extern mainWindowApp;
 
 GtkWidget*
@@ -937,7 +939,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (limit_results_hbox), label1010, FALSE, FALSE, 0);
   gtk_misc_set_padding (GTK_MISC (label1010), 5, 0);
 
-  maxHitsSpinResults_adj = gtk_adjustment_new (25, 1, 99999, 1, 10, 0);
+  maxHitsSpinResults_adj = gtk_adjustment_new (DEFAULT_MAX_HITS, 1, 99999, 1, 10, 0);
   maxHitsSpinResults = gtk_spin_button_new (GTK_ADJUSTMENT (maxHitsSpinResults_adj), 1, 0);
   gtk_widget_show (maxHitsSpinResults);
   gtk_box_pack_start (GTK_BOX (limit_results_hbox), maxHitsSpinResults, TRUE, TRUE, 2);

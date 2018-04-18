@@ -67,6 +67,7 @@ extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. 
 /*
  * Global/miscillaneous constants
  */
+#define MAX_FILE_SIZE_PHASE_TWO 134217728 /* 128 mega bytes - size limit for deep search in order to waste time with ISO videos ... */
 #define MAX_FILENAME_STRING 512 /* String maximum for things like the statusbar, and other fixed length buffers - minimise usage */
 #define TREEVIEW_HEADER_PIXEL_SIZE_Y 25 /* Treeview header size in pixels - on_treeview1_button_press_event() */
 #define SEARCHMONKEY_CONFIG "config.ini" /* Configuration name for searchmonkey options - main()*/
