@@ -2749,7 +2749,12 @@ void updateStatusFilesFound(const gsize matchCount, statusbarData *status, searc
   if ((mSearchControl->flags & SEARCH_INVERT_FILES) != 0) {
     g_strlcat(status->constantString, _(" [inv]"), MAX_FILENAME_STRING);
   }
-  g_strlcat(status->constantString,  g_strdup_printf(_("/%d"), tmpLimit), MAX_FILENAME_STRING);
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(mSearchControl->widget, "limitResultsCheckResults")))) {
+       g_strlcat(status->constantString,  g_strdup_printf(_("/Max hits limit:%d"), tmpLimit), MAX_FILENAME_STRING);
+  }
+  else {
+       g_strlcat(status->constantString,  g_strdup_printf(_("/No Max hits limit")), MAX_FILENAME_STRING);
+  }
   g_mutex_lock(&mutex_Control);
   stopSearch = mSearchControl->cancelSearch;
   g_mutex_unlock(&mutex_Control);

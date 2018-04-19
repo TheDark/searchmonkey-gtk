@@ -941,6 +941,7 @@ void realize_statusbar (GtkWidget *widget)
 {
   statusbarData *status;
   GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(widget, "statusbar1"));
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxHitsSpinResults")));
   status = g_object_get_data(G_OBJECT(mainWindowApp), MASTER_STATUSBAR_DATA);
   /* we get the research mode - Luc A Feb 2018 */
 
@@ -949,7 +950,12 @@ void realize_statusbar (GtkWidget *widget)
         g_sprintf(status->constantString, _("Ready-research mode with jokers(DOS like)"));
     }
   else   g_sprintf(status->constantString, _("Ready-research mode with RegEx"));
-
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "limitResultsCheckResults")))) {
+       g_strlcat(status->constantString,  g_strdup_printf(_("/Max hits limit:%d"), tmpLimit), MAX_FILENAME_STRING);
+  }
+  else {
+       g_strlcat(status->constantString,  g_strdup_printf(_("/No Max hits limit")), MAX_FILENAME_STRING);
+  }
   gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar), status->constantString);
 }
 

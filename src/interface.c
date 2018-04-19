@@ -3651,9 +3651,9 @@ void createFileDateModified(const gchar *str, GtkWidget *win, GtkExpander *expan
  g_signal_connect ((gpointer) intervalEndEntry, "clicked",
                     G_CALLBACK (on_IntervalEndBtn_clicked),
                     NULL);
- g_signal_connect ((gpointer) sinceUnits, "changed",
-                    G_CALLBACK (on_sinceUnits_focus_out_event),
-                    NULL);
+// g_signal_connect ((gpointer) sinceUnits, "changed",
+  //                  G_CALLBACK (on_sinceUnits_focus_out_event),
+    //                NULL);
  g_signal_connect ((gpointer) entrySince, "value-changed",
                     G_CALLBACK (on_entrySince_value_changed_event),
                     NULL);

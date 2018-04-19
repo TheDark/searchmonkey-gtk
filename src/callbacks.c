@@ -1414,7 +1414,14 @@ on_dosExpressionRadioFile_clicked      (GtkButton       *button,
                                         gpointer         user_data)
 {
   GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(GTK_WIDGET(button), "statusbar1"));
-
+  gchar *tmpstr;
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(GTK_WIDGET(button), "maxHitsSpinResults")));
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(button), "limitResultsCheckResults")))) {
+       tmpstr= g_strdup_printf(_("/Max hits limit:%d"), tmpLimit);
+  }
+  else {
+       tmpstr=  g_strdup_printf(_("/No Max hits limit"));
+  }
 
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
     changeModel(GTK_WIDGET(button), "regex", "noregex");
@@ -1423,10 +1430,11 @@ on_dosExpressionRadioFile_clicked      (GtkButton       *button,
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(GTK_WIDGET(button), "dosExpressionRadioFile"))))
     {        
         gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
-                     _("research mode with jokers(DOS like)"));
+                     g_strdup_printf(_("%s/research mode with jokers(DOS like)"), tmpstr));
     }
   else  gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
-                     _("research mode with RegEx")); 
+                     g_strdup_printf(_("%s/research mode with RegEx"), tmpstr)); 
+  g_free(tmpstr);
 }
 
 
@@ -1632,8 +1640,26 @@ void
 on_limitResultsCheckResults_toggled    (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
+  gchar *tmpstr;
   gboolean active = gtk_toggle_button_get_active(togglebutton);
+  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(GTK_WIDGET(togglebutton), "statusbar1"));
   gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "limit_results_hbox"), active);
+
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(GTK_WIDGET(togglebutton), "maxHitsSpinResults")));
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(togglebutton), "limitResultsCheckResults")))) {
+       tmpstr= g_strdup_printf(_("/Max hits limit:%d"), tmpLimit);
+  }
+  else {
+       tmpstr=  g_strdup_printf(_("/No Max hits limit"));
+  }
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(GTK_WIDGET(togglebutton), "dosExpressionRadioFile"))))
+    {        
+        gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
+                     g_strdup_printf(_("%s/research mode with jokers(DOS like)"), tmpstr));
+    }
+  else  gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
+                     g_strdup_printf(_("%s/research mode with RegEx"), tmpstr)); 
+  g_free(tmpstr);
 }
 
 
@@ -1697,31 +1723,12 @@ gboolean on_entrySince_value_changed_event   (GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data)
 {
-
   gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(GTK_WIDGET(widget), "sinceUnits")));
 
   g_free(test);
   return FALSE;
 }
-/**************************************************
- callback : change in units used by
- the modified since combobox - response : change
-the preview field
-*************************************************/
-gboolean
-on_sinceUnits_focus_out_event         (GtkWidget       *widget,
-                                        GdkEventFocus   *event,
-                                        gpointer         user_data)
-{
 
-  gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
-
-  /* now we modifiy the preview area */
-
-
-  g_free(test);
-  return FALSE;
-}
 /**********************************************
  a function to retrieve the current ACTIVE
   radio button 
@@ -1738,8 +1745,7 @@ void radio_button_selected (GtkWidget *widget, gpointer data)
   GtkWidget *buttonInterval2;
   gchar *val_spin;
 
-    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget)))
-    {
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) {
        group  = gtk_radio_button_get_group (GTK_RADIO_BUTTON (widget));
        i =  g_slist_index (group, widget);
     }
@@ -1756,8 +1762,7 @@ void radio_button_selected (GtkWidget *widget, gpointer data)
   gtk_widget_set_sensitive (buttonInterval1, FALSE);
   gtk_widget_set_sensitive (buttonInterval2, FALSE);
 
-  switch(i)
-   {
+  switch(i) {
      case 0:{ gtk_widget_set_sensitive (gridSince, TRUE);
               gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT( lookup_widget(GTK_WIDGET(widget), "sinceUnits")  ));
               val_spin = g_strdup_printf("%d", 
@@ -1776,7 +1781,7 @@ void radio_button_selected (GtkWidget *widget, gpointer data)
      case 4:{break;}
      case 5:{break;}
      default:{break;}
-   }/* end switch */
+  }/* end switch */
 }
 
 

@@ -169,10 +169,10 @@ on_IntervalStartBtn_clicked            (GtkButton       *button,
 void
 on_IntervalEndBtn_clicked            (GtkButton       *button,
                                         gpointer         user_data);
-gboolean
+/*gboolean
 on_sinceUnits_focus_out_event         (GtkWidget       *widget,
                                         GdkEventFocus   *event,
-                                        gpointer         user_data);
+                                        gpointer         user_data);*/
 gboolean 
 on_entrySince_value_changed_event   (GtkWidget       *widget,
                                         GdkEventFocus   *event,
