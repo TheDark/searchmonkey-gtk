@@ -1112,7 +1112,7 @@ gchar *PDFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    }/* next i*/
  misc_close_file(outputFile);
  tmpfileToExtract = g_strdup_printf("%s", path_to_tmp_file);
-
+ g_object_unref(doc);
  return tmpfileToExtract;
 }
 
