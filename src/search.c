@@ -581,7 +581,7 @@ gboolean is_font_family(gchar *buffer)
 gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 {
   FILE *outputFile, *inputFile;
-  gint  i, j, fileSize = 0, openedBraces = 0;
+  gint  i, j, fileSize = 0, openedBraces = 0, stylebraces=0, fontbraces=0;
   gchar *buffer = NULL;
   gboolean fParagraph = FALSE;
   GError **error;
@@ -611,6 +611,7 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
    outputFile = fopen(path_to_tmp_file, "w"); 
    if(outputFile==NULL)
      return NULL;
+
    while(i<=fileSize) {
     /* is it a command char ? */
     switch(buffer[i])
@@ -619,7 +620,7 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
          i++;/* next char */        
          switch(buffer[i])
           {
-            case '*':{openedBraces = 1;
+            case '*':{openedBraces = 1;/* destination control word */
                while( (i<fileSize)&&(openedBraces>0)){
                 /* we skip all chars */
                 i++;
@@ -713,15 +714,16 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
               break;
             }
             default:{/* ? a true control ? */
-              /* at least, we must check if it's a paragraph command */
+              /* at least, we must check if it's a paragraph command 
+                  \pard resets any previous paragraph formatting, 
+                  \plain resets any previous character formatting*/
               if( g_ascii_strncasecmp ((gchar*)&buffer[i],"pard",4*sizeof(gchar))==0) {
                       i=i+4;
-                      fParagraph = TRUE;
+                      /* we should reset properties of paraggraph */
               }
               else
                 if(g_ascii_strncasecmp ((gchar*)&buffer[i],"par",3*sizeof(gchar))==0) {
                       i=i+3;
-                      fParagraph = FALSE;
                       str= g_string_append (str, "\n");
                 }
                 /* we must add the case of \pict controls ! */
@@ -730,7 +732,7 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                      /* 2 cases ; simple picture, then no braces in other cases we have \* and braces */
                      i=i+4;
                      openedBraces = 1;
-                     while((i<fileSize)&&(openedBraces>=0)) {
+                     while((i<fileSize)&&(openedBraces>0)) {
                         /* we skip all picture's hexa codes */
                         i++;
                         if(buffer[i]=='}')
@@ -738,27 +740,60 @@ gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
                         if(buffer[i]=='{')
                            openedBraces++;
                      }/* wend */
+                     i++;
                    }
-                   else {
-                        while((i<fileSize)&&(buffer[i]!=' ')&&(buffer[i]!='\\')&&(buffer[i]!='}')&&(buffer[i]!='{') &&(buffer[i]!='\n')) {
-                        /* we skip all chars */
-                        i++;
+                   else /* we must remove fonts definitions */
+                      if(is_font_family((gchar*)&buffer[i])){
+                        i=i+4;
+                        while((i<fileSize)&&(buffer[i]!='}')) {
+                          i++;
                         }/* wend */
-                   }/* elseif */
+                        i++;
+                      }
+                      else /* stylesheets */
+                        if(g_ascii_strncasecmp ((gchar*)&buffer[i],"stylesheet",10*sizeof(gchar))==0 ) {
+                          i=i+10;printf("bingo style sheet \n");
+                          stylebraces=1;
+                          while((i<fileSize)&&(stylebraces>0)) {
+                            if(buffer[i]=='}')
+                               stylebraces--;
+                            if(buffer[i]=='{')
+                               stylebraces++;
+                            i++;
+                          }/* wend */
+                          stylebraces=0;
+                          i++;
+                        }/* fonttbl = fontable */
+                        else
+                          if(g_ascii_strncasecmp ((gchar*)&buffer[i],"fonttbl",7*sizeof(gchar))==0) {
+                             i=i+7;printf("bingo font table \n");
+                             fontbraces=1;
+                             while((i<fileSize)&&(fontbraces>0)) {
+                               if(buffer[i]=='}')
+                                  fontbraces--;
+                               if(buffer[i]=='{')
+                                  fontbraces++;
+                               i++;
+                             }/* wend */
+                             fontbraces=0;
+                             i++;
+                          }
+                          else {/* others control words - TODO minus sign before digits */
+                            while((i<fileSize)&&(buffer[i]!=' ')&&(buffer[i]!='\\')&&(buffer[i]!='}')&&(buffer[i]!='{') &&(buffer[i]!='\n')) {
+                              /* we skip all chars */
+                              i++;
+                            }/* wend */
+                          }/* elseif */
              i--;
             }/* case default */
           }/* end switch first char after control */
          break;
        }
-       case '{':
-       case '}':
-       case '\n':{/* a Parser MUST ignore LF */
+       case '{': case '}': case '\n':{/* a Parser MUST ignore LF */
          break;
        }      
-       default:{
-        if(fParagraph) {
+       default:{/* plain text */
             str= g_string_append_c (str, buffer[i]);
-        }
        }
      }/* end switch */
     i++;
