@@ -559,6 +559,23 @@ gchar *OLECheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
 }
 
 /*********************************************
+  various functions to test command words
+*********************************************/
+gboolean is_font_family(gchar *buffer)
+{
+   if((g_ascii_strncasecmp (buffer,"fnil",4*sizeof(gchar))==0) ||
+       (g_ascii_strncasecmp (buffer,"from",4*sizeof(gchar))==0)
+       ||(g_ascii_strncasecmp (buffer,"fswi",4*sizeof(gchar))==0)
+       ||(g_ascii_strncasecmp (buffer,"fmod",4*sizeof(gchar))==0)
+       ||(g_ascii_strncasecmp (buffer,"fdec",4*sizeof(gchar))==0)
+       ||(g_ascii_strncasecmp (buffer,"fscr",4*sizeof(gchar))==0)
+       ||(g_ascii_strncasecmp (buffer,"fbid",4*sizeof(gchar))==0)
+       ||(g_ascii_strncasecmp (buffer,"ftec",4*sizeof(gchar))==0) )
+   return TRUE;
+   else return FALSE;
+}
+
+/*********************************************
    ms-RTF parser
 *********************************************/
 gchar *RTFCheckFile(gchar *path_to_file, gchar *path_to_tmp_file)
