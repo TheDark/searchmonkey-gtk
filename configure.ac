@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([searchmonkey],[0.8.3])
+AC_INIT([searchmonkey],[0.9.0])
 AC_CONFIG_SRCDIR([configure.ac])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -30,7 +30,7 @@ AC_PROG_CXX
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 
-pkg_modules="libzip poppler-glib gtk+-2.0 gthread-2.0"
+pkg_modules="libzip poppler-glib gtk+-3.0 gthread-2.0"
 PKG_CHECK_MODULES(PACKAGE, [$pkg_modules])
 AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
