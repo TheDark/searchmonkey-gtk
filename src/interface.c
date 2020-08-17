@@ -1534,12 +1534,14 @@ create_folderChooserDialog (void)
   gtk_widget_show (dialog_action_area1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area1), GTK_BUTTONBOX_END);
 
-  button18 = gtk_button_new_from_stock ("gtk-cancel");
+//  button18 = gtk_button_new_from_stock ("gtk-cancel");// TODO : modifier
+//  button18 = gtk_button_new_from_icon_name ("gtk-cancel", GTK_ICON_SIZE_BUTTON);
+  button18 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (button18);
   gtk_dialog_add_action_widget (GTK_DIALOG (folderChooserDialog), button18, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (button18, TRUE);
 
-  button19 = gtk_button_new_from_stock ("gtk-open");
+  button19 = misc_create_button ("gtk-open", _("Choose"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (button19);
   gtk_dialog_add_action_widget (GTK_DIALOG (folderChooserDialog), button19, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (button19, TRUE);
@@ -1791,11 +1793,11 @@ create_clearSearchHistoryDialog (void)
   gtk_widget_show (dialog_action_area2);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area2), GTK_BUTTONBOX_EDGE);
 
-  cancelbutton1 = gtk_button_new_from_stock ("gtk-cancel");
+  cancelbutton1 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (cancelbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (clearSearchHistoryDialog), cancelbutton1, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (cancelbutton1, TRUE);
-  okbutton1 = gtk_button_new_from_stock ("gtk-ok");
+  okbutton1 = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okbutton1);
   gtk_dialog_add_action_widget (GTK_DIALOG (clearSearchHistoryDialog), okbutton1, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (okbutton1, TRUE);
@@ -1944,11 +1946,11 @@ create_testRegExDialog (void)
   gtk_widget_show (dialog_action_area3);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area3), GTK_BUTTONBOX_END);
 
-  okbutton2 = gtk_button_new_from_stock ("gtk-apply");
+  okbutton2 = misc_create_button ("gtk-apply", _("Apply"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okbutton2);
   gtk_dialog_add_action_widget (GTK_DIALOG (testRegExDialog), okbutton2, GTK_RESPONSE_APPLY);
   gtk_widget_set_can_default (okbutton2, TRUE);
-  closeButton2 = gtk_button_new_from_stock ("gtk-close");
+  closeButton2 = misc_create_button ("gtk-close", _("Close"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (closeButton2);
   gtk_dialog_add_action_widget (GTK_DIALOG (testRegExDialog), closeButton2, GTK_RESPONSE_CLOSE);
   gtk_widget_set_can_default (closeButton2, TRUE);
@@ -2266,19 +2268,19 @@ create_expWizard (void)
   gtk_widget_show (dialog_action_area4);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area4), GTK_BUTTONBOX_END);
 
-  wizardHelp = gtk_button_new_from_stock ("gtk-help");
+  wizardHelp = misc_create_button ("gtk-help", _("Help"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (wizardHelp);
   gtk_dialog_add_action_widget (GTK_DIALOG (expWizard), wizardHelp, GTK_RESPONSE_HELP);
   gtk_widget_set_can_default (wizardHelp, TRUE);
   gtk_widget_set_tooltip_text (wizardHelp, _("Help with the Regular Expression Builder"));
 
-  cancelExpWiz = gtk_button_new_from_stock ("gtk-cancel");
+  cancelExpWiz = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (cancelExpWiz);
   gtk_dialog_add_action_widget (GTK_DIALOG (expWizard), cancelExpWiz, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (cancelExpWiz, TRUE);
   gtk_widget_set_tooltip_text ( cancelExpWiz, _("Discard any changes."));
 
-  okRegExWizard = gtk_button_new_from_stock ("gtk-ok");
+  okRegExWizard = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okRegExWizard);
   gtk_dialog_add_action_widget (GTK_DIALOG (expWizard), okRegExWizard, GTK_RESPONSE_OK);
   gtk_widget_set_sensitive (okRegExWizard, FALSE);
@@ -2775,13 +2777,13 @@ create_configDialog (void)
   gtk_widget_show (dialog_action_area5);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area5), GTK_BUTTONBOX_END);
 
-  cancelbutton2 = gtk_button_new_from_stock ("gtk-cancel");
+  cancelbutton2 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (cancelbutton2);
   gtk_dialog_add_action_widget (GTK_DIALOG (configDialog), cancelbutton2, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (cancelbutton2, TRUE);
   gtk_widget_set_tooltip_text ( cancelbutton2, _("Searching for system files, please wait..."));
 
-  okbutton3 = gtk_button_new_from_stock ("gtk-ok");
+  okbutton3 = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okbutton3);
   gtk_dialog_add_action_widget (GTK_DIALOG (configDialog), okbutton3, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (okbutton3, TRUE);
@@ -2892,12 +2894,12 @@ create_saveFileDialog (void)
   gtk_widget_show (dialog_action_area6);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area6), GTK_BUTTONBOX_END);
 
-  button43 = gtk_button_new_from_stock ("gtk-cancel");
+  button43 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (button43);
   gtk_dialog_add_action_widget (GTK_DIALOG (saveFileDialog), button43, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (button43, TRUE);
 
-  button44 = gtk_button_new_from_stock ("gtk-save");
+  button44 = misc_create_button ("gtk-save", _("Save"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (button44);
   gtk_dialog_add_action_widget (GTK_DIALOG (saveFileDialog), button44, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (button44, TRUE);
@@ -3054,12 +3056,12 @@ create_importCriteria (void)
   gtk_widget_show (dialog_action_area7);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area7), GTK_BUTTONBOX_END);
 
-  cancelbutton3 = gtk_button_new_from_stock ("gtk-cancel");
+  cancelbutton3 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (cancelbutton3);
   gtk_dialog_add_action_widget (GTK_DIALOG (importCriteria), cancelbutton3, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (cancelbutton3, TRUE);
 
-  okbutton4 = gtk_button_new_from_stock ("gtk-ok");
+  okbutton4 = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okbutton4);
   gtk_dialog_add_action_widget (GTK_DIALOG (importCriteria), okbutton4, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (okbutton4, TRUE);
@@ -3236,12 +3238,12 @@ create_exportCriteria (void)
   gtk_widget_show (hbuttonbox1);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox1), GTK_BUTTONBOX_END);
 
-  button45 = gtk_button_new_from_stock ("gtk-cancel");
+  button45 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (button45);
   gtk_dialog_add_action_widget (GTK_DIALOG (exportCriteria), button45, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (button45, TRUE);
 
-  button46 = gtk_button_new_from_stock ("gtk-ok");
+  button46 = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (button46);
   gtk_dialog_add_action_widget (GTK_DIALOG (exportCriteria), button46, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (button46, TRUE);
@@ -3330,13 +3332,13 @@ create_autoComplete (void)
   gtk_widget_show (dialog_action_area8);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area8), GTK_BUTTONBOX_END);
 
-  cancelbutton4 = gtk_button_new_from_stock ("gtk-cancel");
+  cancelbutton4 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (cancelbutton4);
   gtk_dialog_add_action_widget (GTK_DIALOG (autoComplete), cancelbutton4, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (cancelbutton4, TRUE);
   gtk_widget_set_tooltip_text (cancelbutton4, _("Searching for system files, please wait..."));
 
-  okbutton5 = gtk_button_new_from_stock ("gtk-ok");
+  okbutton5 = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okbutton5);
   gtk_dialog_add_action_widget (GTK_DIALOG (autoComplete), okbutton5, GTK_RESPONSE_OK);
   gtk_widget_set_sensitive (okbutton5, FALSE);
@@ -3475,12 +3477,12 @@ create_calendarDialog (GtkWidget *win)
   gtk_widget_show (dialog_action_area11);
   gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area11), GTK_BUTTONBOX_END);
 
-  cancelbutton5 = gtk_button_new_from_stock ("gtk-cancel");
+  cancelbutton5 = misc_create_button ("gtk-cancel", _("Cancel"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (cancelbutton5);
   gtk_dialog_add_action_widget (GTK_DIALOG (calendarDialog), cancelbutton5, GTK_RESPONSE_CANCEL);
   gtk_widget_set_can_default (cancelbutton5, TRUE);
 
-  okbutton6 = gtk_button_new_from_stock ("gtk-ok");
+  okbutton6 = misc_create_button ("gtk-ok", _("Ok"), GTK_ICON_SIZE_BUTTON);
   gtk_widget_show (okbutton6);
   gtk_dialog_add_action_widget (GTK_DIALOG (calendarDialog), okbutton6, GTK_RESPONSE_OK);
   gtk_widget_set_can_default (okbutton6, TRUE);
