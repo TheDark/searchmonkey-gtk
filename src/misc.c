@@ -566,3 +566,23 @@ uint32_t getulong(unsigned char *buffer,int offset) {
 	return (unsigned long)buffer[offset]|((unsigned long)buffer[offset+1]<<8L)
 		|((unsigned long)buffer[offset+2]<<16L)|((unsigned long)buffer[offset+3]<<24L);
 }  
+
+
+/*****************************************
+  PUBLIC : create a button compliant with
+  GTk 3.10 +
+*****************************************/
+GtkWidget *misc_create_button (const gchar *icon_name, const gchar *text, GtkIconSize size)
+{
+   GtkWidget *button, *box, *icon, *label;
+
+   button = gtk_button_new ();
+   box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
+   gtk_container_add (GTK_CONTAINER(button), box);
+   icon = gtk_image_new_from_icon_name (icon_name, size);
+   gtk_box_pack_start (GTK_BOX (box), icon, TRUE, TRUE, 0);
+   label = gtk_label_new (text);
+   gtk_box_pack_start (GTK_BOX (box), label, TRUE, TRUE, 0);
+   gtk_widget_show_all (GTK_WIDGET (button));
+   return button;
+}

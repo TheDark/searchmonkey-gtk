@@ -66,4 +66,7 @@ int32_t getlong(unsigned char *buffer,int offset);
 uint32_t getulong(unsigned char *buffer,int offset);
 gint get_file_type_by_signature(gchar *path_to_file);
 void misc_close_file(FILE *outputFile);
+GtkWidget *misc_create_button (const gchar *icon_name, const gchar *text, GtkIconSize size);
+
+
 #endif /* MISC_H */
