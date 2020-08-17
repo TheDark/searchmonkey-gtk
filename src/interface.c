@@ -551,6 +551,7 @@ create_window1 (void)
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem7), menuitem7_menu);
 
   contents1 = gtk_menu_item_new_with_mnemonic (_("_User Guide"));
+  gtk_widget_set_sensitive (GTK_WIDGET (contents1), FALSE);
   gtk_widget_show (contents1);
   gtk_container_add (GTK_CONTAINER (menuitem7_menu), contents1);
   gtk_widget_add_accelerator (contents1, "activate", accel_group,
@@ -559,6 +560,7 @@ create_window1 (void)
 
   support1 = gtk_menu_item_new_with_mnemonic (_("_Support"));
   gtk_widget_show (support1);
+  gtk_widget_set_sensitive (GTK_WIDGET (support1), FALSE);
   gtk_container_add (GTK_CONTAINER (menuitem7_menu), support1);
 
   online_release_notes1 = gtk_menu_item_new_with_mnemonic (_("Release _Notes"));
@@ -567,6 +569,7 @@ create_window1 (void)
 
   forums1 = gtk_menu_item_new_with_mnemonic (_("_Forums"));
   gtk_widget_show (forums1);
+  gtk_widget_set_sensitive (GTK_WIDGET (forums1), FALSE);
   gtk_container_add (GTK_CONTAINER (menuitem7_menu), forums1);
 
   separator1 = gtk_separator_menu_item_new ();
@@ -580,7 +583,7 @@ create_window1 (void)
 
 /* toolbar 1 - removed 15 feb 2018 ------------------------*/
 
-  GtkWidget *hseparator_after_menu = gtk_hseparator_new ();
+  GtkWidget *hseparator_after_menu = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator_after_menu);
   gtk_box_pack_start (GTK_BOX (vbox1), hseparator_after_menu, FALSE, FALSE, 2);
 /* hbox searchmonkey */
@@ -623,7 +626,7 @@ create_window1 (void)
   gtk_widget_set_sensitive (stopButton1, FALSE);
   gtk_widget_set_tooltip_text (stopButton1, _("Stop the search!"));
 
-  GtkWidget *hseparator1title = gtk_hseparator_new ();
+  GtkWidget *hseparator1title = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator1title);
 /* separator ------------------------------*/
   gtk_box_pack_start (GTK_BOX (vbox3), hseparator1title, FALSE, FALSE, 0); 
@@ -689,7 +692,7 @@ create_window1 (void)
 /* end pango button label */
   gtk_box_pack_start (GTK_BOX (containingTextHbox), regExpWizard2, FALSE, FALSE, 5);
   gtk_widget_set_tooltip_text (regExpWizard2, _("Use the wizard to create a containing text regular expression..."));
-  GtkWidget *hseparator1d = gtk_hseparator_new ();
+  GtkWidget *hseparator1d = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator1d);
 /* separator ------------------------------*/
   gtk_box_pack_start (GTK_BOX (vbox3), hseparator1d, FALSE, FALSE, 0);
@@ -753,7 +756,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (hbox40), image9, FALSE, FALSE, 0);
 
 /* end transitory */
-  GtkWidget *hseparator1c = gtk_hseparator_new ();
+  GtkWidget *hseparator1c = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator1c);
   gtk_box_pack_start (GTK_BOX (vbox3), hseparator1c, FALSE, FALSE, 0);
 /* end Luc A. */
@@ -834,7 +837,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (vbox47), followSymLinksCheck, FALSE, FALSE, 0);
   gtk_widget_set_tooltip_text (followSymLinksCheck, _("Follow Symbolic Links (Only on systems that support them)"));
 
-  hseparator9 = gtk_hseparator_new ();
+  hseparator9 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator9);
   gtk_box_pack_start (GTK_BOX (vbox47), hseparator9, FALSE, TRUE, 0);
 
@@ -877,7 +880,7 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (vbox46), matchCaseCheckContents, FALSE, FALSE, 0);
   gtk_widget_set_tooltip_text (matchCaseCheckContents, _("Use strict contents case matching."));
 
-  hseparator8 = gtk_hseparator_new ();
+  hseparator8 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator8);
   gtk_box_pack_start (GTK_BOX (vbox46), hseparator8, FALSE, TRUE, 0);
 
@@ -944,7 +947,7 @@ create_window1 (void)
   gtk_widget_show (maxHitsSpinResults);
   gtk_box_pack_start (GTK_BOX (limit_results_hbox), maxHitsSpinResults, TRUE, TRUE, 2);
 
-  hseparator7 = gtk_hseparator_new ();
+  hseparator7 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator7);
   gtk_box_pack_start (GTK_BOX (vbox45), hseparator7, FALSE, TRUE, 0);
 
@@ -968,7 +971,7 @@ create_window1 (void)
   gtk_widget_show (showLinesSpinResults);
   gtk_box_pack_start (GTK_BOX (show_line_contents_hbox), showLinesSpinResults, TRUE, TRUE, 2);
 
-  hseparator11 = gtk_hseparator_new ();
+  hseparator11 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator11);
   gtk_box_pack_start (GTK_BOX (vbox45), hseparator11, TRUE, TRUE, 0);
 
@@ -1000,7 +1003,7 @@ create_window1 (void)
   gtk_label_set_use_markup (GTK_LABEL (label1008), TRUE);
 
 /* added by Luc A., 29 dec 2017, also to breath the UI */
-  GtkWidget *hseparator10b = gtk_hseparator_new ();
+  GtkWidget *hseparator10b = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator10b);
   gtk_box_pack_start (GTK_BOX (vbox1), hseparator10b, FALSE, FALSE, 4);
 /* end Luc A. */
@@ -1780,7 +1783,7 @@ create_clearSearchHistoryDialog (void)
   gtk_label_set_line_wrap (GTK_LABEL (label225), TRUE);
   gtk_misc_set_padding (GTK_MISC (label225), 5, 5);
 
-  GtkWidget *hseparator1 = gtk_hseparator_new ();
+  GtkWidget *hseparator1 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator1);
   gtk_box_pack_start (GTK_BOX (vbox19), hseparator1, TRUE, TRUE, 0);
 
@@ -1870,7 +1873,7 @@ create_testRegExDialog (void)
     gtk_box_pack_start(GTK_BOX(hbox27), iconHeaderTest, FALSE, FALSE, 2);
     gtk_misc_set_padding(GTK_MISC(labelHeaderTest), 2, 2);
     gtk_container_add(GTK_CONTAINER(hbox27), labelHeaderTest); 
-    GtkWidget *hseparatorHeaderTest = gtk_hseparator_new ();
+    GtkWidget *hseparatorHeaderTest = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
     gtk_widget_show(hseparatorHeaderTest);
    gtk_box_pack_start (GTK_BOX (vbox21), hseparatorHeaderTest, FALSE, FALSE, 0);
 
@@ -1917,7 +1920,7 @@ create_testRegExDialog (void)
   gtk_label_set_use_markup (GTK_LABEL (label228), TRUE);
   gtk_label_set_line_wrap (GTK_LABEL (label228), TRUE);
 
-  hseparator3 = gtk_hseparator_new ();
+  hseparator3 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator3);
   gtk_box_pack_start (GTK_BOX (vbox21), hseparator3, FALSE, FALSE, 0);
 
@@ -2185,7 +2188,7 @@ create_expWizard (void)
   gtk_widget_show (hbox32);
   gtk_box_pack_start (GTK_BOX (vbox23), hbox32, FALSE, FALSE, 4);
   /* added by Luc A. - 30 dec 2017 */
-  GtkWidget *hseparator1ExpWiazrd = gtk_hseparator_new ();
+  GtkWidget *hseparator1ExpWiazrd = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator1ExpWiazrd);
   gtk_box_pack_start (GTK_BOX (vbox23), hseparator1ExpWiazrd, TRUE, TRUE, 0);
   /* end Luc A. */
@@ -2575,7 +2578,7 @@ create_configDialog (void)
   gtk_widget_set_tooltip_text ( configWebBrowser, _("Paste and edit full file name of your preferred web browser."));
   gtk_entry_set_invisible_char (GTK_ENTRY (configWebBrowser), 8226);
 
-  hseparator4 = gtk_hseparator_new ();
+  hseparator4 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparator4);
   gtk_box_pack_start (GTK_BOX (vbox29), hseparator4, TRUE, TRUE, 0);
 
@@ -2710,7 +2713,7 @@ create_configDialog (void)
     gtk_widget_show (configResetAllLabel);
     gtk_box_pack_start (GTK_BOX (hboxconfigResetAll), configResetAllLabel, FALSE, FALSE, 0);
 /* end button à la mano Gtk 3 */
-  GtkWidget *hSeperatorConfigReset = gtk_hseparator_new ();
+  GtkWidget *hSeperatorConfigReset = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hSeperatorConfigReset);
   gtk_box_pack_start (GTK_BOX (vbox28), hSeperatorConfigReset, FALSE, TRUE, 5);
   
@@ -3375,8 +3378,8 @@ GtkWidget *create_aboutSearchmonkey (void)
       gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dialog), aboutSearchmonkey_icon_pixbuf);
       g_object_unref(G_OBJECT(aboutSearchmonkey_icon_pixbuf ));
     }
-  gtk_about_dialog_set_version (GTK_ABOUT_DIALOG(dialog),"0.9.0");
-  gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), _("Copyright (c) 2006-2018 Adam Cottrell"));
+  gtk_about_dialog_set_version (GTK_ABOUT_DIALOG(dialog),"0.9.0.1");
+  gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), _("Copyright (c) 2006-2020 Adam Cottrell"));
   gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), 
      _("Regular expression power search utility written in GTK+ and licensed under GPL v.3"));
   gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), 
@@ -3534,7 +3537,7 @@ void createFileDateModified(const gchar *str, GtkWidget *win, GtkExpander *expan
  gtk_label_set_use_markup (GTK_LABEL (labelModifiedDate), TRUE);
  gtk_grid_attach (GTK_GRID (grid1), labelModifiedDate, 0, 0, 4, 1);
 
- separator3 = gtk_hseparator_new ();
+ separator3 = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
  gtk_widget_show (separator3);
  gtk_grid_attach(GTK_GRID(grid1),separator3, 0, 11, 6, 1);
  /* radio buttons */
@@ -3747,7 +3750,7 @@ void createAreaFileSize(GtkWidget *win, GtkWidget *expander_area)
   gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (LessThanSize), _("Mb"));
   gtk_combo_box_text_append_text  (GTK_COMBO_BOX_TEXT (LessThanSize), _("Gb"));
   gtk_combo_box_set_active (GTK_COMBO_BOX (LessThanSize),0);
-  hseparatorExpander = gtk_hseparator_new ();
+  hseparatorExpander = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (hseparatorExpander);
   gtk_grid_attach(GTK_GRID(grid1),hseparatorExpander, 0, 5, 3, 1);
  /* callbacks connection */
