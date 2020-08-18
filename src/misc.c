@@ -11,11 +11,13 @@
 #include <assert.h>
 #include <gtk/gtk.h>
 #include <glib.h>
+#include <regex.h>
+#include <string.h>
 
 #include "interface.h" /* glade requirement */
 #include "support.h" /* glade requirement */
 #include "misc.h"
-#include <regex.h>
+
 
 /*****************************************
  close file parsed with a correct trailer
@@ -31,7 +33,7 @@ void misc_close_file(FILE *outputFile)
   entry = path to file
   output = a gint code to switch
 *****************************************/
-gint get_file_type_by_signature(gchar *path_to_file)
+gint get_file_type_by_signature (gchar *path_to_file)
 {
   FILE *inputFile;
   gint retval = iUnknownFile;
@@ -49,7 +51,7 @@ gint get_file_type_by_signature(gchar *path_to_file)
   inputFile = fopen(path_to_file,"rb");
   if(inputFile==NULL) {
           printf("* ERROR : impossible to open file:%s to check signature *\n", path_to_file);
-          return NULL;
+          return -1;
   }
   /* we compute the size before dynamically allocate buffer */
    glong prev = ftell(inputFile);   
@@ -61,8 +63,8 @@ gint get_file_type_by_signature(gchar *path_to_file)
    /* we allocate the buffer */
    buffer = g_malloc0(128);
    /* we start the file reading in Binary mode : it's better for future parsing */
-   fileSize = fread(buffer, sizeof(gchar), sz, inputFile);
-   fclose(inputFile);
+   fileSize = fread (buffer, sizeof(gchar), sz, inputFile);
+   fclose (inputFile);
    /* now we attempt to recognize signature */
    if (strncmp(buffer,&write_sign,2)==0)
       return iMsWriteFile;
@@ -586,3 +588,29 @@ GtkWidget *misc_create_button (const gchar *icon_name, const gchar *text, GtkIco
    gtk_widget_show_all (GTK_WIDGET (button));
    return button;
 }
+
+
+/**************************************************
+  PUBLIC : create a image menu item compliant with
+  GTk 3.10 +
+***************************************************/
+GtkWidget *misc_create_menu_image (const gchar *icon_name, const gchar *text)
+{
+   GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+   GtkWidget *icon = gtk_image_new_from_icon_name (icon_name, GTK_ICON_SIZE_MENU);
+   GtkWidget *label = gtk_label_new (text);
+   GtkWidget *menu_item = gtk_menu_item_new ();
+
+   gtk_label_set_use_underline (GTK_LABEL (label), TRUE);
+ //  gtk_label_set_xalign (GTK_LABEL (label), 0.0);
+
+   gtk_container_add (GTK_CONTAINER (box), icon);
+   gtk_container_add (GTK_CONTAINER (box), label);
+
+   gtk_container_add (GTK_CONTAINER (menu_item), box);
+
+   gtk_widget_show_all (menu_item);
+   return menu_item;
+}
+
+

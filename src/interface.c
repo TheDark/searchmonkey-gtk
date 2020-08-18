@@ -19,6 +19,7 @@
 #include "interface.h"
 #include "support.h"
 
+
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
     g_object_ref (widget), (GDestroyNotify) g_object_unref)
@@ -40,10 +41,8 @@ create_window1 (void)
   GtkWidget *menuitem4;
   GtkWidget *menuitem4_menu;
   GtkWidget *newInstance1;
-  GtkWidget *image165;
   GtkWidget *separatormenuitem1;
   GtkWidget *save_results1;
-  GtkWidget *image166;
   GtkWidget *separator5;
   GtkWidget *print1;
   GtkWidget *print_preview1;
@@ -53,13 +52,9 @@ create_window1 (void)
   GtkWidget *menuitem5;
   GtkWidget *menuitem5_menu;
   GtkWidget *delete1;
-  GtkWidget *image167;
   GtkWidget *edit_file1;
-  GtkWidget *image168;
   GtkWidget *open_folder1;
-  GtkWidget *image169;
   GtkWidget *copy2;
-  GtkWidget *image170;
   GtkWidget *menuitem6;
   GtkWidget *menuitem6_menu;
 
@@ -81,12 +76,9 @@ create_window1 (void)
   GtkWidget *search1;
   GtkWidget *search1_menu;
   GtkWidget *playButton3;
-  GtkWidget *image171;
   GtkWidget *stopButton3;
-  GtkWidget *image172;
   GtkWidget *separator2;
   GtkWidget *cl_ear_history1;
-  GtkWidget *image173;
   GtkWidget *settings3;
   GtkWidget *settings3_menu;
   GtkWidget *set_font1;
@@ -99,9 +91,7 @@ create_window1 (void)
   GtkWidget *test1;
   GtkWidget *test1_menu;
   GtkWidget *open_criteria1;
-  GtkWidget *image174;
   GtkWidget *save_criteria1;
-  GtkWidget *image175;
   GtkWidget *separator16;
   GtkWidget *reg_expression1;
   GtkWidget *menuitem7;
@@ -267,29 +257,19 @@ create_window1 (void)
   menuitem4_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem4), menuitem4_menu);
 
-  newInstance1 = gtk_image_menu_item_new_with_mnemonic (_("_New Instance"));
-  gtk_widget_show (newInstance1);
+  newInstance1 = misc_create_menu_image ("gtk-new", _("_New Instance"));
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), newInstance1);
   gtk_widget_add_accelerator (newInstance1, "activate", accel_group,
                               GDK_KEY_n, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
                               GTK_ACCEL_VISIBLE);
-
-  image165 = gtk_image_new_from_icon_name ("gtk-new", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image165);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (newInstance1), image165);
 
   separatormenuitem1 = gtk_separator_menu_item_new ();
   gtk_widget_show (separatormenuitem1);
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), separatormenuitem1);
   gtk_widget_set_sensitive (separatormenuitem1, FALSE);
 
-  save_results1 = gtk_image_menu_item_new_with_mnemonic (_("Save R_esults to CSV..."));
-  gtk_widget_show (save_results1);
+  save_results1 = misc_create_menu_image ("gtk-file", _("Save R_esults to CSV..."));
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), save_results1);
-
-  image166 = gtk_image_new_from_icon_name ("gtk-file", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image166);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_results1), image166);
 
   separator5 = gtk_separator_menu_item_new ();
   gtk_widget_show (separator5);
@@ -320,37 +300,17 @@ create_window1 (void)
   menuitem5_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem5), menuitem5_menu);
 
-  delete1 = gtk_image_menu_item_new_with_mnemonic (_("_Delete (File)"));
-  gtk_widget_show (delete1);
+  delete1 = misc_create_menu_image ("gtk-delete", _("_Delete (File)"));
   gtk_container_add (GTK_CONTAINER (menuitem5_menu), delete1);
 
-  image167 = gtk_image_new_from_icon_name ("gtk-delete", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image167);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (delete1), image167);
-
-  edit_file1 = gtk_image_menu_item_new_with_mnemonic (_("Edit File"));
-  gtk_widget_show (edit_file1);
+  edit_file1 = misc_create_menu_image ("gtk-edit", _("Edit File"));
   gtk_container_add (GTK_CONTAINER (menuitem5_menu), edit_file1);
 
-  image168 = gtk_image_new_from_icon_name ("gtk-edit", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image168);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (edit_file1), image168);
-
-  open_folder1 = gtk_image_menu_item_new_with_mnemonic (_("Open Folder"));
-  gtk_widget_show (open_folder1);
+  open_folder1 = misc_create_menu_image ("gtk-open", _("Open Folder"));
   gtk_container_add (GTK_CONTAINER (menuitem5_menu), open_folder1);
 
-  image169 = gtk_image_new_from_icon_name ("gtk-open", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image169);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open_folder1), image169);
-
-  copy2 = gtk_image_menu_item_new_with_mnemonic (_("_Copy (Filename)"));
-  gtk_widget_show (copy2);
+  copy2 = misc_create_menu_image ("gtk-copy", _("_Copy (Filename)"));
   gtk_container_add (GTK_CONTAINER (menuitem5_menu), copy2);
-
-  image170 = gtk_image_new_from_icon_name ("gtk-copy", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image170);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (copy2), image170);
 
   menuitem6 = gtk_menu_item_new_with_mnemonic (_("_View"));
   gtk_widget_show (menuitem6);
@@ -430,41 +390,27 @@ create_window1 (void)
   search1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (search1), search1_menu);
 
-  playButton3 = gtk_image_menu_item_new_with_mnemonic (_("Start"));
-  gtk_widget_show (playButton3);
+  playButton3 = misc_create_menu_image ("gtk-find", _("Start"));
   gtk_container_add (GTK_CONTAINER (search1_menu), playButton3);
   gtk_widget_add_accelerator (playButton3, "activate", accel_group,
                               GDK_KEY_Return, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image171 = gtk_image_new_from_icon_name ("gtk-find", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image171);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (playButton3), image171);
-
-  stopButton3 = gtk_image_menu_item_new_with_mnemonic (_("Stop"));
-  gtk_widget_show (stopButton3);
+  stopButton3 = misc_create_menu_image ("gtk-stop", _("Stop"));
   gtk_container_add (GTK_CONTAINER (search1_menu), stopButton3);
   gtk_widget_set_sensitive (stopButton3, FALSE);
   gtk_widget_add_accelerator (stopButton3, "activate", accel_group,
                               GDK_KEY_Escape, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
-  image172 = gtk_image_new_from_icon_name ("gtk-stop", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image172);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (stopButton3), image172);
-
   separator2 = gtk_separator_menu_item_new ();
   gtk_widget_show (separator2);
   gtk_container_add (GTK_CONTAINER (search1_menu), separator2);
   gtk_widget_set_sensitive (separator2, FALSE);
 
-  cl_ear_history1 = gtk_image_menu_item_new_with_mnemonic (_("Clear History..."));
-  gtk_widget_show (cl_ear_history1);
+  cl_ear_history1 = misc_create_menu_image ("gtk-clear", _("Clear History..."));
   gtk_container_add (GTK_CONTAINER (search1_menu), cl_ear_history1);
 
-  image173 = gtk_image_new_from_icon_name ("gtk-clear", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image173);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (cl_ear_history1), image173);
 
   settings3 = gtk_menu_item_new_with_mnemonic (_("Settings"));
   gtk_widget_show (settings3);
@@ -512,27 +458,18 @@ create_window1 (void)
   test1_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (test1), test1_menu);
 
-  open_criteria1 = gtk_image_menu_item_new_with_mnemonic (_("_Import Regular Expression..."));
-  gtk_widget_show (open_criteria1);
+  open_criteria1 = misc_create_menu_image ("gtk-open", _("_Import Regular Expression..."));
   gtk_container_add (GTK_CONTAINER (test1_menu), open_criteria1);
   gtk_widget_add_accelerator (open_criteria1, "activate", accel_group,
                               GDK_KEY_o, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image174 = gtk_image_new_from_icon_name ("gtk-open", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image174);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open_criteria1), image174);
-
-  save_criteria1 = gtk_image_menu_item_new_with_mnemonic (_("_Export Regular Expression..."));
-  gtk_widget_show (save_criteria1);
+  save_criteria1 = misc_create_menu_image ("gtk-save-as", _("_Export Regular Expression..."));
   gtk_container_add (GTK_CONTAINER (test1_menu), save_criteria1);
   gtk_widget_add_accelerator (save_criteria1, "activate", accel_group,
                               GDK_KEY_s, (GdkModifierType) GDK_CONTROL_MASK | GDK_SHIFT_MASK,
                               GTK_ACCEL_VISIBLE);
 
-  image175 = gtk_image_new_from_icon_name ("gtk-save-as", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image175);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (save_criteria1), image175);
 
   separator16 = gtk_separator_menu_item_new ();
   gtk_widget_show (separator16);
@@ -772,13 +709,12 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (vbox3), gridAdvancedSwitch, FALSE, TRUE, 5);
 
 /* expander for options */
-  expander_options = gtk_expander_new(_("Advanced options"));
-  gtk_widget_set_tooltip_text ( expander_options,
-                       _("Click here to see all search options ..."));
+  expander_options = gtk_expander_new (_("Advanced options"));
+  gtk_widget_set_tooltip_text (GTK_WIDGET(expander_options),  _("Click here to see all search options ..."));
   gtk_expander_set_expanded (GTK_EXPANDER(expander_options), FALSE);
-  gtk_widget_show(expander_options);
-  gtk_box_pack_start (GTK_BOX (vbox3), expander_options, TRUE, TRUE, 0);
-  gtk_widget_set_sensitive (expander_options, FALSE);
+  gtk_widget_show (GTK_WIDGET(expander_options));
+  gtk_box_pack_start (GTK_BOX (vbox3), GTK_WIDGET(expander_options), TRUE, TRUE, 0);
+  gtk_widget_set_sensitive (GTK_WIDGET(expander_options), FALSE);
 /* scrolled winddow inside options expander */
   GtkWidget *expanderScroll = gtk_scrolled_window_new (NULL, NULL);
   gtk_widget_show (expanderScroll);
@@ -1341,10 +1277,8 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, menuitem4, "menuitem4");
   GLADE_HOOKUP_OBJECT (window1, menuitem4_menu, "menuitem4_menu");
   GLADE_HOOKUP_OBJECT (window1, newInstance1, "newInstance1");
-  GLADE_HOOKUP_OBJECT (window1, image165, "image165");
   GLADE_HOOKUP_OBJECT (window1, separatormenuitem1, "separatormenuitem1");
   GLADE_HOOKUP_OBJECT (window1, save_results1, "save_results1");
-  GLADE_HOOKUP_OBJECT (window1, image166, "image166");
   GLADE_HOOKUP_OBJECT (window1, separator5, "separator5");
   GLADE_HOOKUP_OBJECT (window1, print1, "print1");
   GLADE_HOOKUP_OBJECT (window1, print_preview1, "print_preview1");
@@ -1354,13 +1288,9 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, menuitem5, "menuitem5");
   GLADE_HOOKUP_OBJECT (window1, menuitem5_menu, "menuitem5_menu");
   GLADE_HOOKUP_OBJECT (window1, delete1, "delete1");
-  GLADE_HOOKUP_OBJECT (window1, image167, "image167");
   GLADE_HOOKUP_OBJECT (window1, edit_file1, "edit_file1");
-  GLADE_HOOKUP_OBJECT (window1, image168, "image168");
   GLADE_HOOKUP_OBJECT (window1, open_folder1, "open_folder1");
-  GLADE_HOOKUP_OBJECT (window1, image169, "image169");
   GLADE_HOOKUP_OBJECT (window1, copy2, "copy2");
-  GLADE_HOOKUP_OBJECT (window1, image170, "image170");
   GLADE_HOOKUP_OBJECT (window1, menuitem6, "menuitem6");
   GLADE_HOOKUP_OBJECT (window1, menuitem6_menu, "menuitem6_menu");
 
@@ -1380,12 +1310,9 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, search1, "search1");
   GLADE_HOOKUP_OBJECT (window1, search1_menu, "search1_menu");
   GLADE_HOOKUP_OBJECT (window1, playButton3, "playButton3");
-  GLADE_HOOKUP_OBJECT (window1, image171, "image171");
   GLADE_HOOKUP_OBJECT (window1, stopButton3, "stopButton3");
-  GLADE_HOOKUP_OBJECT (window1, image172, "image172");
   GLADE_HOOKUP_OBJECT (window1, separator2, "separator2");
   GLADE_HOOKUP_OBJECT (window1, cl_ear_history1, "cl_ear_history1");
-  GLADE_HOOKUP_OBJECT (window1, image173, "image173");
   GLADE_HOOKUP_OBJECT (window1, settings3, "settings3");
   GLADE_HOOKUP_OBJECT (window1, settings3_menu, "settings3_menu");
   GLADE_HOOKUP_OBJECT (window1, set_font1, "set_font1");
@@ -1398,9 +1325,7 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, test1, "test1");
   GLADE_HOOKUP_OBJECT (window1, test1_menu, "test1_menu");
   GLADE_HOOKUP_OBJECT (window1, open_criteria1, "open_criteria1");
-  GLADE_HOOKUP_OBJECT (window1, image174, "image174");
   GLADE_HOOKUP_OBJECT (window1, save_criteria1, "save_criteria1");
-  GLADE_HOOKUP_OBJECT (window1, image175, "image175");
   GLADE_HOOKUP_OBJECT (window1, separator16, "separator16");
   GLADE_HOOKUP_OBJECT (window1, reg_expression1, "reg_expression1");
   GLADE_HOOKUP_OBJECT (window1, menuitem7, "menuitem7");
