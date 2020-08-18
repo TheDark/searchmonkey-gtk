@@ -18,16 +18,16 @@
 #include "support.h" /* glade requirement */
 #include "misc.h"
 
-extern  *mainWindowApp;
+extern  GtkWidget *mainWindowApp;
 
 /*****************************************
  close file parsed with a correct trailer
 ******************************************/
-void misc_close_file(FILE *outputFile)
+void misc_close_file (FILE *outputFile)
 {
   gchar end_sign[]={0x0a,0};
-  fwrite(end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
-  fclose(outputFile);
+  fwrite (end_sign, sizeof(gchar),strlen(end_sign), outputFile); 
+  fclose (outputFile);
 }
 /******************************************
   function to recognize the file type
@@ -49,15 +49,15 @@ gint get_file_type_by_signature (gchar *path_to_file)
   gchar abiword_sign[]={0x3C,0x3F,0x78,0x6D,0};
   gchar pdf_sign[]={0x25, 0x50, 0x44, 0x46, 0};
 
-  inputFile = fopen(path_to_file,"rb");
+  inputFile = fopen (path_to_file,"rb");
   if(inputFile==NULL) {
-          printf("* ERROR : impossible to open file:%s to check signature *\n", path_to_file);
+          printf ("* ERROR : impossible to open file:%s to check signature *\n", path_to_file);
           return -1;
   }
   /* we compute the size before dynamically allocate buffer */
-   glong prev = ftell(inputFile);   
-   fseek(inputFile, 0L, SEEK_END);
-   glong sz = ftell(inputFile);
+   glong prev = ftell (inputFile);   
+   fseek (inputFile, 0L, SEEK_END);
+   glong sz = ftell (inputFile);
    fseek(inputFile, prev, SEEK_SET);
    if(sz>127)
      sz = 127;
@@ -67,17 +67,17 @@ gint get_file_type_by_signature (gchar *path_to_file)
    fileSize = fread (buffer, sizeof(gchar), sz, inputFile);
    fclose (inputFile);
    /* now we attempt to recognize signature */
-   if (strncmp(buffer,&write_sign,2)==0)
+   if (g_ascii_strncasecmp (buffer, (gchar *)&write_sign,2)==0)
       return iMsWriteFile;
-   if (strncmp(buffer,&old_word_sign,2)==0)
+   if (strncmp ( (const gchar *)buffer, (const gchar *)&old_word_sign,2)==0)
       return iOldMSWordFile;
-   if (strncmp(buffer,&ole_sign,8)==0)
+   if (strncmp ((const gchar *)buffer, (const gchar *)&ole_sign,8)==0)
       return iOleMsWordFile;
-   if (strncmp(buffer,&rtf_sign,4)==0)
+   if (strncmp ((const gchar *)buffer, (const gchar *)&rtf_sign,4)==0)
       return iRtfFile;
-   if (strncmp(buffer,&pdf_sign,4)==0)
+   if (strncmp ((const gchar *)buffer, (const gchar *)&pdf_sign,4)==0)
       return iPdfFile;
-   if (strncmp(buffer, &zip_sign,4) == 0) {
+   if (strncmp ((const gchar *)buffer, (const gchar *)&zip_sign,4) == 0) {
      /* two cases : MS XML or Oasis XML */
      if(strncmp ((const gchar*)buffer+54,(const gchar *)"oasis", 5)==0) {
         /* now we switch between OASIS files signatures */
@@ -95,7 +95,7 @@ gint get_file_type_by_signature (gchar *path_to_file)
         return iXmlMsWordFile;
      }
    }
-   if (strncmp(buffer, &abiword_sign,4) == 0)
+   if (strncmp ((const gchar *)buffer, (const gchar *)&abiword_sign, 4) == 0)
       if(strncmp ((const gchar*)buffer+0x31,(const gchar *)"abiwo", 5)==0)
            return iAbiwordFile;
    return retval;

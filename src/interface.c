@@ -29,7 +29,7 @@
 
 #define DEFAULT_MAX_HITS 50 /* maximum default number of results */
 
-extern mainWindowApp;
+extern GtkWidget *mainWindowApp;
 
 GtkWidget*
 create_window1 (void)
@@ -220,7 +220,7 @@ create_window1 (void)
 
 // "                GtkExpander#expander_search_options{border-radius: 25px;border-width: 3px;color: yellow}\n"
 /* #expander_search_options >> associated by specifying above gtk_widget_set_name() */
-  gtk_css_provider_load_from_data(css_provider,css,sizeof(css)-1,NULL);
+  gtk_css_provider_load_from_data (css_provider,css,sizeof(css)-1,NULL);
 /* expander for options */
   GtkWidget *expander_options;
 
@@ -1439,9 +1439,9 @@ create_window1 (void)
   gtk_widget_grab_focus (window1);
   gtk_window_add_accel_group (GTK_WINDOW (window1), accel_group);
 /*----- css *****/
-  GdkScreen* screen = gdk_screen_get_default();
-  GtkStyleContext* style_context = gtk_widget_get_style_context(window1);
-  gtk_style_context_add_provider_for_screen (screen,css_provider,
+  GdkScreen* screen = gdk_screen_get_default ();
+  GtkStyleContext* style_context = gtk_widget_get_style_context (window1);
+  gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(css_provider),
 	 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   return window1;
 }
