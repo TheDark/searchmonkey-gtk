@@ -18,6 +18,7 @@
 #include "support.h" /* glade requirement */
 #include "misc.h"
 
+extern  *mainWindowApp;
 
 /*****************************************
  close file parsed with a correct trailer
@@ -490,7 +491,7 @@ gboolean test_regexp(gchar *regexp, guint flags, gchar *error)
   gint regerr;
   regex_t testRegEx;
   GtkWidget *dialog;
-  extern GtkWidget * mainWindowApp;
+//  extern GtkWidget * mainWindowApp;
   GObject *window1 = G_OBJECT(mainWindowApp);
 
   regerr = regcomp(&testRegEx, regexp, flags);

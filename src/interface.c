@@ -18,7 +18,7 @@
 #include "callbacks.h"
 #include "interface.h"
 #include "support.h"
-
+#include "misc.h"
 
 #define GLADE_HOOKUP_OBJECT(component,widget,name) \
   g_object_set_data_full (G_OBJECT (component), name, \
@@ -124,7 +124,7 @@ create_window1 (void)
   GtkWidget *hbox40;
   GtkWidget *image9;
   GtkWidget *label253;
-  GtkWidget *folderDepthSpin_adj;/* ex object */
+  GtkAdjustment  *folderDepthSpin_adj;/* ex object */
   GtkWidget *folderDepthSpin;
 
   GtkWidget *hbox62;
@@ -153,22 +153,21 @@ create_window1 (void)
   GtkWidget *limitResultsCheckResults;
   GtkWidget *limit_results_hbox;
   GtkWidget *label1010;
-  GtkWidget *maxHitsSpinResults_adj;
+  GtkAdjustment *maxHitsSpinResults_adj;
   GtkWidget *maxHitsSpinResults;
   GtkWidget *hseparator7;
   GtkWidget *showLinesCheckResults;
   GtkWidget *show_line_contents_hbox;
   GtkWidget *label1009;
-  GtkWidget *showLinesSpinResults_adj;
+  GtkAdjustment *showLinesSpinResults_adj;
   GtkWidget *showLinesSpinResults;
   GtkWidget *hseparator11;
   GtkWidget *limitContentsCheckResults;
   GtkWidget *limit_contents_hbox;
   GtkWidget *label1025;
-  GtkWidget *maxContentHitsSpinResults_adj;
+  GtkAdjustment *maxContentHitsSpinResults_adj;
   GtkWidget *maxContentHitsSpinResults;
   GtkWidget *label1008;
-
   GtkWidget *playButton1;
   GtkWidget *label1015;
   GtkWidget *stopButton1;
@@ -223,7 +222,7 @@ create_window1 (void)
 /* #expander_search_options >> associated by specifying above gtk_widget_set_name() */
   gtk_css_provider_load_from_data(css_provider,css,sizeof(css)-1,NULL);
 /* expander for options */
-  GtkExpander *expander_options;
+  GtkWidget *expander_options;
 
   accel_group = gtk_accel_group_new ();
 
@@ -276,21 +275,24 @@ create_window1 (void)
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), separator5);
   gtk_widget_set_sensitive (separator5, FALSE);
 
-  print1 = gtk_image_menu_item_new_from_stock ("gtk-print", accel_group);
+ /* not used
+  print1 = misc_create_menu_image ("gtk-print", _("Print"));
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), print1);
 
-  print_preview1 = gtk_image_menu_item_new_from_stock ("gtk-print-preview", accel_group);
+  print_preview1 = misc_create_menu_image ("gtk-print-preview", _("Print preview"));
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), print_preview1);
 
   print_setup1 = gtk_menu_item_new_with_mnemonic (_("P_rint Setup..."));
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), print_setup1);
-
+*/
   separator6 = gtk_separator_menu_item_new ();
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), separator6);
   gtk_widget_set_sensitive (separator6, FALSE);
 
-  quit1 = gtk_image_menu_item_new_from_stock ("gtk-quit", accel_group);
-  gtk_widget_show (quit1);
+//  quit1 = gtk_image_menu_item_new_from_stock ("gtk-quit", accel_group);
+  quit1 = misc_create_menu_image ("gtk-quit", _("Quit Searchmonkey")); 
+
+//  gtk_widget_show (quit1);
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), quit1);
 
   menuitem5 = gtk_menu_item_new_with_mnemonic (_("_Edit"));
@@ -419,12 +421,17 @@ create_window1 (void)
   settings3_menu = gtk_menu_new ();
   gtk_menu_item_set_submenu (GTK_MENU_ITEM (settings3), settings3_menu);
 
-  set_font1 = gtk_image_menu_item_new_from_stock ("gtk-select-font", accel_group);
-  gtk_widget_show (set_font1);
+//  set_font1 = gtk_image_menu_item_new_from_stock ("gtk-select-font", accel_group);
+  set_font1 = misc_create_menu_image ("gtk-select-font", _("_Font"));
+
+//  gtk_widget_show (set_font1);
   gtk_container_add (GTK_CONTAINER (settings3_menu), set_font1);
 
-  set_highligting_colour1 = gtk_image_menu_item_new_from_stock ("gtk-select-color", accel_group);
-  gtk_widget_show (set_highligting_colour1);
+//  set_highligting_colour1 = gtk_image_menu_item_new_from_stock ("gtk-select-color", accel_group);
+
+  set_highligting_colour1 = misc_create_menu_image ("gtk-select-color", _("_Color"));
+
+//  gtk_widget_show (set_highligting_colour1);
   gtk_container_add (GTK_CONTAINER (settings3_menu), set_highligting_colour1);
 
   separator12 = gtk_separator_menu_item_new ();
@@ -447,8 +454,9 @@ create_window1 (void)
   gtk_container_add (GTK_CONTAINER (settings3_menu), separator11);
   gtk_widget_set_sensitive (separator11, FALSE);
 
-  configuration1 = gtk_image_menu_item_new_from_stock ("gtk-preferences", accel_group);
-  gtk_widget_show (configuration1);
+//  configuration1 = gtk_image_menu_item_new_from_stock ("gtk-preferences", accel_group);
+  configuration1 = misc_create_menu_image ("gtk-preferences", _("Preferences"));
+//  gtk_widget_show (configuration1);
   gtk_container_add (GTK_CONTAINER (settings3_menu), configuration1);
 
   test1 = gtk_menu_item_new_with_mnemonic (_("Extras"));
@@ -514,8 +522,9 @@ create_window1 (void)
   gtk_container_add (GTK_CONTAINER (menuitem7_menu), separator1);
   gtk_widget_set_sensitive (separator1, FALSE);
 
-  about1 = gtk_image_menu_item_new_from_stock ("gtk-about", accel_group);
-  gtk_widget_show (about1);
+//  about1 = gtk_image_menu_item_new_from_stock ("gtk-about", accel_group);
+  about1 = misc_create_menu_image ("gtk-about", _("About Searchmonkey"));
+//  gtk_widget_show (about1);
   gtk_container_add (GTK_CONTAINER (menuitem7_menu), about1);
 
 /* toolbar 1 - removed 15 feb 2018 ------------------------*/
@@ -944,11 +953,11 @@ create_window1 (void)
   gtk_box_pack_start (GTK_BOX (vbox1), hseparator10b, FALSE, FALSE, 4);
 /* end Luc A. */
 
-  GtkWidget *vseparator_after_left_side = gtk_vseparator_new ();
+  GtkWidget *vseparator_after_left_side = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
   gtk_widget_show (vseparator_after_left_side);
   gtk_box_pack_start (GTK_BOX (hboxSearchmonkey), vseparator_after_left_side, FALSE, FALSE, 2);
 /* Hpane */
-  resultsHPane = gtk_hpaned_new ();
+  resultsHPane = gtk_paned_new (GTK_ORIENTATION_HORIZONTAL);
   gtk_widget_show (resultsHPane);
   gtk_box_pack_start (GTK_BOX (hboxSearchmonkey), resultsHPane, TRUE, TRUE, 0);
   resultsScroll = gtk_scrolled_window_new (NULL, NULL);
@@ -985,7 +994,7 @@ create_window1 (void)
   gtk_text_view_set_right_margin (GTK_TEXT_VIEW (textview1), 5);
 
 /* vPane */
-  resultsVPane = gtk_vpaned_new ();
+  resultsVPane = gtk_paned_new (GTK_ORIENTATION_VERTICAL);
   gtk_box_pack_start (GTK_BOX (hboxSearchmonkey), resultsVPane, TRUE, TRUE, 0);
 
   scrolledwindow15 = gtk_scrolled_window_new (NULL, NULL);
@@ -1022,12 +1031,12 @@ create_window1 (void)
   gtk_text_view_set_right_margin (GTK_TEXT_VIEW (textview4), 5);
 
 /* vertical separator before options expander */
-  GtkWidget *vseparator_before_options_expander = gtk_vseparator_new();
+  GtkWidget *vseparator_before_options_expander = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
   gtk_widget_show(vseparator_before_options_expander);
   gtk_box_pack_start (GTK_BOX (hboxSearchmonkey), vseparator_before_options_expander , FALSE, FALSE, 0);
 /******* expander for size and modified options */
 
-  GtkExpander *expander_search_options = gtk_expander_new(NULL);
+  GtkWidget *expander_search_options = gtk_expander_new(NULL);
   gtk_widget_set_tooltip_text ( expander_search_options, _("Click here to set-up size and date search options ..."));
   gtk_expander_set_expanded (GTK_EXPANDER(expander_search_options), FALSE);
   gtk_widget_show(expander_search_options);
@@ -1039,23 +1048,23 @@ create_window1 (void)
   GtkWidget *label_expander = gtk_label_new(_("<b>  Search filters  </b>"));
   gtk_widget_set_name(label_expander, "label_expander");
   gtk_widget_show(label_expander);
-  gtk_label_set_use_markup(label_expander, TRUE);
-  gtk_label_set_angle(label_expander, 90);
+  gtk_label_set_use_markup(GTK_LABEL(label_expander), TRUE);
+  gtk_label_set_angle(GTK_LABEL(label_expander), 90);
   GtkWidget *iconExpander = gtk_image_new_from_file(g_strconcat(PACKAGE_DATA_DIR, "/pixmaps/", PACKAGE, "/", 
                                "Filter_24x24.png", NULL));
-  gtk_widget_set_name(iconExpander, "iconExpander");
-  gtk_widget_show(iconExpander);
+  gtk_widget_set_name (iconExpander, "iconExpander");
+  gtk_widget_show (iconExpander);
   gtk_grid_attach(GTK_GRID(gridExpander), label_expander, 0, 0, 1, 1);
   gtk_grid_attach(GTK_GRID(gridExpander), iconExpander, 0, 1, 1, 1);
-  gtk_expander_set_label_widget (expander_search_options, gridExpander);
+  gtk_expander_set_label_widget (GTK_EXPANDER(expander_search_options), gridExpander);
   gtk_box_pack_start (GTK_BOX (hboxSearchmonkey), expander_search_options, FALSE, FALSE, 0);
   /* file size options */
-  GtkWidget *grid_expander = gtk_grid_new();
+  GtkWidget *grid_expander = gtk_grid_new ();
   gtk_widget_show (grid_expander);
   gtk_container_add (GTK_CONTAINER (expander_search_options), grid_expander);
-  createAreaFileSize(window1, grid_expander);
+  createAreaFileSize (window1, grid_expander);
   /* modified date options */
-  createFileDateModified("", window1, grid_expander);
+  createFileDateModified ("", window1, GTK_GRID(grid_expander));//
 
 /* status bar */
   hbox41 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
@@ -1088,15 +1097,18 @@ create_window1 (void)
   g_signal_connect ((gpointer) save_results1, "activate",
                     G_CALLBACK (on_save_results1_activate),
                     NULL);
+/* not implemented 
   g_signal_connect ((gpointer) print1, "activate",
                     G_CALLBACK (on_print1_activate),
                     NULL);
+
   g_signal_connect ((gpointer) print_preview1, "activate",
                     G_CALLBACK (on_print_preview1_activate),
                     NULL);
   g_signal_connect ((gpointer) print_setup1, "activate",
                     G_CALLBACK (on_print_setup1_activate),
                     NULL);
+*/
   g_signal_connect ((gpointer) quit1, "activate",
                     G_CALLBACK (on_quit1_activate),
                     NULL);
@@ -1280,9 +1292,9 @@ create_window1 (void)
   GLADE_HOOKUP_OBJECT (window1, separatormenuitem1, "separatormenuitem1");
   GLADE_HOOKUP_OBJECT (window1, save_results1, "save_results1");
   GLADE_HOOKUP_OBJECT (window1, separator5, "separator5");
-  GLADE_HOOKUP_OBJECT (window1, print1, "print1");
-  GLADE_HOOKUP_OBJECT (window1, print_preview1, "print_preview1");
-  GLADE_HOOKUP_OBJECT (window1, print_setup1, "print_setup1");
+//  GLADE_HOOKUP_OBJECT (window1, print1, "print1");
+//  GLADE_HOOKUP_OBJECT (window1, print_preview1, "print_preview1");
+//  GLADE_HOOKUP_OBJECT (window1, print_setup1, "print_setup1");
   GLADE_HOOKUP_OBJECT (window1, separator6, "separator6");
   GLADE_HOOKUP_OBJECT (window1, quit1, "quit1");
   GLADE_HOOKUP_OBJECT (window1, menuitem5, "menuitem5");
@@ -1429,8 +1441,7 @@ create_window1 (void)
 /*----- css *****/
   GdkScreen* screen = gdk_screen_get_default();
   GtkStyleContext* style_context = gtk_widget_get_style_context(window1);
-  gtk_style_context_add_provider_for_screen
-	(screen,css_provider,
+  gtk_style_context_add_provider_for_screen (screen,css_provider,
 	 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   return window1;
 }
@@ -1487,49 +1498,51 @@ create_menu1 (void)
 {
   GtkWidget *menu1;
   GtkWidget *open1;
-  GtkWidget *image58;
   GtkWidget *copy3;
-  GtkWidget *image59;
   GtkWidget *delete2;
-  GtkWidget *image60;
   GtkWidget *explore1;
-  GtkWidget *image61;
   GtkWidget *separator14;
   GtkWidget *cancel1;
 
   menu1 = gtk_menu_new ();
 
-  open1 = gtk_image_menu_item_new_with_mnemonic (_("Edit (File)"));
-  gtk_widget_show (open1);
+//  open1 = gtk_image_menu_item_new_with_mnemonic (_("Edit (File)"));
+  open1 = misc_create_menu_image ("gtk-edit", _("Edit (File)")); 
+
+//  gtk_widget_show (open1);
   gtk_container_add (GTK_CONTAINER (menu1), open1);
 
-  image58 = gtk_image_new_from_icon_name  ("gtk-edit", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image58);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open1), image58);
+ // image58 = gtk_image_new_from_icon_name  ("gtk-edit", GTK_ICON_SIZE_MENU);
+//  gtk_widget_show (image58);
+//  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (open1), image58);
 
-  copy3 = gtk_image_menu_item_new_with_mnemonic (_("_Copy (Filename)"));
-  gtk_widget_show (copy3);
+//  copy3 = gtk_image_menu_item_new_with_mnemonic (_("_Copy (Filename)"));
+  copy3 = misc_create_menu_image ("gtk-copy", _("_Copy (Filename)")); 
+//  gtk_widget_show (copy3);
   gtk_container_add (GTK_CONTAINER (menu1), copy3);
 
-  image59 = gtk_image_new_from_icon_name  ("gtk-copy", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image59);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (copy3), image59);
+ // image59 = gtk_image_new_from_icon_name  ("gtk-copy", GTK_ICON_SIZE_MENU);
+//  gtk_widget_show (image59);
+//  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (copy3), image59);
 
-  delete2 = gtk_image_menu_item_new_with_mnemonic (_("_Delete File"));
-  gtk_widget_show (delete2);
+//  delete2 = gtk_image_menu_item_new_with_mnemonic (_("_Delete File"));
+  delete2 = misc_create_menu_image ("gtk-delete", _("_Delete File")); 
+//  gtk_widget_show (delete2);
   gtk_container_add (GTK_CONTAINER (menu1), delete2);
 
-  image60 = gtk_image_new_from_icon_name ("gtk-delete", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image60);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (delete2), image60);
+ // image60 = gtk_image_new_from_icon_name ("gtk-delete", GTK_ICON_SIZE_MENU);
+ // gtk_widget_show (image60);
+ // gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (delete2), image60);
 
-  explore1 = gtk_image_menu_item_new_with_mnemonic (_("_Explore Folder"));
-  gtk_widget_show (explore1);
+//  explore1 = gtk_image_menu_item_new_with_mnemonic (_("_Explore Folder"));
+  explore1 = misc_create_menu_image ("gtk-open", _("_Explore Folder")); 
+
+//  gtk_widget_show (explore1);
   gtk_container_add (GTK_CONTAINER (menu1), explore1);
 
-  image61 = gtk_image_new_from_icon_name ("gtk-open", GTK_ICON_SIZE_MENU);
-  gtk_widget_show (image61);
-  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (explore1), image61);
+ // image61 = gtk_image_new_from_icon_name ("gtk-open", GTK_ICON_SIZE_MENU);
+ // gtk_widget_show (image61);
+//  gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (explore1), image61);
 
   separator14 = gtk_separator_menu_item_new ();
   gtk_widget_show (separator14);
@@ -1559,13 +1572,9 @@ create_menu1 (void)
   /* Store pointers to all widgets, for use by lookup_widget(). */
   GLADE_HOOKUP_OBJECT_NO_REF (menu1, menu1, "menu1");
   GLADE_HOOKUP_OBJECT (menu1, open1, "open1");
-  GLADE_HOOKUP_OBJECT (menu1, image58, "image58");
   GLADE_HOOKUP_OBJECT (menu1, copy3, "copy3");
-  GLADE_HOOKUP_OBJECT (menu1, image59, "image59");
   GLADE_HOOKUP_OBJECT (menu1, delete2, "delete2");
-  GLADE_HOOKUP_OBJECT (menu1, image60, "image60");
   GLADE_HOOKUP_OBJECT (menu1, explore1, "explore1");
-  GLADE_HOOKUP_OBJECT (menu1, image61, "image61");
   GLADE_HOOKUP_OBJECT (menu1, separator14, "separator14");
   GLADE_HOOKUP_OBJECT (menu1, cancel1, "cancel1");
 
@@ -1581,7 +1590,7 @@ create_highlightColourDialog (void)
   GtkWidget *help_button1;
   GtkWidget *color_selection1;
 
-  highlightColourDialog = gtk_color_chooser_dialog_new (_("Select highlighting Colour"),mainWindowApp);
+  highlightColourDialog = gtk_color_chooser_dialog_new (_("Select highlighting Colour"), GTK_WINDOW(mainWindowApp));
   gtk_container_set_border_width (GTK_CONTAINER (highlightColourDialog), 5);
   gtk_window_set_resizable (GTK_WINDOW (highlightColourDialog), FALSE);
   gtk_window_set_destroy_with_parent (GTK_WINDOW (highlightColourDialog), TRUE);
@@ -1600,7 +1609,7 @@ create_fontSelectionDialog (void)
 {
   GtkWidget *fontSelectionDialog;
 
-  fontSelectionDialog = gtk_font_chooser_dialog_new (_("Select Font"),mainWindowApp);
+  fontSelectionDialog = gtk_font_chooser_dialog_new (_("Select Font"), GTK_WINDOW(mainWindowApp));
 
   gtk_container_set_border_width (GTK_CONTAINER (fontSelectionDialog), 4);
   gtk_window_set_destroy_with_parent (GTK_WINDOW (fontSelectionDialog), TRUE);
@@ -3427,7 +3436,7 @@ create_calendarDialog (GtkWidget *win)
 /*****************************************
  dialog to choose the file date filter
 *****************************************/
-void createFileDateModified(const gchar *str, GtkWidget *win, GtkExpander *expander_area)
+void createFileDateModified (const gchar *str, GtkWidget *win, GtkGrid *expander_area)
 {
  GtkWidget *grid1;
  GtkWidget *labelModifiedDate;
@@ -3448,7 +3457,7 @@ void createFileDateModified(const gchar *str, GtkWidget *win, GtkExpander *expan
  GtkWidget *intervalEndEntry;
  GtkWidget *gridSince;
  GtkWidget *sinceUnits;
- GtkWidget *adjustmentEntrySince;
+ GtkAdjustment  *adjustmentEntrySince;
  GtkWidget *entrySince;
 
 
@@ -3527,10 +3536,10 @@ void createFileDateModified(const gchar *str, GtkWidget *win, GtkExpander *expan
  gtk_grid_attach(GTK_GRID(grid1),intervalEndEntry, 3, 8, 1, 1);
  gtk_widget_set_sensitive (intervalEndEntry, FALSE);
 
- gridSince = gtk_grid_new();
- gtk_widget_show(gridSince);
- gtk_grid_set_column_homogeneous(GTK_GRID(gridSince), FALSE);
- gtk_grid_attach(GTK_GRID(grid1),gridSince, 2, 9, 3, 1);
+ gridSince = gtk_grid_new ();
+ gtk_widget_show (gridSince);
+ gtk_grid_set_column_homogeneous (GTK_GRID(gridSince), FALSE);
+ gtk_grid_attach (GTK_GRID(grid1),gridSince, 2, 9, 3, 1);
  adjustmentEntrySince = gtk_adjustment_new (1, 1, 18000, 1, 10, 0);/* 18000 =50 years of 360 days - =max value, even if the user types himself */
  entrySince = gtk_spin_button_new (GTK_ADJUSTMENT (adjustmentEntrySince), 1, 0);/* 0 = no decimal point */
  gtk_widget_show (entrySince);
@@ -3605,9 +3614,10 @@ void createFileDateModified(const gchar *str, GtkWidget *win, GtkExpander *expan
 
 
 /************************************
+ PUBLIC
  expander area to the file size
 ************************************/
-void createAreaFileSize(GtkWidget *win, GtkWidget *expander_area)
+void createAreaFileSize (GtkWidget *win, GtkWidget *expander_area)
 {
  GtkWidget *grid1;
  GtkWidget *labelMoreThan;

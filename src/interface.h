@@ -20,4 +20,5 @@ GtkWidget* create_creditsDialog (void);
 GtkWidget* create_calendarDialog (GtkWidget *win);
 GtkWidget *createDialogFileSize(void);
 GtkWidget *createDialogFileDateModified(const gchar *str);
-
+void createFileDateModified (const gchar *str, GtkWidget *win, GtkGrid *expander_area);
+void createAreaFileSize (GtkWidget *win, GtkWidget *expander_area);

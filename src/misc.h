@@ -41,7 +41,7 @@ from catdoc and me ;-)
 #define iCpIbm437 3
 #define iCpIso8859_1 4
 
-extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
+// extern GtkWidget *mainWindowApp; /* Holds pointer to the main searchmonkey GUI. Declared in main.c */
 
 void miscErrorDialog(GtkWidget *widget, const gchar* msg);
 gchar *misc_combo_index_to_size_units(gint index);
