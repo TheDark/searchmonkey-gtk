@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([searchmonkey],[0.9.0])
+AC_INIT([searchmonkey],[0.9.20200820])
 AC_CONFIG_SRCDIR([configure.ac])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -40,7 +40,7 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Gettext package.])
 
 dnl Add the languages which your application supports here.
-ALL_LINGUAS="en_GB en_UK en_US fr_FR fr ru_RU"
+ALL_LINGUAS="en_GB en_UK en_US fr_FR fr ru_RU ru pt_PT"
 AM_GLIB_GNU_GETTEXT
 
 AC_CONFIG_FILES([
