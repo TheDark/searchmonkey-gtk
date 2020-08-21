@@ -227,8 +227,7 @@ create_window1 (void)
   accel_group = gtk_accel_group_new ();
 
   window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_widget_set_can_focus (window1, TRUE);
-  gtk_widget_set_tooltip_text (window1, _("Desktop search to replace find and grep."));
+  gtk_widget_set_can_focus (GTK_WIDGET(window1), TRUE);
   gtk_window_set_title (GTK_WINDOW (window1), _("searchmonkey"));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (window1), TRUE);
   window1_icon_pixbuf = create_pixbuf ("searchmonkey.png");

@@ -1230,7 +1230,7 @@ void realizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
   if (g_key_file_has_key (keyString, group, name, NULL)) {
     newFont = g_key_file_get_string (keyString, group, name, NULL);
     if (newFont != NULL) {
-      desc = pango_font_description_from_string(newFont);
+      desc = pango_font_description_from_string (newFont);
       if (desc != NULL) {   
         gtk_widget_override_font (GTK_WIDGET(lookup_widget (widget, "textview1")), desc);
         gtk_widget_override_font (GTK_WIDGET(lookup_widget (widget, "textview4")), desc);

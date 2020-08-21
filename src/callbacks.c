@@ -37,7 +37,7 @@ void
 on_open_criteria1_activate             (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  importCriteria(GTK_WIDGET(menuitem));
+  importCriteria(GTK_WIDGET (menuitem));
 }
 
 
@@ -45,7 +45,7 @@ void
 on_save_criteria1_activate             (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  exportCriteria(GTK_WIDGET(menuitem));
+  exportCriteria(GTK_WIDGET (menuitem));
 }
 
 
@@ -53,7 +53,7 @@ void
 on_save_results1_activate              (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  saveResults(GTK_WIDGET(menuitem));
+  saveResults(GTK_WIDGET (menuitem));
 }
 
 
@@ -85,8 +85,8 @@ void
 on_quit1_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  GObject *window1 = G_OBJECT(lookup_widget(GTK_WIDGET(menuitem), "window1"));
-   gtk_widget_destroy(GTK_WIDGET(window1));
+  GObject *window1 = G_OBJECT(lookup_widget (GTK_WIDGET (menuitem), "window1"));
+   gtk_widget_destroy(GTK_WIDGET (window1));
 }
 
 
@@ -96,15 +96,15 @@ on_word_wrap1_activate                 (GtkMenuItem     *menuitem,
 {
     gboolean setWordWrap;
     GtkTextView *textBox;
-    if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-      textBox = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview1"));
+    if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
+      textBox = GTK_TEXT_VIEW(lookup_widget (GTK_WIDGET (menuitem), "textview1"));
     } else {
-      textBox = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview4"));
+      textBox = GTK_TEXT_VIEW(lookup_widget (GTK_WIDGET (menuitem), "textview4"));
     }
     
     setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem));
     if(setWordWrap)
-        gtk_text_view_set_wrap_mode(textBox, GTK_WRAP_WORD);
+        gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textBox), GTK_WRAP_WORD);
           else gtk_text_view_set_wrap_mode(textBox, GTK_WRAP_NONE);
     gtk_text_view_set_justification( GTK_TEXT_VIEW(textBox), GTK_JUSTIFY_LEFT );
 }
@@ -115,48 +115,49 @@ on_set_font1_activate                  (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
     gchar *newFont;
-    GtkWidget *textView1, *textView4;
-    GtkWidget *textView;
-    if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-      textView = lookup_widget(GTK_WIDGET(menuitem), "textview1");
+    GtkWidget *textView1, *textView4, *textView;
+    if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
+      textView = lookup_widget (GTK_WIDGET (menuitem), "textview1");
     } else {
-      textView = lookup_widget(GTK_WIDGET(menuitem), "textview4");
+      textView = lookup_widget (GTK_WIDGET (menuitem), "textview4");
     }
-    textView1 = lookup_widget(GTK_WIDGET(menuitem), "textview1");
-    textView4 = lookup_widget(GTK_WIDGET(menuitem), "textview4");
+    textView1 = lookup_widget (GTK_WIDGET (menuitem), "textview1");
+    textView4 = lookup_widget (GTK_WIDGET (menuitem), "textview4");
     
-    GtkFontSelectionDialog *dialog = create_fontSelectionDialog();
-    PangoContext* context = gtk_widget_get_pango_context  (textView);
-    PangoFontDescription *desc = pango_context_get_font_description(context);    
-    newFont = pango_font_description_to_string(desc);
+    GtkFontSelectionDialog *dialog = create_fontSelectionDialog ();
+    PangoContext *context = gtk_widget_get_pango_context  (textView);
+    PangoFontDescription *desc = pango_context_get_font_description (context);    
+    newFont = pango_font_description_to_string (desc);
 
-    gtk_font_chooser_set_font (GTK_FONT_CHOOSER(dialog ),newFont);
+    gtk_font_chooser_set_font (GTK_FONT_CHOOSER (dialog), newFont);
 
-    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
-      newFont = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(dialog ));
-      if (newFont != NULL) { 
+    if(gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
+      newFont = gtk_font_chooser_get_font (GTK_FONT_CHOOSER (dialog));
+      if(newFont != NULL) { 
         desc = pango_font_description_from_string (newFont);
         if (desc != NULL) {
-          gtk_widget_modify_font (GTK_WIDGET(textView1), desc);
-          gtk_widget_modify_font (GTK_WIDGET(textView4), desc);
-          pango_font_description_free(desc);
+          /* please note, we change only the font and size, not others characteristics, for example 'bold' */
+
+          gtk_widget_override_font (GTK_WIDGET (textView1), desc);
+          gtk_widget_override_font (GTK_WIDGET (textView4), desc);
+          pango_font_description_free (desc);
         }
-        g_free(newFont);
+        g_free (newFont);
       }
     }
-    gtk_widget_destroy(GTK_WIDGET(dialog));
+    gtk_widget_destroy (GTK_WIDGET (dialog));
 }
 
 
 void
-on_set_highligting_colour1_activate    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_set_highligting_colour1_activate (GtkMenuItem     *menuitem,
+                                     gpointer         user_data)
 {
     GdkRGBA color, *cp;
     GtkTextView *textView1, *textView4;
 
-    textView1 = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview1"));
-    textView4 = GTK_TEXT_VIEW(lookup_widget(GTK_WIDGET(menuitem), "textview4"));
+    textView1 = GTK_TEXT_VIEW(lookup_widget (GTK_WIDGET (menuitem), "textview1"));
+    textView4 = GTK_TEXT_VIEW(lookup_widget (GTK_WIDGET (menuitem), "textview4"));
     
     GtkTextBuffer* textBuf1 = gtk_text_view_get_buffer (textView1);
     GtkTextTagTable* tagTable1 = gtk_text_buffer_get_tag_table(textBuf1);
@@ -173,7 +174,7 @@ on_set_highligting_colour1_activate    (GtkMenuItem     *menuitem,
     g_assert(tag1 != NULL);
     g_assert(dialog != NULL);
     
-    if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
+    if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
       g_object_get( G_OBJECT(tag1), "background-rgba", &cp, NULL);
     } else {
       g_object_get( G_OBJECT(tag4), "background-rgba", &cp, NULL);
@@ -183,10 +184,10 @@ on_set_highligting_colour1_activate    (GtkMenuItem     *menuitem,
     gdk_rgba_free (cp);
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
         gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dialog), &color);
-        g_object_set( G_OBJECT(tag1), "background-rgba", &color, NULL);
-        g_object_set( G_OBJECT(tag4), "background-rgba", &color, NULL);
+        g_object_set (G_OBJECT(tag1), "background-rgba", &color, NULL);
+        g_object_set (G_OBJECT(tag4), "background-rgba", &color, NULL);
     }
-    gtk_widget_destroy(dialog);
+    gtk_widget_destroy (GTK_WIDGET(dialog));
 }
 
 
@@ -202,39 +203,39 @@ on_cl_ear_history1_activate            (GtkMenuItem     *menuitem,
 
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK) {
         /* Clear file names? */
-        check = GTK_TOGGLE_BUTTON(lookup_widget(dialog, "clearFileNamesCheck"));
+        check = GTK_TOGGLE_BUTTON(lookup_widget (dialog, "clearFileNamesCheck"));
         if(gtk_toggle_button_get_active(check)) {
-          clearComboBox2(lookup_widget(GTK_WIDGET(menuitem), "fileName"));
+          clearComboBox2(lookup_widget (GTK_WIDGET (menuitem), "fileName"));
         }
 
         /* Clear containing text? */
-        check = GTK_TOGGLE_BUTTON(lookup_widget(dialog, "clearContainingTextCheck"));
+        check = GTK_TOGGLE_BUTTON(lookup_widget (dialog, "clearContainingTextCheck"));
         if(gtk_toggle_button_get_active(check)) {
-            clearComboBox(lookup_widget(GTK_WIDGET(menuitem), "containingText"));
+            clearComboBox(lookup_widget (GTK_WIDGET (menuitem), "containingText"));
         }
 
         /* Clear look in? */
-        check = GTK_TOGGLE_BUTTON(lookup_widget(dialog, "clearLookInCheck"));
+        check = GTK_TOGGLE_BUTTON(lookup_widget (dialog, "clearLookInCheck"));
         if(gtk_toggle_button_get_active(check)) {
-            clearComboBox(lookup_widget(GTK_WIDGET(menuitem), "lookIn"));
+            clearComboBox(lookup_widget (GTK_WIDGET (menuitem), "lookIn"));
 
         }
 
         /* Clear size/modified? */
-        check = GTK_TOGGLE_BUTTON(lookup_widget(dialog, "resetSizeModifiedCheck"));
+        check = GTK_TOGGLE_BUTTON(lookup_widget (dialog, "resetSizeModifiedCheck"));
         if(gtk_toggle_button_get_active(check)) {
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(menuitem), "lessThanCheck")), FALSE);
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(menuitem), "moreThanCheck")), FALSE);
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(menuitem), "afterCheck")), FALSE);
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(menuitem), "beforeCheck")), FALSE);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (menuitem), "lessThanCheck")), FALSE);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (menuitem), "moreThanCheck")), FALSE);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (menuitem), "afterCheck")), FALSE);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (menuitem), "beforeCheck")), FALSE);
 
-            entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(menuitem), "lessThanEntry"));
+            entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (menuitem), "lessThanEntry"));
             gtk_entry_set_text(entry, "");
-            entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(menuitem), "moreThanEntry"));
+            entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (menuitem), "moreThanEntry"));
             gtk_entry_set_text(entry, "");
-            entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(menuitem), "afterEntry"));
+            entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (menuitem), "afterEntry"));
             gtk_entry_set_text(entry, "");
-            entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(menuitem), "beforeEntry"));
+            entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (menuitem), "beforeEntry"));
             gtk_entry_set_text(entry, "");
         }
     }
@@ -246,7 +247,7 @@ void
 on_delete1_activate                    (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  deleteFile (GTK_WIDGET(menuitem));
+  deleteFile (GTK_WIDGET (menuitem));
 }
 
 
@@ -254,7 +255,7 @@ void
 on_copy2_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  copyFile (GTK_WIDGET(menuitem));
+  copyFile (GTK_WIDGET (menuitem));
 }
 
 
@@ -264,7 +265,7 @@ void
 on_status_bar1_activate                (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  GtkWidget *widget = lookup_widget(GTK_WIDGET(menuitem), "hbox41"); /* Contains status plus progress bar */
+  GtkWidget *widget = lookup_widget (GTK_WIDGET (menuitem), "hbox41"); /* Contains status plus progress bar */
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
     gtk_widget_show(widget);
   } else {
@@ -278,7 +279,7 @@ on_file_name1_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    columnClick(GTK_WIDGET(menuitem), FILENAME_COLUMN);
+    columnClick(GTK_WIDGET (menuitem), FILENAME_COLUMN);
   }
 }
 
@@ -288,7 +289,7 @@ on_location1_activate                  (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    columnClick(GTK_WIDGET(menuitem), LOCATION_COLUMN);
+    columnClick(GTK_WIDGET (menuitem), LOCATION_COLUMN);
   }
 }
 
@@ -298,7 +299,7 @@ on_size1_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    columnClick(GTK_WIDGET(menuitem), INT_SIZE_COLUMN);
+    columnClick(GTK_WIDGET (menuitem), INT_SIZE_COLUMN);
   }
 }
 
@@ -308,7 +309,7 @@ on_type1_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    columnClick(GTK_WIDGET(menuitem), TYPE_COLUMN);
+    columnClick(GTK_WIDGET (menuitem), TYPE_COLUMN);
   }
 }
 
@@ -318,7 +319,7 @@ on_modified1_activate                  (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    columnClick(GTK_WIDGET(menuitem), INT_MODIFIED_COLUMN);
+    columnClick(GTK_WIDGET (menuitem), INT_MODIFIED_COLUMN);
   }
 }
 
@@ -366,7 +367,7 @@ on_reg_expression1_activate            (GtkMenuItem     *menuitem,
     testRegExDialog1 = create_testRegExDialog();
     gtk_widget_show(testRegExDialog1);
   } else {
-    gtk_widget_grab_focus(lookup_widget(testRegExDialog1, "testEntry"));
+    gtk_widget_grab_focus(lookup_widget (testRegExDialog1, "testEntry"));
   }
 }
 
@@ -405,12 +406,12 @@ on_about1_activate                     (GtkMenuItem     *menuitem,
   PangoAttrList *list;
   PangoAttribute *attr;
   
-  gtk_dialog_run(GTK_DIALOG (aboutDialog));  
-  gtk_widget_destroy(GTK_DIALOG (aboutDialog));
+  gtk_dialog_run (GTK_DIALOG (aboutDialog));  
+  gtk_widget_destroy (GTK_WIDGET(aboutDialog));
   return;
 }
   /* Set searchmonkey version text and font size */
-//  tmpWidget = lookup_widget(aboutDialog, "aboutVersion");
+//  tmpWidget = lookup_widget (aboutDialog, "aboutVersion");
  // tmpString = g_strdup_printf(_("searchmonkey %s"), VERSION);/* defined in "configure" line 1644 - luc A 3 janv 2018 */
  // gtk_label_set_text(GTK_LABEL(tmpWidget), tmpString);
  // g_free(tmpString);
@@ -449,7 +450,7 @@ on_containingText_changed              (GtkComboBox     *combobox,
   GtkToggleButton *checkBox;
 
  
-  checkBox = GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(combobox), "containingTextCheck"));
+  checkBox = GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (combobox), "containingTextCheck"));
 
   gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combobox));
 
@@ -474,7 +475,7 @@ on_folderSelector_clicked              (GtkButton       *button,
   GtkWidget *dialog;
   GtkComboBox *fileWidget;
   gint result;
-  gchar *currentFolderName = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(GTK_WIDGET(button), "lookIn")));
+  gchar *currentFolderName = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget (GTK_WIDGET (button), "lookIn")));
   
   dialog = create_folderChooserDialog();
   gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), currentFolderName);
@@ -484,9 +485,9 @@ on_folderSelector_clicked              (GtkButton       *button,
     gchar *filename;
     
     filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-    fileWidget = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "lookIn"));
-    addUniqueRow(GTK_WIDGET(fileWidget), filename);
-    gtk_widget_set_tooltip_text (GTK_WIDGET(lookup_widget(GTK_WIDGET(button), "lookIn")),filename ); 
+    fileWidget = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "lookIn"));
+    addUniqueRow(GTK_WIDGET (fileWidget), filename);
+    gtk_widget_set_tooltip_text (GTK_WIDGET (lookup_widget (GTK_WIDGET (button), "lookIn")),filename ); 
     g_free (filename);
   }
   gtk_widget_destroy (dialog);
@@ -497,7 +498,7 @@ void
 on_lessThanCheck_toggled               (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-  GtkWidget *pTextBox = lookup_widget(GTK_WIDGET(togglebutton), "lessThanEntry");
+  GtkWidget *pTextBox = lookup_widget (GTK_WIDGET (togglebutton), "lessThanEntry");
   gtk_widget_set_sensitive(pTextBox, gtk_toggle_button_get_active(togglebutton));
 }
 
@@ -506,9 +507,9 @@ void
 on_beforeCheck_toggled                 (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-  GtkWidget *pTextBox = lookup_widget(GTK_WIDGET(togglebutton), "beforeEntry");
+  GtkWidget *pTextBox = lookup_widget (GTK_WIDGET (togglebutton), "beforeEntry");
   gtk_widget_set_sensitive(pTextBox, gtk_toggle_button_get_active(togglebutton));
-  gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "beforeCalendarBtn"), gtk_toggle_button_get_active(togglebutton));
+  gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (togglebutton), "beforeCalendarBtn"), gtk_toggle_button_get_active(togglebutton));
 }
 
 
@@ -516,7 +517,7 @@ void
 on_moreThanCheck_toggled               (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-  GtkWidget *pTextBox = lookup_widget(GTK_WIDGET(togglebutton), "moreThanEntry");
+  GtkWidget *pTextBox = lookup_widget (GTK_WIDGET (togglebutton), "moreThanEntry");
   gtk_widget_set_sensitive(pTextBox, gtk_toggle_button_get_active(togglebutton));
 }
 
@@ -525,9 +526,9 @@ void
 on_afterCheck_toggled                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-  GtkWidget *pTextBox = lookup_widget(GTK_WIDGET(togglebutton), "afterEntry");
+  GtkWidget *pTextBox = lookup_widget (GTK_WIDGET (togglebutton), "afterEntry");
   gtk_widget_set_sensitive(pTextBox, gtk_toggle_button_get_active(togglebutton));
-  gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "afterCalendarBtn"), gtk_toggle_button_get_active(togglebutton));
+  gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (togglebutton), "afterCalendarBtn"), gtk_toggle_button_get_active(togglebutton));
 }
 
 
@@ -617,10 +618,10 @@ on_open1_activate                      (GtkMenuItem     *menuitem,
   GtkTreeView *treeView;
   gchar *fullFileName;
   
-  if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview1"));
+  if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview1"));
   } else {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview2"));
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview2"));
   }
   fullFileName = getFullFileName(treeView, FULL_FILENAME_COLUMN);
 
@@ -637,7 +638,7 @@ void
 on_copy3_activate                      (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  copyFile(GTK_WIDGET(menuitem));    
+  copyFile(GTK_WIDGET (menuitem));    
   detachMenu(menuitem);
 }
 
@@ -646,7 +647,7 @@ void
 on_delete2_activate                    (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  deleteFile (GTK_WIDGET(menuitem));
+  deleteFile (GTK_WIDGET (menuitem));
   detachMenu(menuitem);
 }
 
@@ -658,10 +659,10 @@ on_explore1_activate                   (GtkMenuItem     *menuitem,
   GtkTreeView *treeView;
   gchar *location;
   
-  if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview1"));
+  if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview1"));
   } else {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview2"));
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview2"));
   }
   location = getFullFileName(treeView, LOCATION_COLUMN);
 
@@ -689,11 +690,11 @@ on_testRegExDialog_response            (GtkDialog       *dialog,
 {
     switch (response_id) {
         case GTK_RESPONSE_APPLY:
-            refreshTestResults(GTK_WIDGET(dialog));
+            refreshTestResults(GTK_WIDGET (dialog));
             break;
         default:
             testRegExDialog1 = NULL;
-            gtk_widget_destroy(GTK_WIDGET(dialog));
+            gtk_widget_destroy(GTK_WIDGET (dialog));
             break;
     }
 }
@@ -723,17 +724,17 @@ on_expWizard_response                  (GtkDialog       *dialog,
                                         gpointer         user_data)
 {
     gint typeRegex = (intptr_t)g_object_get_data(G_OBJECT(dialog), "regexType");
-    GtkEntry *output = GTK_ENTRY(lookup_widget(GTK_WIDGET(dialog), "resultExp"));/* resulExp = name of GtkEntry for the final RegEx formula */
+    GtkEntry *output = GTK_ENTRY(lookup_widget (GTK_WIDGET (dialog), "resultExp"));/* resulExp = name of GtkEntry for the final RegEx formula */
     gchar *finalRegex;
     GtkComboBox *retCombo;/* contains a pointer on main Window, for GtkCombo for files OR GtkCombo for containing text */
     
     if (typeRegex == FILE_REGEX_TYPE) {
-        retCombo = GTK_COMBO_BOX(lookup_widget(mainWindowApp, "fileName"));/* filename = GtkWidget, field of the combo in main window */
+        retCombo = GTK_COMBO_BOX(lookup_widget (mainWindowApp, "fileName"));/* filename = GtkWidget, field of the combo in main window */
     } else if (typeRegex == CONTEXT_REGEX_TYPE) {
-        retCombo = GTK_COMBO_BOX(lookup_widget(mainWindowApp, "containingText"));
+        retCombo = GTK_COMBO_BOX(lookup_widget (mainWindowApp, "containingText"));
     } else {
         g_print (_("Internal Error! Unable to find calling wizard type!"));
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+        gtk_widget_destroy(GTK_WIDGET (dialog));
         return;
     }
     
@@ -745,7 +746,7 @@ on_expWizard_response                  (GtkDialog       *dialog,
             finalRegex = (gchar *)gtk_entry_get_text(output);/* read text in Wizard dialog, resulting formula */
             if (*finalRegex != '\0') {
 printf("tentative regex\n");
-                addUniqueRow(GTK_WIDGET(retCombo), finalRegex);/* modify combobox in main window */
+                addUniqueRow(GTK_WIDGET (retCombo), finalRegex);/* modify combobox in main window */
             }
             /* Do not break here! We want the widget to be destroyed! */
 
@@ -755,7 +756,7 @@ printf("tentative regex\n");
             } else if (typeRegex == CONTEXT_REGEX_TYPE) {
                 contextRegexWizard = NULL;
             }
-            gtk_widget_destroy(GTK_WIDGET(dialog));
+            gtk_widget_destroy(GTK_WIDGET (dialog));
             break;
     }
 }
@@ -765,10 +766,10 @@ void
 on_startType_changed                   (GtkComboBox     *combobox,
                                         gpointer         user_data)
 {
-    GtkWidget *entry = lookup_widget(GTK_WIDGET(combobox), "startEntry");
-    GtkWidget *repeat = lookup_widget(GTK_WIDGET(combobox), "startOccurance");
+    GtkWidget *entry = lookup_widget (GTK_WIDGET (combobox), "startEntry");
+    GtkWidget *repeat = lookup_widget (GTK_WIDGET (combobox), "startOccurance");
     updateTypeChangeEntry(combobox, entry, repeat);
-    updateRegExWizard(GTK_WIDGET(combobox));
+    updateRegExWizard(GTK_WIDGET (combobox));
 }
 
 
@@ -776,7 +777,7 @@ void
 on_startEntry_changed                  (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(editable));
+    updateRegExWizard(GTK_WIDGET (editable));
 }
 
 
@@ -784,7 +785,7 @@ void
 on_startOccurance_changed              (GtkComboBox     *combobox,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(combobox));
+    updateRegExWizard(GTK_WIDGET (combobox));
 }
 
 
@@ -792,11 +793,11 @@ void
 on_midType_changed                     (GtkComboBox     *combobox,
                                         gpointer         user_data)
 {
-    GtkWidget *entry = lookup_widget(GTK_WIDGET(combobox), "midEntry");
-    GtkWidget *repeat = lookup_widget(GTK_WIDGET(combobox), "midOccurance");
+    GtkWidget *entry = lookup_widget (GTK_WIDGET (combobox), "midEntry");
+    GtkWidget *repeat = lookup_widget (GTK_WIDGET (combobox), "midOccurance");
 
     updateTypeChangeEntry(combobox, entry, repeat);
-    updateRegExWizard(GTK_WIDGET(combobox));
+    updateRegExWizard(GTK_WIDGET (combobox));
     
 }
 
@@ -805,7 +806,7 @@ void
 on_midEntry_changed                    (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(editable));
+    updateRegExWizard(GTK_WIDGET (editable));
 }
 
 
@@ -813,7 +814,7 @@ void
 on_midOccurance_changed                (GtkComboBox     *combobox,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(combobox));
+    updateRegExWizard(GTK_WIDGET (combobox));
 }
 
 
@@ -821,10 +822,10 @@ void
 on_endType_changed                     (GtkComboBox     *combobox,
                                         gpointer         user_data)
 {
-    GtkWidget *entry = lookup_widget(GTK_WIDGET(combobox), "endEntry");
-    GtkWidget *repeat = lookup_widget(GTK_WIDGET(combobox), "endOccurance");
+    GtkWidget *entry = lookup_widget (GTK_WIDGET (combobox), "endEntry");
+    GtkWidget *repeat = lookup_widget (GTK_WIDGET (combobox), "endOccurance");
     updateTypeChangeEntry(combobox, entry, repeat);
-    updateRegExWizard(GTK_WIDGET(combobox));
+    updateRegExWizard(GTK_WIDGET (combobox));
 }
 
 
@@ -832,7 +833,7 @@ void
 on_endEntry_changed                    (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(editable));
+    updateRegExWizard(GTK_WIDGET (editable));
 }
 
 
@@ -840,7 +841,7 @@ void
 on_endOccurance_changed                (GtkComboBox     *combobox,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(combobox));
+    updateRegExWizard(GTK_WIDGET (combobox));
 }
 
 
@@ -854,7 +855,7 @@ on_regExpWizard1_clicked               (GtkButton       *button,
         g_object_set_data(G_OBJECT(fileRegexWizard), "regexType", (gpointer)FILE_REGEX_TYPE); /* file type */
         gtk_widget_show(fileRegexWizard);
     } else {
-        gtk_widget_grab_focus(lookup_widget(fileRegexWizard, "startEntry"));
+        gtk_widget_grab_focus(lookup_widget (fileRegexWizard, "startEntry"));
     }
 }
 
@@ -869,7 +870,7 @@ on_regExpWizard2_clicked               (GtkButton       *button,
         g_object_set_data(G_OBJECT(contextRegexWizard), "regexType", (gpointer)CONTEXT_REGEX_TYPE); /* file type */
         gtk_widget_show(contextRegexWizard);
     } else {
-        gtk_widget_grab_focus(lookup_widget(contextRegexWizard, "startEntry"));
+        gtk_widget_grab_focus(lookup_widget (contextRegexWizard, "startEntry"));
     }
 }
 
@@ -878,7 +879,7 @@ void
 on_convertRegex_toggled                (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
-    updateRegExWizard(GTK_WIDGET(togglebutton));
+    updateRegExWizard(GTK_WIDGET (togglebutton));
 }
 
 
@@ -886,12 +887,12 @@ void
 on_addMidContents_clicked              (GtkButton       *button,
                                         gpointer         user_data)
 {
-    GtkComboBox *type = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midType"));    
-    GtkEntry *entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midEntry"));
-    GtkComboBox *repeat = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midOccurance"));
-    GtkEntry *iterStr = GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection"));
+    GtkComboBox *type = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midType"));    
+    GtkEntry *entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midEntry"));
+    GtkComboBox *repeat = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midOccurance"));
+    GtkEntry *iterStr = GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection"));
     
-    appendTableRow(lookup_widget(GTK_WIDGET(button), "midTreeView"),
+    appendTableRow(lookup_widget (GTK_WIDGET (button), "midTreeView"),
                    5,
                    gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(type)),
                    gtk_entry_get_text(entry),
@@ -902,8 +903,8 @@ on_addMidContents_clicked              (GtkButton       *button,
     gtk_entry_set_text(entry, "");
     gtk_combo_box_set_active(repeat, 0);
     gtk_entry_set_text(iterStr, "");
-    gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(button), "deleteSelectedContents"), TRUE);
-    gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(button), "modifiedSelectedContents"), TRUE);
+    gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (button), "deleteSelectedContents"), TRUE);
+    gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (button), "modifiedSelectedContents"), TRUE);
 }
 
 
@@ -911,7 +912,7 @@ void
 on_modifiedSelectedContents_clicked    (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GtkTreeView *treeview = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(button), "midTreeView"));
+  GtkTreeView *treeview = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (button), "midTreeView"));
   GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
   GtkTreeIter iter;
   GtkTreeModel *model;
@@ -930,14 +931,14 @@ on_modifiedSelectedContents_clicked    (GtkButton       *button,
                         REGEX_REPEAT_INT_COLUMN, &repeat,
                         -1);
     
-    gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midType")), type);
-    gtk_entry_set_text(GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midEntry")), entry);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midOccurance")), repeat);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midType")), type);
+    gtk_entry_set_text(GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midEntry")), entry);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midOccurance")), repeat);
     g_free (entry);
 
     iterStr = gtk_tree_model_get_string_from_iter (model, &iter);
     if (iterStr != NULL) {
-      gtk_entry_set_text(GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection")), iterStr);
+      gtk_entry_set_text(GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection")), iterStr);
       g_free(iterStr);
     }
     
@@ -949,14 +950,14 @@ void
 on_deleteSelectedContents_clicked      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GtkTreeView *treeview = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(button), "midTreeView"));
+  GtkTreeView *treeview = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (button), "midTreeView"));
   GtkTreeSelection *selection = gtk_tree_view_get_selection (treeview);
   GtkTreeIter iter;
   GtkTreeModel *model;
-  GtkComboBox *type = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midType"));    
-  GtkEntry *entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midEntry"));
-  GtkEntry *iterC = GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection"));
-  GtkComboBox *repeat = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midOccurance"));
+  GtkComboBox *type = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midType"));    
+  GtkEntry *entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midEntry"));
+  GtkEntry *iterC = GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection"));
+  GtkComboBox *repeat = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midOccurance"));
   
   if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
@@ -966,10 +967,10 @@ on_deleteSelectedContents_clicked      (GtkButton       *button,
     gtk_entry_set_text(iterC, "");
   }
   if (gtk_tree_model_iter_n_children (model, NULL) <= 0) {
-    gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(button), "modifiedSelectedContents"), FALSE);
-    gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(button), "deleteSelectedContents"), FALSE);
+    gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (button), "modifiedSelectedContents"), FALSE);
+    gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (button), "deleteSelectedContents"), FALSE);
   }
-  updateRegExWizard(GTK_WIDGET(button));
+  updateRegExWizard(GTK_WIDGET (button));
 }
 
 /* Regex Wizard : middle part of the expression */
@@ -1012,14 +1013,14 @@ void
 on_updateSelectedContents_clicked      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GtkTreeView *treeview = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(button), "midTreeView"));
+  GtkTreeView *treeview = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (button), "midTreeView"));
   GtkTreeIter iter;
   GtkTreeModel *model = gtk_tree_view_get_model (treeview);
-  GtkComboBox *type = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midType"));    
-  GtkEntry *entry = GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midEntry"));
-  GtkEntry *iterC = GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection"));
-  GtkComboBox *repeat = GTK_COMBO_BOX(lookup_widget(GTK_WIDGET(button), "midOccurance"));
-  const gchar *iterStr = gtk_entry_get_text(GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection")));
+  GtkComboBox *type = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midType"));    
+  GtkEntry *entry = GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midEntry"));
+  GtkEntry *iterC = GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection"));
+  GtkComboBox *repeat = GTK_COMBO_BOX(lookup_widget (GTK_WIDGET (button), "midOccurance"));
+  const gchar *iterStr = gtk_entry_get_text(GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection")));
 
   g_assert (treeview != NULL);
   g_assert (model != NULL);
@@ -1036,14 +1037,14 @@ on_updateSelectedContents_clicked      (GtkButton       *button,
   if (gtk_combo_box_get_active(type) == REGWIZ_DONT_KNOW) {
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
     if (gtk_tree_model_iter_n_children (model, NULL) <= 0) {
-      gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(button), "modifiedSelectedContents"), FALSE);
-      gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(button), "deleteSelectedContents"), FALSE);
+      gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (button), "modifiedSelectedContents"), FALSE);
+      gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (button), "deleteSelectedContents"), FALSE);
     }
     gtk_combo_box_set_active(type, 0);
     gtk_entry_set_text(entry, "");
     gtk_combo_box_set_active(repeat, 0);
     gtk_entry_set_text(iterC, "");
-    gtk_entry_set_text(GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection")), "");
+    gtk_entry_set_text(GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection")), "");
     return; /* Delete entry instead */
   }
     
@@ -1058,7 +1059,7 @@ on_updateSelectedContents_clicked      (GtkButton       *button,
     gtk_entry_set_text(entry, "");
     gtk_combo_box_set_active(repeat, 0);
     gtk_entry_set_text(iterC, "");
-    gtk_entry_set_text(GTK_ENTRY(lookup_widget(GTK_WIDGET(button), "midSelection")), "");
+    gtk_entry_set_text(GTK_ENTRY(lookup_widget (GTK_WIDGET (button), "midSelection")), "");
 }
 
 
@@ -1069,9 +1070,9 @@ on_midSelection_changed                (GtkEditable     *editable,
   const gchar *selection = gtk_entry_get_text(GTK_ENTRY(editable));
   
   if (*selection != '\0') {
-    gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(editable), "updateSelectedContents"), TRUE);
+    gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (editable), "updateSelectedContents"), TRUE);
   } else {
-    gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(editable), "updateSelectedContents"), FALSE);
+    gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (editable), "updateSelectedContents"), FALSE);
   }
 }
 
@@ -1088,12 +1089,12 @@ on_expWizard_realize                   (GtkWidget       *widget,
     gtk_window_set_title (GTK_WINDOW (contextRegexWizard), _("Context Expression Wizard"));
   }
   
-  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "startType")), REGWIZ_DONT_KNOW);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "startOccurance")), REGWIZ_REPEAT_ONCE);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "midType")), REGWIZ_DONT_KNOW);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "midOccurance")), REGWIZ_REPEAT_ONCE);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "endType")), REGWIZ_DONT_KNOW);
-  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "endOccurance")), REGWIZ_REPEAT_ONCE);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "startType")), REGWIZ_DONT_KNOW);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "startOccurance")), REGWIZ_REPEAT_ONCE);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "midType")), REGWIZ_DONT_KNOW);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "midOccurance")), REGWIZ_REPEAT_ONCE);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "endType")), REGWIZ_DONT_KNOW);
+  gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "endOccurance")), REGWIZ_REPEAT_ONCE);
 }
 
 
@@ -1119,11 +1120,11 @@ on_autoFindExe_clicked                 (GtkButton       *button,
                                         gpointer         user_data)
 {
   GtkWidget *dialog = create_autoComplete();
-  GtkProgressBar *pbar = GTK_PROGRESS_BAR(lookup_widget(dialog, "progressbar3"));
+  GtkProgressBar *pbar = GTK_PROGRESS_BAR(lookup_widget (dialog, "progressbar3"));
   userExeData *exeData = g_malloc0(sizeof(userExeData));
 
   /* Attach data to the dialog */
-  exeData->parent = GTK_WIDGET(button);
+  exeData->parent = GTK_WIDGET (button);
   gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
   gtk_progress_bar_set_fraction(pbar, 0);
   gtk_progress_bar_set_text(pbar, _("0%"));
@@ -1150,7 +1151,7 @@ on_configResetAll_clicked              (GtkButton       *button,
                                         gpointer         user_data)
 {
   gchar *searchmonkeyExe = g_object_get_data(G_OBJECT(mainWindowApp), "argvPointer");
-  GtkWidget *confirmDialog = gtk_message_dialog_new (GTK_WINDOW(lookup_widget(GTK_WIDGET(button), "configDialog")),
+  GtkWidget *confirmDialog = gtk_message_dialog_new (GTK_WINDOW(lookup_widget (GTK_WIDGET (button), "configDialog")),
                                                      (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
                                                      GTK_MESSAGE_WARNING,
                                                      GTK_BUTTONS_OK_CANCEL,
@@ -1164,7 +1165,7 @@ on_configResetAll_clicked              (GtkButton       *button,
     }
     g_object_set_data(G_OBJECT(mainWindowApp), CONFIG_DISABLE_SAVE_CONFIG_STRING, GINT_TO_POINTER(CONFIG_DISABLE_SAVE_CONFIG));
     g_spawn_command_line_async (searchmonkeyExe, NULL); /* Assume it worked */
-    gtk_dialog_response (GTK_DIALOG(lookup_widget(GTK_WIDGET(button), "configDialog")), GTK_RESPONSE_REJECT);
+    gtk_dialog_response (GTK_DIALOG(lookup_widget (GTK_WIDGET (button), "configDialog")), GTK_RESPONSE_REJECT);
     gtk_main_quit(); /* Exit this instance */
     return;
   }
@@ -1176,13 +1177,13 @@ void
 on_configSaveNow_clicked               (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(mainWindowApp));
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET (mainWindowApp));
 
   /* Immediately unrealize check button */
-  unrealizeToggle(GTK_WIDGET(button), keyString, "configuration", "configPromptSave");
+  unrealizeToggle(GTK_WIDGET (button), keyString, "configuration", "configPromptSave");
   
   storeGKeyFile(keyString);
-  setConfigFileLocation (GTK_WIDGET(button));
+  setConfigFileLocation (GTK_WIDGET (button));
 }
 
 
@@ -1199,7 +1200,7 @@ on_matches1_activate                   (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    columnClick(GTK_WIDGET(menuitem), MATCHES_COUNT_COLUMN);
+    columnClick(GTK_WIDGET (menuitem), MATCHES_COUNT_COLUMN);
   }
 }
 
@@ -1224,7 +1225,7 @@ on_configResultEOL_focus_out_event     (GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data)
 {
-  checkCsvEntry(GTK_ENTRY(lookup_widget(widget, "configResultEOL")));
+  checkCsvEntry(GTK_ENTRY(lookup_widget (widget, "configResultEOL")));
   return FALSE;
 }
 
@@ -1235,7 +1236,7 @@ on_configResultEOF_focus_out_event     (GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data)
 {
-  checkCsvEntry(GTK_ENTRY(lookup_widget(widget, "configResultEOF")));
+  checkCsvEntry(GTK_ENTRY(lookup_widget (widget, "configResultEOF")));
   return FALSE;
 }
 
@@ -1246,7 +1247,7 @@ on_configResultDelimiter_focus_out_event
                                         GdkEventFocus   *event,
                                         gpointer         user_data)
 {
-  checkCsvEntry(GTK_ENTRY(lookup_widget(widget, "configResultDelimiter")));
+  checkCsvEntry(GTK_ENTRY(lookup_widget (widget, "configResultDelimiter")));
   return FALSE;
 }
 
@@ -1263,7 +1264,7 @@ void
 on_playButton_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  start_search_thread(GTK_WIDGET(menuitem));
+  start_search_thread(GTK_WIDGET (menuitem));
 }
 
 
@@ -1271,7 +1272,7 @@ void
 on_stopButton_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  stop_search_thread(GTK_WIDGET(menuitem));
+  stop_search_thread(GTK_WIDGET (menuitem));
 }
 
 
@@ -1280,7 +1281,7 @@ on_horizontal_results1_activate        (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    setResultsViewHorizontal(GTK_WIDGET(menuitem), TRUE);
+    setResultsViewHorizontal(GTK_WIDGET (menuitem), TRUE);
   }
 }
 
@@ -1290,7 +1291,7 @@ on_vertical_results1_activate          (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 { 
   if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem))) {
-    setResultsViewHorizontal(GTK_WIDGET(menuitem), FALSE); /* default to vertical */
+    setResultsViewHorizontal(GTK_WIDGET (menuitem), FALSE); /* default to vertical */
   }
 }
 
@@ -1309,7 +1310,7 @@ void
 on_playButton_clicked                  (GtkButton       *button,
                                         gpointer         user_data)
 {
-  start_search_thread(GTK_WIDGET(button));
+  start_search_thread(GTK_WIDGET (button));
 }
 
 
@@ -1317,7 +1318,7 @@ void
 on_stopButton_clicked                  (GtkButton       *button,
                                         gpointer         user_data)
 {
-  stop_search_thread(GTK_WIDGET(button));
+  stop_search_thread(GTK_WIDGET (button));
 }
 
 
@@ -1326,12 +1327,12 @@ void
 on_autosize_columns_activate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
-  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(mainWindowApp));
+  GKeyFile *keyString = getGKeyFile(GTK_WIDGET (mainWindowApp));
   gboolean autoColumnWidth = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem));
 
   g_assert(keyString != NULL);
   
-  realizeTreeviewColumns (GTK_WIDGET(mainWindowApp), keyString, "history", "treeview", autoColumnWidth);  
+  realizeTreeviewColumns (GTK_WIDGET (mainWindowApp), keyString, "history", "treeview", autoColumnWidth);  
 }
 
 /* surprise : menu empty at last 2017
@@ -1346,10 +1347,10 @@ on_edit_file1_activate                 (GtkMenuItem     *menuitem,
  GtkTreeView *treeView;
  gchar *fullFileName;
   
-  if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview1"));
+  if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview1"));
   } else {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview2"));
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview2"));
   }
   fullFileName = getFullFileName(treeView, FULL_FILENAME_COLUMN);
 
@@ -1372,10 +1373,10 @@ on_open_folder1_activate               (GtkMenuItem     *menuitem,
  GtkTreeView *treeView;
   gchar *location;
   
-  if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview1"));
+  if (getResultsViewHorizontal(GTK_WIDGET (menuitem))) {
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview1"));
   } else {
-    treeView = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(menuitem), "treeview2"));
+    treeView = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET (menuitem), "treeview2"));
   }
   location = getFullFileName(treeView, LOCATION_COLUMN);
 
@@ -1392,9 +1393,9 @@ on_folderDepthCheck_toggled            (GtkToggleButton *togglebutton,
 {
   gboolean checked = gtk_toggle_button_get_active(togglebutton);
 
-  gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "folderDepthSpin"), checked); /* Control spin sensitivity */
+  gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (togglebutton), "folderDepthSpin"), checked); /* Control spin sensitivity */
   if (checked) { /* Re-enable folder recursion enable, if depth set */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(togglebutton), "searchSubfoldersCheck")), TRUE);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (togglebutton), "searchSubfoldersCheck")), TRUE);
   }
 }
 
@@ -1404,7 +1405,7 @@ on_searchSubfoldersCheck_toggled       (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
   if (!gtk_toggle_button_get_active(togglebutton)) { /* Disable depth limit, if recurse disabled */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(togglebutton), "folderDepthCheck")), FALSE);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (togglebutton), "folderDepthCheck")), FALSE);
   }
 }
 
@@ -1413,10 +1414,10 @@ void
 on_dosExpressionRadioFile_clicked      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(GTK_WIDGET(button), "statusbar1"));
+  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget (GTK_WIDGET (button), "statusbar1"));
   gchar *tmpstr;
-  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(GTK_WIDGET(button), "maxHitsSpinResults")));
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(button), "limitResultsCheckResults")))) {
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget (GTK_WIDGET (button), "maxHitsSpinResults")));
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (button), "limitResultsCheckResults")))) {
        tmpstr= g_strdup_printf(_("/Max hits limit:%d"), tmpLimit);
   }
   else {
@@ -1424,10 +1425,10 @@ on_dosExpressionRadioFile_clicked      (GtkButton       *button,
   }
 
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
-    changeModel(GTK_WIDGET(button), "regex", "noregex");
+    changeModel(GTK_WIDGET (button), "regex", "noregex");
   }
   gtk_statusbar_pop(statusbar, STATUSBAR_CONTEXT_ID(statusbar));  
-  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(GTK_WIDGET(button), "dosExpressionRadioFile"))))
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget (GTK_WIDGET (button), "dosExpressionRadioFile"))))
     {        
         gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
                      g_strdup_printf(_("%s/research mode with jokers(DOS like)"), tmpstr));
@@ -1443,7 +1444,7 @@ on_regularExpressionRadioFile_clicked  (GtkButton       *button,
                                         gpointer         user_data)
 {
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) {
-    changeModel(GTK_WIDGET(button), "noregex", "regex");
+    changeModel(GTK_WIDGET (button), "noregex", "regex");
   }
 }
 
@@ -1454,27 +1455,27 @@ on_IntervalStartBtn_clicked            (GtkButton       *button,
   GDate date_interval1, date_interval2;
   gboolean fErrDateInterval1 = FALSE;
   gboolean fErrDateInterval2 = FALSE;
-  GtkWidget *dateEntry = lookup_widget(GTK_WIDGET(button), "intervalStartEntry");
-  gchar* newDate = getDate(gtk_button_get_label(dateEntry), lookup_widget(GTK_WIDGET(button), "window1"));
-  gtk_button_set_label(dateEntry, newDate);
+  GtkWidget *dateEntry = lookup_widget (GTK_WIDGET (button), "intervalStartEntry");
+  gchar* newDate = getDate (gtk_button_get_label (GTK_BUTTON(dateEntry)), lookup_widget (GTK_WIDGET (button), "window1"));
+  gtk_button_set_label (GTK_BUTTON (dateEntry), newDate);
 
  /* we must check if dates aren't inverted */
 
-  gchar *endDate=NULL;
-  endDate = gtk_button_get_label(lookup_widget(GTK_WIDGET(button), "intervalEndEntry"));
-  g_date_set_parse(&date_interval1, newDate);
-  g_date_set_parse(&date_interval2, endDate);
+  const gchar *endDate = NULL;
+  endDate = gtk_button_get_label (GTK_BUTTON(lookup_widget (GTK_WIDGET (button), "intervalEndEntry")));
+  g_date_set_parse (&date_interval1, newDate);
+  g_date_set_parse (&date_interval2, endDate);
   fErrDateInterval1 = g_date_valid(&date_interval1);
   if(!fErrDateInterval1)
-      printf("Internal erreor date Interv 1\n");
+      printf ("Internal erreor date Interv 1\n");
   fErrDateInterval2 = g_date_valid(&date_interval2);  
   if(!fErrDateInterval2)
-      printf("Internal error date Interv 2\n");
+      printf ("Internal error date Interv 2\n");
   gint cmp_date = g_date_compare (&date_interval1,&date_interval2);
   if(cmp_date>0)
     {
-       miscErrorDialog(lookup_widget(GTK_WIDGET(button), "window1"), _("<b>Error!</b>\n\nDates mismatch ! 'Before than' date must be <i>more recent</i> than 'After than' date.\n\nPlease check the dates."));
-       gtk_button_set_label(lookup_widget(GTK_WIDGET(button), "intervalStartEntry"), endDate);
+       miscErrorDialog (lookup_widget (GTK_WIDGET (button), "window1"), _("<b>Error!</b>\n\nDates mismatch ! 'Before than' date must be <i>more recent</i> than 'After than' date.\n\nPlease check the dates."));
+       gtk_button_set_label (GTK_BUTTON(lookup_widget (GTK_WIDGET (button), "intervalStartEntry")), endDate);
     }
 
   g_free(newDate);
@@ -1488,26 +1489,26 @@ on_IntervalEndBtn_clicked            (GtkButton       *button,
   GDate date_interval1, date_interval2;
   gboolean fErrDateInterval1 = FALSE;
   gboolean fErrDateInterval2 = FALSE;
-  GtkWidget *dateEntry = lookup_widget(GTK_WIDGET(button), "intervalEndEntry");
-  gchar* newDate = getDate(gtk_button_get_label(dateEntry), lookup_widget(GTK_WIDGET(button), "window1"));
-  gtk_button_set_label(dateEntry, newDate);
+  GtkWidget *dateEntry = lookup_widget (GTK_WIDGET (button), "intervalEndEntry");
+  gchar* newDate = getDate (gtk_button_get_label (GTK_BUTTON(dateEntry)), lookup_widget (GTK_WIDGET (button), "window1"));
+  gtk_button_set_label (GTK_BUTTON (dateEntry), newDate);
 
  /* we must check if dates aren't inverted */
-  gchar *startDate=NULL;
-  startDate = gtk_button_get_label(lookup_widget(GTK_WIDGET(button), "intervalStartEntry"));
-  g_date_set_parse(&date_interval1, startDate);
-  g_date_set_parse(&date_interval2, newDate);
-  fErrDateInterval1 = g_date_valid(&date_interval1);
+  const gchar *startDate=NULL;
+  startDate = gtk_button_get_label (GTK_BUTTON(lookup_widget (GTK_WIDGET (button), "intervalStartEntry")));
+  g_date_set_parse (&date_interval1, startDate);
+  g_date_set_parse (&date_interval2, newDate);
+  fErrDateInterval1 = g_date_valid (&date_interval1);
   if(!fErrDateInterval1)
       printf("Internal error date Interv 1\n");
-  fErrDateInterval2 = g_date_valid(&date_interval2);  
+  fErrDateInterval2 = g_date_valid (&date_interval2);  
   if(!fErrDateInterval2)
       printf("Internal error date Interv 2\n");
   gint cmp_date = g_date_compare (&date_interval1,&date_interval2);
   if(cmp_date>0)
     {
-       miscErrorDialog(lookup_widget(GTK_WIDGET(button), "window1"), _("<b>Error!</b>\n\nDates mismatch ! 'Before than' date must be <i>more recent</i> than 'After than' date.\n\nPlease check the dates."));
-       gtk_button_set_label(lookup_widget(GTK_WIDGET(button), "intervalEndEntry"), startDate);
+       miscErrorDialog (lookup_widget (GTK_WIDGET (button), "window1"), _("<b>Error!</b>\n\nDates mismatch ! 'Before than' date must be <i>more recent</i> than 'After than' date.\n\nPlease check the dates."));
+       gtk_button_set_label (GTK_BUTTON (GTK_BUTTON(lookup_widget (GTK_WIDGET (button), "intervalEndEntry"))), startDate);
     }
 
   g_free(newDate);
@@ -1517,9 +1518,9 @@ void
 on_afterCalenderBtn_clicked            (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GtkWidget *dateEntry = lookup_widget(GTK_WIDGET(button), "afterEntry");
-  gchar* newDate = getDate(gtk_button_get_label(dateEntry), lookup_widget(GTK_WIDGET(button), "window1"));
-  gtk_button_set_label(dateEntry, newDate);
+  GtkWidget *dateEntry = lookup_widget (GTK_WIDGET (button), "afterEntry");
+  gchar* newDate = getDate (gtk_button_get_label (GTK_BUTTON(dateEntry)), lookup_widget (GTK_WIDGET (button), "window1"));
+  gtk_button_set_label (GTK_BUTTON(dateEntry), newDate);
   g_free(newDate);
 }
 
@@ -1528,9 +1529,9 @@ void
 on_beforeCalendatBtn_clicked           (GtkButton       *button,
                                         gpointer         user_data)
 {
-  GtkWidget *dateEntry = lookup_widget(GTK_WIDGET(button), "beforeEntry");
-  gchar* newDate = getDate(gtk_button_get_label(dateEntry),lookup_widget(GTK_WIDGET(button), "window1"));
-  gtk_button_set_label(dateEntry, newDate);
+  GtkWidget *dateEntry = lookup_widget (GTK_WIDGET (button), "beforeEntry");
+  gchar* newDate = getDate (gtk_button_get_label (GTK_BUTTON(dateEntry)),lookup_widget (GTK_WIDGET (button), "window1"));
+  gtk_button_set_label (GTK_BUTTON(dateEntry), newDate);
   g_free(newDate);
 }
 
@@ -1566,7 +1567,7 @@ gboolean on_folder_focus_out_event(GtkWidget       *widget,
 
  filename = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
  /* we must change the tooltip */
- gtk_widget_set_tooltip_text (GTK_WIDGET(lookup_widget(GTK_WIDGET(widget), "lookIn")),filename ); 
+ gtk_widget_set_tooltip_text (GTK_WIDGET (lookup_widget (GTK_WIDGET (widget), "lookIn")),filename ); 
  return FALSE;
 }
 
@@ -1581,8 +1582,8 @@ gboolean  on_folder_query_tooltip_event(GtkWidget  *widget,
 
  filename = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(widget));
  /* we must change the tooltip */
- gtk_tooltip_set_markup (GTK_TOOLTIP(tooltip),g_strconcat(_("<b><u>Look in :</u></b>\n") ,filename, NULL) ); 
- gtk_tooltip_set_icon_from_icon_name (GTK_TOOLTIP(tooltip),
+ gtk_tooltip_set_markup (GTK_TOOLTIP (tooltip), g_strconcat(_("<b><u>Look in :</u></b>\n") ,filename, NULL)); 
+ gtk_tooltip_set_icon_from_icon_name (GTK_TOOLTIP (tooltip),
                                      "gtk-open",
                                      GTK_ICON_SIZE_DIALOG);
  
@@ -1598,7 +1599,7 @@ on_regexp_focus_out_event              (GtkWidget       *widget,
   guint flags;
   gchar* error = _("Error! Invalid 'file name' regular expression");
   
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "regularExpressionRadioFile")))) {
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget (widget, "regularExpressionRadioFile")))) {
     if (getExtendedRegexMode(widget)) {
       flags |= REG_EXTENDED;
     }
@@ -1642,17 +1643,17 @@ on_limitResultsCheckResults_toggled    (GtkToggleButton *togglebutton,
 {
   gchar *tmpstr;
   gboolean active = gtk_toggle_button_get_active(togglebutton);
-  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(GTK_WIDGET(togglebutton), "statusbar1"));
-  gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "limit_results_hbox"), active);
+  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget (GTK_WIDGET (togglebutton), "statusbar1"));
+  gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (togglebutton), "limit_results_hbox"), active);
 
-  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(GTK_WIDGET(togglebutton), "maxHitsSpinResults")));
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(GTK_WIDGET(togglebutton), "limitResultsCheckResults")))) {
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget (GTK_WIDGET (togglebutton), "maxHitsSpinResults")));
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget (GTK_WIDGET (togglebutton), "limitResultsCheckResults")))) {
        tmpstr= g_strdup_printf(_("/Max hits limit:%d"), tmpLimit);
   }
   else {
        tmpstr=  g_strdup_printf(_("/No Max hits limit"));
   }
-  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(GTK_WIDGET(togglebutton), "dosExpressionRadioFile"))))
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget (GTK_WIDGET (togglebutton), "dosExpressionRadioFile"))))
     {        
         gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar),
                      g_strdup_printf(_("%s/research mode with jokers(DOS like)"), tmpstr));
@@ -1668,7 +1669,7 @@ on_showLinesCheckResults_toggled       (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
   gboolean active = gtk_toggle_button_get_active(togglebutton);
-  gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "show_line_contents_hbox"), active);
+  gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (togglebutton), "show_line_contents_hbox"), active);
 }
 
 
@@ -1678,7 +1679,7 @@ on_limitContentsCheckResults_toggled   (GtkToggleButton *togglebutton,
                                         gpointer         user_data)
 {
   gboolean active = gtk_toggle_button_get_active(togglebutton);
-  gtk_widget_set_sensitive(lookup_widget(GTK_WIDGET(togglebutton), "limit_contents_hbox"), active);	
+  gtk_widget_set_sensitive(lookup_widget (GTK_WIDGET (togglebutton), "limit_contents_hbox"), active);	
 }
 
 
@@ -1689,15 +1690,15 @@ on_autoComplete_response               (GtkDialog       *dialog,
 {
   userExeData *exeData = g_object_get_data(G_OBJECT(dialog), "exeData");
   GtkWidget *parent = exeData->parent;
-  GtkWidget *widget = GTK_WIDGET(dialog);
+  GtkWidget *widget = GTK_WIDGET (dialog);
   GtkWidget *choosers[3];
   gint i,j;
 
   if (response_id == GTK_RESPONSE_OK) { /* Can only happen with valid data.. */
     /* Store new values into configuration */  
-    choosers[BROWSER_LIST] = lookup_widget(parent, "configWebBrowser");
-    choosers[TEXTEDITOR_LIST] = lookup_widget(parent, "configTextEditor");
-    choosers[FILEEXPLORER_LIST] = lookup_widget(parent, "configFileExplorer");
+    choosers[BROWSER_LIST] = lookup_widget (parent, "configWebBrowser");
+    choosers[TEXTEDITOR_LIST] = lookup_widget (parent, "configTextEditor");
+    choosers[FILEEXPLORER_LIST] = lookup_widget (parent, "configFileExplorer");
     for (j=0; j<G_EXE_LIST_MAX_DEPTH; j++) {
       for (i=0; i<G_EXE_LIST_MAX_WIDTH; i++) {
         if (exeData->retStr[j][i] != NULL) {
@@ -1711,7 +1712,7 @@ on_autoComplete_response               (GtkDialog       *dialog,
   }
 
   /* Clean exit */
-  gtk_widget_destroy(GTK_WIDGET(dialog));
+  gtk_widget_destroy(GTK_WIDGET (dialog));
 }
 
 /*************************************************
@@ -1723,7 +1724,7 @@ gboolean on_entrySince_value_changed_event   (GtkWidget       *widget,
                                         GdkEventFocus   *event,
                                         gpointer         user_data)
 {
-  gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(lookup_widget(GTK_WIDGET(widget), "sinceUnits")));
+  gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (lookup_widget (GTK_WIDGET (widget), "sinceUnits")));
 
   g_free(test);
   return FALSE;
@@ -1751,11 +1752,11 @@ void radio_button_selected (GtkWidget *widget, gpointer data)
     }
 
   /* now we deactivate options for all OTHERS lines of Widgets */
-  buttonAfter = GTK_BUTTON(lookup_widget(GTK_WIDGET(widget), "afterEntry"));/* code 3*/
-  buttonBefore = GTK_BUTTON(lookup_widget(GTK_WIDGET(widget), "beforeEntry"));/* code 2 */
-  gridSince = lookup_widget(GTK_WIDGET(widget), "gridSince");/* code 0 */
-  buttonInterval1 = GTK_BUTTON(lookup_widget(GTK_WIDGET(widget), "intervalStartEntry"));/* code 1 */
-  buttonInterval2 = GTK_BUTTON(lookup_widget(GTK_WIDGET(widget), "intervalEndEntry"));
+  buttonAfter = GTK_WIDGET (lookup_widget (GTK_WIDGET (widget), "afterEntry"));/* code 3*/
+  buttonBefore = GTK_WIDGET (lookup_widget (GTK_WIDGET (widget), "beforeEntry"));/* code 2 */
+  gridSince = lookup_widget (GTK_WIDGET (widget), "gridSince");/* code 0 */
+  buttonInterval1 = GTK_WIDGET (lookup_widget (GTK_WIDGET (widget), "intervalStartEntry"));/* code 1 */
+  buttonInterval2 = GTK_WIDGET (lookup_widget (GTK_WIDGET (widget), "intervalEndEntry"));
   gtk_widget_set_sensitive (buttonAfter, FALSE);
   gtk_widget_set_sensitive (buttonBefore, FALSE);
   gtk_widget_set_sensitive (gridSince, FALSE);
@@ -1764,19 +1765,19 @@ void radio_button_selected (GtkWidget *widget, gpointer data)
 
   switch(i) {
      case 0:{ gtk_widget_set_sensitive (gridSince, TRUE);
-              gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT( lookup_widget(GTK_WIDGET(widget), "sinceUnits")  ));
+              gchar *test = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT( lookup_widget (GTK_WIDGET (widget), "sinceUnits")  ));
               val_spin = g_strdup_printf("%d", 
                              gtk_spin_button_get_value_as_int(
-                                   GTK_SPIN_BUTTON(lookup_widget(GTK_WIDGET(widget), "entrySince")) ) );
-              g_free(test);
-              g_free(val_spin);
+                                   GTK_SPIN_BUTTON(lookup_widget (GTK_WIDGET (widget), "entrySince")) ) );
+              g_free (test);
+              g_free (val_spin);
               break;}
-     case 1:{gtk_widget_set_sensitive (buttonInterval1, TRUE);  
-             gtk_widget_set_sensitive (buttonInterval2, TRUE);
+     case 1:{gtk_widget_set_sensitive (GTK_WIDGET(buttonInterval1), TRUE);  
+             gtk_widget_set_sensitive (GTK_WIDGET(buttonInterval2), TRUE);
              break;}
-     case 2:{gtk_widget_set_sensitive (buttonBefore, TRUE);
+     case 2:{gtk_widget_set_sensitive (GTK_WIDGET(buttonBefore), TRUE);
               break;}
-     case 3:{gtk_widget_set_sensitive (buttonAfter, TRUE);             
+     case 3:{gtk_widget_set_sensitive (GTK_WIDGET(buttonAfter), TRUE);             
             break;}
      case 4:{break;}
      case 5:{break;}
@@ -1790,7 +1791,7 @@ on_radiobuttonAll_toggled      (GtkButton       *button,
                                         gpointer         user_data)
 {
 
-  radio_button_selected(button, NULL);
+  radio_button_selected (GTK_WIDGET(button), NULL);
 }
 
 void
@@ -1798,7 +1799,7 @@ on_radiobuttonToday_toggled      (GtkButton       *button,
                                         gpointer         user_data)
 {
 
-  radio_button_selected(button, NULL);
+  radio_button_selected (GTK_WIDGET(button), NULL);
 
 }
 
@@ -1806,28 +1807,28 @@ void
 on_radiobuttonAfter_toggled      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  radio_button_selected(button, NULL);
+  radio_button_selected (GTK_WIDGET(button), NULL);
 }
 
 void
 on_radiobuttonBefore_toggled      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  radio_button_selected(button, NULL);
+  radio_button_selected (GTK_WIDGET(button), NULL);
 }
 
 void
 on_radiobuttonInterval_toggled      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  radio_button_selected(button, NULL);
+  radio_button_selected (GTK_WIDGET(button), NULL);
 }
 
 void
 on_radiobuttonSince_toggled      (GtkButton       *button,
                                         gpointer         user_data)
 {
-  radio_button_selected(button, NULL);
+  radio_button_selected (GTK_WIDGET(button), NULL);
 }
 
 
@@ -1845,9 +1846,9 @@ void expander_callback (GObject    *object,
   GtkWidget *gridExp;
 
   expander = GTK_EXPANDER (object);
-  label =  GTK_LABEL(lookup_widget(GTK_WIDGET(expander), "label_expander"));
-  iconExp = lookup_widget(GTK_WIDGET(expander), "iconExpander");
-  gridExp = lookup_widget(GTK_WIDGET(expander), "gridExpander");
+  label =  GTK_LABEL(lookup_widget (GTK_WIDGET (expander), "label_expander"));
+  iconExp = lookup_widget (GTK_WIDGET (expander), "iconExpander");
+  gridExp = lookup_widget (GTK_WIDGET (expander), "gridExpander");
 
   if (gtk_expander_get_expanded (expander))
     {
@@ -1877,19 +1878,19 @@ void expander_callback (GObject    *object,
 void on_advancedMode_event(GtkSwitch *widget,
                gpointer   user_data)
 {
-   GtkWidget *expander = lookup_widget(GTK_WIDGET(widget), "expander_options");
-   GtkWidget *btnWizar1 = lookup_widget(GTK_WIDGET(widget), "regExpWizard1");
-   GtkWidget *btnWizar2 = lookup_widget(GTK_WIDGET(widget), "regExpWizard2");
+   GtkWidget *expander = lookup_widget (GTK_WIDGET (widget), "expander_options");
+   GtkWidget *btnWizar1 = lookup_widget (GTK_WIDGET (widget), "regExpWizard1");
+   GtkWidget *btnWizar2 = lookup_widget (GTK_WIDGET (widget), "regExpWizard2");
 
    if(gtk_switch_get_active (GTK_SWITCH(widget))) {
-       gtk_widget_set_sensitive(GTK_WIDGET(expander) , TRUE);
-       gtk_widget_set_sensitive(GTK_WIDGET(btnWizar1) , TRUE);
-       gtk_widget_set_sensitive(GTK_WIDGET(btnWizar2) , TRUE);
+       gtk_widget_set_sensitive(GTK_WIDGET (expander) , TRUE);
+       gtk_widget_set_sensitive(GTK_WIDGET (btnWizar1) , TRUE);
+       gtk_widget_set_sensitive(GTK_WIDGET (btnWizar2) , TRUE);
    }
    else {
     gtk_expander_set_expanded (GTK_EXPANDER(expander), FALSE);
-    gtk_widget_set_sensitive(GTK_WIDGET(expander) , FALSE);
-    gtk_widget_set_sensitive(GTK_WIDGET(btnWizar1) , FALSE);
-    gtk_widget_set_sensitive(GTK_WIDGET(btnWizar2) , FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET (expander) , FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET (btnWizar1) , FALSE);
+    gtk_widget_set_sensitive(GTK_WIDGET (btnWizar2) , FALSE);
    }
 }
