@@ -17,6 +17,7 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <glib/gstdio.h> /* g_fopen, etc */
+#include <string.h>
 
 #include "interface.h" /* glade requirement */
 #include "support.h" /* glade requirement */
@@ -40,10 +41,10 @@ extern gboolean fStartedSearch;
  */
 void createNewKeyFile(GKeyFile *keyString)
 {
-    gchar* tmpStr = g_strdup_printf(_(" %s settings auto-generated - Do not edit!"), PACKAGE);
+    gchar* tmpStr = g_strdup_printf (_(" %s settings auto-generated - Do not edit!"), PACKAGE);
     g_key_file_set_comment (keyString, NULL, NULL, tmpStr, NULL);
-    g_key_file_set_string(keyString, "version-info", "version", CURRENT_VERSION);
-    g_free(tmpStr);
+    g_key_file_set_string (keyString, "version-info", "version", CURRENT_VERSION);
+    g_free (tmpStr);
     return;
 }
 /*
@@ -62,7 +63,7 @@ void createGKeyFile(GObject *object, const gchar *dataName)
                                   NULL)) {
     createNewKeyFile(keyString);
   } else {
-    gchar* version = g_key_file_get_string(keyString, "version-info", "version", NULL);
+    gchar* version = g_key_file_get_string (keyString, "version-info", "version", NULL);
     gint versionCmp = 1;
 
     if (version != NULL) {
@@ -72,25 +73,25 @@ void createGKeyFile(GObject *object, const gchar *dataName)
     if (versionCmp != 0) {
       GtkWidget* yesNoDialog;
       
-      yesNoDialog = gtk_message_dialog_new(GTK_WINDOW(mainWindowApp), 
+      yesNoDialog = gtk_message_dialog_new (GTK_WINDOW(mainWindowApp), 
 	                      (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT), 
 			      GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, 
 			      _("Configuration files are for a different version of Searchmonkey. This may cause errors. Delete old configuration files?"));
       
       if (gtk_dialog_run(GTK_DIALOG(yesNoDialog)) != GTK_RESPONSE_YES) {
 	/*This is to prevent checking the next time */
-	g_key_file_set_string(keyString, "version-info", "version", CURRENT_VERSION); 
+	g_key_file_set_string (keyString, "version-info", "version", CURRENT_VERSION); 
       } else {
 	g_key_file_free(keyString);
 	g_remove(gConfigFile);
 	keyString = g_key_file_new();
-	createNewKeyFile(keyString);
+	createNewKeyFile (keyString);
       }
-      gtk_widget_destroy(yesNoDialog);
+      gtk_widget_destroy (GTK_WIDGET(yesNoDialog));
     }
-    g_free(version);
+    g_free (version);
   }
-  g_object_set_data_full(object, dataName, keyString, destroyGKeyFile);
+  g_object_set_data_full (object, dataName, keyString, destroyGKeyFile);
 }
 
 
@@ -107,7 +108,7 @@ void destroyGKeyFile(gpointer data)
   }
   g_key_file_free(keyString);
   if (gConfigFile != NULL) {
-    g_free(gConfigFile);
+    g_free (gConfigFile);
   }
 }
 
@@ -117,7 +118,7 @@ void destroyGKeyFile(gpointer data)
  */
 GKeyFile *getGKeyFile(GtkWidget *widget)
 {
-  GObject *window1 = G_OBJECT(lookup_widget(GTK_WIDGET(widget), "window1"));
+  GObject *window1 = G_OBJECT(lookup_widget (GTK_WIDGET(widget), "window1"));
   GKeyFile *keyString = g_object_get_data(window1, MASTER_OPTIONS_DATA);
   return keyString;
 }
@@ -137,7 +138,7 @@ void storeGKeyFile(GKeyFile *keyString)
   gchar *folderName;
   GtkWidget *okCancelDialog;
   
-  if (g_key_file_has_key(keyString, "configuration", "configPromptSave", NULL) &&
+  if (g_key_file_has_key (keyString, "configuration", "configPromptSave", NULL) &&
       (g_key_file_get_boolean(keyString, "configuration", "configPromptSave", NULL))) {
     okCancelDialog = gtk_message_dialog_new(GTK_WINDOW(mainWindowApp), (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT),
                                             GTK_MESSAGE_WARNING, GTK_BUTTONS_OK_CANCEL,
@@ -162,8 +163,8 @@ void storeGKeyFile(GKeyFile *keyString)
     }
   }
   
-  g_free(outText);
-  g_free(folderName);
+  g_free (outText);
+  g_free (folderName);
 }
 
 
@@ -176,11 +177,11 @@ void setConfigFileLocation (GtkWidget *widget)
   gchar *fullPath;
 
   if (g_file_test(gConfigFile, G_FILE_TEST_EXISTS)) {
-    gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "configFileLocation")), gConfigFile);
+    gtk_entry_set_text(GTK_ENTRY(lookup_widget (widget, "configFileLocation")), gConfigFile);
   } else {
 	fullPath = g_strconcat(gConfigFile, _(" [missing]"), NULL);
-    gtk_entry_set_text(GTK_ENTRY(lookup_widget(widget, "configFileLocation")), fullPath);
-    g_free(fullPath);
+    gtk_entry_set_text(GTK_ENTRY(lookup_widget (widget, "configFileLocation")), fullPath);
+    g_free (fullPath);
   }
 }
 
@@ -205,15 +206,15 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
   realizeWindow(widget, keyString, "application", "window1"); /* restore window size */
 
   /* Search stuff */
-  initComboBox2(lookup_widget(widget, "fileName"));
-  initComboBox(lookup_widget(widget, "containingText"));
-  initComboBox(lookup_widget(widget, "lookIn"));
+  initComboBox2(lookup_widget (widget, "fileName"));
+  initComboBox(lookup_widget (widget, "containingText"));
+  initComboBox(lookup_widget (widget, "lookIn"));
 
   /* main part : all variables are retrieved from config.ini file with file's corruption checking */
   realize_searchNotebook(widget);
 
   /* directories parameters = parameter1 from command line - Luc A janv 2018 */
-  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "lookIn"));
+  tmpCombo = GTK_COMBO_BOX(lookup_widget (widget, "lookIn"));
   g_assert(tmpCombo != NULL);
   if(sParamater1!=NULL) 
        addUniqueRow(GTK_WIDGET(tmpCombo), sParamater1); /* Luc A janv 2018 */
@@ -222,15 +223,15 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
        {    
          addUniqueRow(GTK_WIDGET(tmpCombo), g_get_home_dir()); /* Set default look in folder */
        }
-  gtk_widget_set_tooltip_text (GTK_WIDGET(tmpCombo),gtk_combo_box_text_get_active_text (tmpCombo)); 
+  gtk_widget_set_tooltip_text (GTK_WIDGET(tmpCombo),gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(tmpCombo))); 
   /* file(s) name parameters = parameter2 from command line - Luc A janv 2018 */
-  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
+  tmpCombo = GTK_COMBO_BOX(lookup_widget (widget, "fileName"));
   g_assert(tmpCombo != NULL);
   if(sParamater2!=NULL) 
        addUniqueRow(GTK_WIDGET(tmpCombo), sParamater2); /* Luc A janv 2018 */
   
   /* containing text parameters = parameter3 from command line - Luc A janv 2018 */
-  tmpCombo = GTK_COMBO_BOX(lookup_widget(widget, "containingText"));
+  tmpCombo = GTK_COMBO_BOX(lookup_widget (widget, "containingText"));
   g_assert(tmpCombo != NULL);
   if(sParamater3!=NULL) 
        addUniqueRow(GTK_WIDGET(tmpCombo), sParamater3); /* Luc A janv 2018 */
@@ -252,8 +253,8 @@ void realize_searchmonkeyWindow (GtkWidget *widget)
 
  /* Menu stuff (do this last so that all view options get set) */
   realize_menubar(widget);
-  gtk_widget_grab_focus (lookup_widget(widget, "playButton1"));
-  // g_free(sParamater1);
+  gtk_widget_grab_focus (lookup_widget (widget, "playButton1"));
+  // g_free (sParamater1);
 }
 
 
@@ -343,63 +344,63 @@ void realize_FileModifiedDialog (GtkWidget *widget)
   g_date_strftime(buffer, 75, _("%x"), &current_date);
 
  /* retieve global settings and setup the dialog widgets*/
-  realizeToggle(widget, keyString, "configuration", "todayCheck");
-  realizeToggle(widget, keyString, "configuration", "anyDateCheck");
-  realizeToggle(widget, keyString, "configuration", "afterCheck");
-  realizeToggle(widget, keyString, "configuration", "beforeCheck");
-  realizeToggle(widget, keyString, "configuration", "intervalCheck");
-  realizeToggle(widget, keyString, "configuration", "sinceCheck");
+  realizeToggle (widget, keyString, "configuration", "todayCheck");
+  realizeToggle (widget, keyString, "configuration", "anyDateCheck");
+  realizeToggle (widget, keyString, "configuration", "afterCheck");
+  realizeToggle (widget, keyString, "configuration", "beforeCheck");
+  realizeToggle (widget, keyString, "configuration", "intervalCheck");
+  realizeToggle (widget, keyString, "configuration", "sinceCheck");
  /* before & after section */
-  if (g_key_file_has_key(keyString, "history", "beforeEntry", NULL)==NULL) {
-      printf(err_msg, " beforeEntry ");
-      gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "beforeEntry")), buffer);
+  if (!g_key_file_has_key (keyString, "history", "beforeEntry", NULL)) {
+      printf (err_msg, " beforeEntry ");
+      gtk_button_set_label(GTK_BUTTON(lookup_widget (widget, "beforeEntry")), buffer);
   }
-  if (g_key_file_has_key(keyString, "history", "afterEntry", NULL)==NULL) {
-      printf(err_msg, " afterEntry ");
-      gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "afterEntry")), buffer);
+  if (!g_key_file_has_key (keyString, "history", "afterEntry", NULL)) {
+      printf (err_msg, " afterEntry ");
+      gtk_button_set_label (GTK_BUTTON(lookup_widget (widget, "afterEntry")), buffer);
   }
-  realizeButtonString(widget, keyString, "history", "beforeEntry");
-  realizeButtonString(widget, keyString, "history", "afterEntry");
+  realizeButtonString (widget, keyString, "history", "beforeEntry");
+  realizeButtonString (widget, keyString, "history", "afterEntry");
   /* interval section */
-  if (g_key_file_has_key(keyString, "history", "intervalStartEntry", NULL)==NULL) {
-      printf(err_msg, " intervalStartEntry ");
-      gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "intervalStartEntry")), buffer);
+  if (!g_key_file_has_key (keyString, "history", "intervalStartEntry", NULL)) {
+      printf (err_msg, " intervalStartEntry ");
+      gtk_button_set_label(GTK_BUTTON(lookup_widget (widget, "intervalStartEntry")), buffer);
   }
-  if (g_key_file_has_key(keyString, "history", "intervalEndEntry", NULL)==NULL) {
-      printf(err_msg, " intervalEndEntry ");
-     gtk_button_set_label(GTK_BUTTON(lookup_widget(widget, "intervalEndEntry")), buffer);
+  if (!g_key_file_has_key (keyString, "history", "intervalEndEntry", NULL)) {
+      printf (err_msg, " intervalEndEntry ");
+     gtk_button_set_label(GTK_BUTTON(lookup_widget (widget, "intervalEndEntry")), buffer);
    }
-  if (g_key_file_has_key(keyString, "configuration", "sinceUnits", NULL)==NULL) {
-      printf(err_msg, " sinceUnits ");
-      gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget(widget, "sinceUnits")), 0);/* by default : days(s) */
+  if (!g_key_file_has_key (keyString, "configuration", "sinceUnits", NULL)) {
+      printf (err_msg, " sinceUnits ");
+      gtk_combo_box_set_active(GTK_COMBO_BOX(lookup_widget (widget, "sinceUnits")), 0);/* by default : days(s) */
   }
-  if (g_key_file_has_key(keyString, "history", "entrySince", NULL)==NULL) {
-      printf(err_msg, " entrySince ");
-      gtk_spin_button_set_value (GTK_SPIN_BUTTON(lookup_widget(widget, "entrySince")), 1);/* by default : days(s) */
+  if (!g_key_file_has_key (keyString, "history", "entrySince", NULL)) {
+      printf (err_msg, " entrySince ");
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON(lookup_widget (widget, "entrySince")), 1);/* by default : days(s) */
   }
-  realizeComboBoxText(widget, keyString, "configuration", "sinceUnits");
-  realizeSpin(widget, keyString, "history", "entrySince");
-  realizeButtonString(widget, keyString, "history", "intervalEndEntry");
-  realizeButtonString(widget, keyString, "history", "intervalStartEntry");
+  realizeComboBoxText (widget, keyString, "configuration", "sinceUnits");
+  realizeSpin (widget, keyString, "history", "entrySince");
+  realizeButtonString (widget, keyString, "history", "intervalEndEntry");
+  realizeButtonString (widget, keyString, "history", "intervalStartEntry");
 }
 
 void unrealize_FileModifiedDialog (GtkWidget *widget)
 {
-  GKeyFile *keyString = getGKeyFile(GTK_WIDGET(widget));
+  GKeyFile *keyString = getGKeyFile (GTK_WIDGET(widget));
 
   /* flags */
-  unrealizeToggle(widget, keyString, "configuration", "todayCheck");
-  unrealizeToggle(widget, keyString, "configuration", "anyDateCheck");
-  unrealizeToggle(widget, keyString, "configuration", "beforeCheck");
-  unrealizeToggle(widget, keyString, "configuration", "afterCheck");
-  unrealizeToggle(widget, keyString, "configuration", "intervalCheck");
-  unrealizeToggle(widget, keyString, "configuration", "sinceCheck");
+  unrealizeToggle (widget, keyString, "configuration", "todayCheck");
+  unrealizeToggle (widget, keyString, "configuration", "anyDateCheck");
+  unrealizeToggle (widget, keyString, "configuration", "beforeCheck");
+  unrealizeToggle (widget, keyString, "configuration", "afterCheck");
+  unrealizeToggle (widget, keyString, "configuration", "intervalCheck");
+  unrealizeToggle (widget, keyString, "configuration", "sinceCheck");
   unrealizeComboBox(widget, keyString, "configuration", "sinceUnits");
   /* values */
-  unrealizeButtonString(widget, keyString, "history", "afterEntry");
-  unrealizeButtonString(widget, keyString, "history", "beforeEntry");
-  unrealizeButtonString(widget, keyString, "history", "intervalStartEntry");
-  unrealizeButtonString(widget, keyString, "history", "intervalEndEntry");
+  unrealizeButtonString (widget, keyString, "history", "afterEntry");
+  unrealizeButtonString (widget, keyString, "history", "beforeEntry");
+  unrealizeButtonString (widget, keyString, "history", "intervalStartEntry");
+  unrealizeButtonString (widget, keyString, "history", "intervalEndEntry");
   unrealizeSpin(widget, keyString, "history", "entrySince");
 
 }
@@ -470,100 +471,100 @@ void unrealize_configDialog (GtkWidget *widget)
 void realize_searchNotebook (GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
-  GtkComboBox *combo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
+  GtkComboBox *combo = GTK_COMBO_BOX(lookup_widget (widget, "fileName"));
   gint count_error_modified_check = 0;
   gchar *tmpstring=NULL;
   const gchar *err_msg = _("* warning ! Corrupted config.ini configuration file ; the <<%s>> key is absent. I set up a default value *\n");
 
   /* Store advanced options expander */
-  realizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
+  realizeToggle (widget, keyString, "history", "ignoreHiddenFiles");
   realizeComboBox2(widget, keyString, "history", "fileName");
 
   /* check if there isn't any value */
-  if(gtk_combo_box_get_active (GTK_COMBO_BOX_TEXT(combo))==-1 ) {
-     gtk_combo_box_set_active (GTK_COMBO_BOX_TEXT(combo), 0);
-     if(strlen((gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combo)) )==0 ) {
-         gtk_combo_box_text_insert_text (GTK_COMBO_BOX_TEXT(combo), 0,"*.*");
-         gtk_combo_box_set_active (GTK_COMBO_BOX_TEXT(combo), 0);
+  if(gtk_combo_box_get_active (GTK_COMBO_BOX (combo))==-1 ) {
+     gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
+     if(strlen ((gchar *)gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT(combo)) )==0 ) {
+         gtk_combo_box_text_insert_text (GTK_COMBO_BOX_TEXT (combo), 0,"*.*");
+         gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
      }
   }
   /* we retrieve last user's mode */
-  if (g_key_file_has_key(keyString, "configuration", "advancedMode", NULL)==NULL) {
+  if (!g_key_file_has_key (keyString, "configuration", "advancedMode", NULL)) {
       g_key_file_set_string (keyString, "configuration", "advancedMode", "false");
-      gtk_switch_set_active (GTK_SWITCH(lookup_widget(widget, "advancedMode")), FALSE);
-      gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "expander_options")) , FALSE);   
-      gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard1")) , FALSE);
-      gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard2")) , FALSE);
+      gtk_switch_set_active (GTK_SWITCH(lookup_widget (widget, "advancedMode")), FALSE);
+      gtk_widget_set_sensitive (GTK_WIDGET(lookup_widget (widget, "expander_options")) , FALSE);   
+      gtk_widget_set_sensitive (GTK_WIDGET(lookup_widget (widget, "regExpWizard1")) , FALSE);
+      gtk_widget_set_sensitive (GTK_WIDGET(lookup_widget (widget, "regExpWizard2")) , FALSE);
   }
   realizeSwitch(widget, keyString, "configuration", "advancedMode");
   realizeComboBox(widget, keyString, "history", "containingText");
-  realizeToggle(widget, keyString, "history", "containingTextCheck");
+  realizeToggle (widget, keyString, "history", "containingTextCheck");
   realizeComboBox(widget, keyString, "history", "lookIn");
-  realizeToggle(widget, keyString, "history", "searchSubfoldersCheck");
-  realizeToggle(widget, keyString, "history", "folderDepthCheck");
+  realizeToggle (widget, keyString, "history", "searchSubfoldersCheck");
+  realizeToggle (widget, keyString, "history", "folderDepthCheck");
   realizeSpin(widget, keyString, "history", "folderDepthSpin");
-  realizeToggle(widget, keyString, "history", "notExpressionCheckFile");
-  realizeToggle(widget, keyString, "history", "matchCaseCheckFile");
-  realizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
-  realizeToggle(widget, keyString, "history", "dosExpressionRadioFile");
-  realizeToggle(widget, keyString, "history", "regularExpressionRadioFile");
-  realizeToggle(widget, keyString, "history", "singlePhaseCheckContents");
-  realizeToggle(widget, keyString, "history", "matchCaseCheckContents");
-  realizeToggle(widget, keyString, "history", "wildcardCheckContents");
-  realizeToggle(widget, keyString, "history", "regularExpressionRadioContents");
-  realizeToggle(widget, keyString, "history", "limitResultsCheckResults");
+  realizeToggle (widget, keyString, "history", "notExpressionCheckFile");
+  realizeToggle (widget, keyString, "history", "matchCaseCheckFile");
+  realizeToggle (widget, keyString, "history", "ignoreHiddenFiles");
+  realizeToggle (widget, keyString, "history", "dosExpressionRadioFile");
+  realizeToggle (widget, keyString, "history", "regularExpressionRadioFile");
+  realizeToggle (widget, keyString, "history", "singlePhaseCheckContents");
+  realizeToggle (widget, keyString, "history", "matchCaseCheckContents");
+  realizeToggle (widget, keyString, "history", "wildcardCheckContents");
+  realizeToggle (widget, keyString, "history", "regularExpressionRadioContents");
+  realizeToggle (widget, keyString, "history", "limitResultsCheckResults");
   realizeSpin(widget, keyString, "history", "maxHitsSpinResults");
-  realizeToggle(widget, keyString, "history", "showLinesCheckResults");
+  realizeToggle (widget, keyString, "history", "showLinesCheckResults");
   realizeSpin(widget, keyString, "history", "showLinesSpinResults");
-  realizeToggle(widget, keyString, "history","followSymLinksCheck");
-  realizeToggle(widget, keyString, "history", "limitContentsCheckResults");
+  realizeToggle (widget, keyString, "history","followSymLinksCheck");
+  realizeToggle (widget, keyString, "history", "limitContentsCheckResults");
   realizeSpin(widget, keyString, "history", "maxContentHitsSpinResults");
   /* we must check if size and modified filters already exist - in other case, set them to default values */
   /* part -1 for filesize filter */
-  if (g_key_file_has_key(keyString, "configuration", "LessThanSize-active", NULL)==NULL) {
-      printf(err_msg, " LessThanSize-active ");
+  if (!g_key_file_has_key (keyString, "configuration", "LessThanSize-active", NULL)) {
+      printf (err_msg, " LessThanSize-active ");
       g_key_file_set_string (keyString, "configuration", "LessThanSize-active", "0");
     }
-  if (g_key_file_has_key(keyString, "configuration", "MoreThanSize-active", NULL)==NULL) {
-      printf(err_msg, " MoreThanSize-active ");
+  if (!g_key_file_has_key (keyString, "configuration", "MoreThanSize-active", NULL)) {
+      printf (err_msg, " MoreThanSize-active ");
       g_key_file_set_string (keyString, "configuration", "MoreThanSize-active", "0");
     }
-  if (g_key_file_has_key(keyString, "configuration", "moreThanCheck", NULL)==NULL) {
-      printf(err_msg," moreThanCheck ");
+  if (!g_key_file_has_key (keyString, "configuration", "moreThanCheck", NULL)) {
+      printf (err_msg," moreThanCheck ");
       g_key_file_set_string (keyString, "configuration", "moreThanCheck", "false");
     }
-  if (g_key_file_has_key(keyString, "configuration", "lessThanCheck", NULL)==NULL) {
-      printf(err_msg," lessThanCheck key ");
+  if (!g_key_file_has_key (keyString, "configuration", "lessThanCheck", NULL)) {
+      printf (err_msg," lessThanCheck key ");
       g_key_file_set_string (keyString, "configuration", "lessThanCheck", "false");
     }
 /* part - 2 for modified date part */
-  if (g_key_file_has_key(keyString, "configuration", "sinceCheck", NULL)==NULL) {
-      printf(err_msg, " sinceCheck key ");
-     g_key_file_set_string (keyString, "configuration", "sinceCheck", "false");
-     count_error_modified_check++;
+  if (!g_key_file_has_key (keyString, "configuration", "sinceCheck", NULL)) {
+      printf (err_msg, " sinceCheck key ");
+      g_key_file_set_string (keyString, "configuration", "sinceCheck", "false");
+      count_error_modified_check++;
     }   
-  if (g_key_file_has_key(keyString, "configuration", "afterCheck", NULL)==NULL) {
-      printf(err_msg, " afterCheck ");
+  if (!g_key_file_has_key (keyString, "configuration", "afterCheck", NULL)) {
+      printf (err_msg, " afterCheck ");
      g_key_file_set_string (keyString, "configuration", "afterCheck", "false");
      count_error_modified_check++;
     }
-  if (g_key_file_has_key(keyString, "configuration", "beforeCheck", NULL)==NULL) {
-      printf(err_msg, " beforeCheck ");
+  if (!g_key_file_has_key (keyString, "configuration", "beforeCheck", NULL)) {
+      printf (err_msg, " beforeCheck ");
      g_key_file_set_string (keyString, "configuration", "beforeCheck", "false");
      count_error_modified_check++;
     }
-  if (g_key_file_has_key(keyString, "configuration", "intervalCheck", NULL)==NULL) {
-      printf(err_msg, " intervalCheck ");
+  if (!g_key_file_has_key (keyString, "configuration", "intervalCheck", NULL)) {
+      printf (err_msg, " intervalCheck ");
      g_key_file_set_string (keyString, "configuration", "intervalCheck", "false");
      count_error_modified_check++;
     }
-  if (g_key_file_has_key(keyString, "configuration", "todayCheck", NULL)==NULL) {
-      printf(err_msg, " todayCheck key ");
+  if (!g_key_file_has_key (keyString, "configuration", "todayCheck", NULL)) {
+      printf (err_msg, " todayCheck key ");
      g_key_file_set_string (keyString, "configuration", "todayCheck", "false");
      count_error_modified_check++;
     }
-  if (g_key_file_has_key(keyString, "configuration", "anyDateCheck", NULL)==NULL) {
-      printf(err_msg, " anyDateCheck ");
+  if (!g_key_file_has_key (keyString, "configuration", "anyDateCheck", NULL)) {
+      printf (err_msg, " anyDateCheck ");
      g_key_file_set_string (keyString, "configuration", "anyDateCheck", "false");
      count_error_modified_check++;
     }
@@ -571,57 +572,57 @@ void realize_searchNotebook (GtkWidget *widget)
   if(count_error_modified_check==6)
      {
        g_key_file_set_string (keyString, "configuration", "anyDateCheck", "true");
-       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget(widget, "anyDateCheck")), TRUE);
+       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (lookup_widget (widget, "anyDateCheck")), TRUE);
      }
   /* get default file explorer options */
-  if (g_key_file_has_key(keyString, "configuration", "configFileExplorer", NULL)==NULL) {
-      printf(err_msg, " configFileExplorer key ");
+  if (!g_key_file_has_key (keyString, "configuration", "configFileExplorer", NULL)) {
+      printf (err_msg, " configFileExplorer key ");
      g_key_file_set_string (keyString, "configuration", "configFileExplorer", "xdg-open");
     }
   else {    
      tmpstring = g_key_file_get_string (keyString, "configuration", "configFileExplorer", NULL);
-     if(strlen(tmpstring)==0) {
+     if(strlen (tmpstring)==0) {
         g_key_file_set_string (keyString, "configuration", "configFileExplorer", "xdg-open");
      }
-     g_free(tmpstring);
+     g_free (tmpstring);
   }
-  if (g_key_file_has_key(keyString, "configuration", "configFileExplorerAttributes", NULL)==NULL) {
-      printf(err_msg, " configFileExplorerAttributes key ");
+  if (!g_key_file_has_key (keyString, "configuration", "configFileExplorerAttributes", NULL)) {
+      printf (err_msg, " configFileExplorerAttributes key ");
      g_key_file_set_string (keyString, "configuration", "configFileExplorerAttributes", "%d");
     }
   else {    
      tmpstring = g_key_file_get_string (keyString, "configuration", "configFileExplorerAttributes", NULL);
-     if(strlen(tmpstring)==0) {
+     if(strlen (tmpstring)==0) {
         g_key_file_set_string (keyString, "configuration", "configFileExplorerAttributes", "%d");
      }
-     g_free(tmpstring);
+     g_free (tmpstring);
   }
   /* get default files associations */
-  if (g_key_file_has_key(keyString, "configuration", "configTextEditor", NULL)==NULL) {
-      printf(err_msg, " configTextEditor key ");
+  if (!g_key_file_has_key (keyString, "configuration", "configTextEditor", NULL)) {
+      printf (err_msg, " configTextEditor key ");
      g_key_file_set_string (keyString, "configuration", "configTextEditor", "xdg-open");
     }
   else {    
      tmpstring = g_key_file_get_string (keyString, "configuration", "configTextEditor", NULL);
-     if(strlen(tmpstring)==0) {
+     if(strlen (tmpstring)==0) {
         g_key_file_set_string (keyString, "configuration", "configTextEditor", "xdg-open");
      }
-     g_free(tmpstring);
+     g_free (tmpstring);
   }
-  if (g_key_file_has_key(keyString, "configuration", "configTextEditorAttributes", NULL)==NULL) {
-      printf(err_msg, " configTextEditorAttributes key ");
+  if (!g_key_file_has_key (keyString, "configuration", "configTextEditorAttributes", NULL)) {
+      printf (err_msg, " configTextEditorAttributes key ");
      g_key_file_set_string (keyString, "configuration", "configTextEditorAttributes", "%f");
     }
   else {    
      tmpstring = g_key_file_get_string (keyString, "configuration", "configTextEditorAttributes", NULL);
-     if(strlen(tmpstring)==0) {
+     if(strlen (tmpstring)==0) {
         g_key_file_set_string (keyString, "configuration", "configTextEditorAttributes", "%f");
      }
-     g_free(tmpstring);
+     g_free (tmpstring);
   }
   /* set default treeview */
-  if (g_key_file_has_key(keyString, "menuOptions", "horizontal_results1", NULL)==NULL) {
-      printf(err_msg, " horizontal_results1 key ");
+  if (!g_key_file_has_key (keyString, "menuOptions", "horizontal_results1", NULL)) {
+      printf (err_msg, " horizontal_results1 key ");
      g_key_file_set_string (keyString, "menuOptions", "horizontal_results1", "false");
      g_key_file_set_string (keyString, "menuOptions", "vertical_results1", "true");
     }
@@ -637,38 +638,38 @@ void realize_searchNotebook (GtkWidget *widget)
 void unrealize_searchNotebook (GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
-  GtkComboBox * combo = GTK_COMBO_BOX(lookup_widget(widget, "fileName"));
+  GtkComboBox * combo = GTK_COMBO_BOX(lookup_widget (widget, "fileName"));
 
   /* Store notebook global settings */
  // unrealizeNotebook(widget, keyString, "history", "hboxSearchmonkey");
   unrealizeSwitch(widget, keyString, "configuration", "advancedMode");
   /* Store basic Tab */
 
-  unrealizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
+  unrealizeToggle (widget, keyString, "history", "ignoreHiddenFiles");
   unrealizeComboBox2(widget, keyString, "history", "fileName");
   unrealizeComboBox(widget, keyString, "history", "containingText");
-  unrealizeToggle(widget, keyString, "history", "containingTextCheck");
+  unrealizeToggle (widget, keyString, "history", "containingTextCheck");
   unrealizeComboBox(widget, keyString, "history", "lookIn");
-  unrealizeToggle(widget, keyString, "history", "searchSubfoldersCheck");
-  unrealizeToggle(widget, keyString, "history", "folderDepthCheck");
+  unrealizeToggle (widget, keyString, "history", "searchSubfoldersCheck");
+  unrealizeToggle (widget, keyString, "history", "folderDepthCheck");
   unrealizeSpin(widget, keyString, "history", "folderDepthSpin");
 
   /* Store Options Tab */
-  unrealizeToggle(widget, keyString, "history", "notExpressionCheckFile");
-  unrealizeToggle(widget, keyString, "history", "matchCaseCheckFile");
-  unrealizeToggle(widget, keyString, "history", "ignoreHiddenFiles");
-  unrealizeToggle(widget, keyString, "history", "dosExpressionRadioFile");
-  unrealizeToggle(widget, keyString, "history", "regularExpressionRadioFile");
-  unrealizeToggle(widget, keyString, "history", "singlePhaseCheckContents");
-  unrealizeToggle(widget, keyString, "history", "matchCaseCheckContents");
-  unrealizeToggle(widget, keyString, "history", "wildcardCheckContents");
-  unrealizeToggle(widget, keyString, "history", "regularExpressionRadioContents");
-  unrealizeToggle(widget, keyString, "history", "limitResultsCheckResults");
+  unrealizeToggle (widget, keyString, "history", "notExpressionCheckFile");
+  unrealizeToggle (widget, keyString, "history", "matchCaseCheckFile");
+  unrealizeToggle (widget, keyString, "history", "ignoreHiddenFiles");
+  unrealizeToggle (widget, keyString, "history", "dosExpressionRadioFile");
+  unrealizeToggle (widget, keyString, "history", "regularExpressionRadioFile");
+  unrealizeToggle (widget, keyString, "history", "singlePhaseCheckContents");
+  unrealizeToggle (widget, keyString, "history", "matchCaseCheckContents");
+  unrealizeToggle (widget, keyString, "history", "wildcardCheckContents");
+  unrealizeToggle (widget, keyString, "history", "regularExpressionRadioContents");
+  unrealizeToggle (widget, keyString, "history", "limitResultsCheckResults");
   unrealizeSpin(widget, keyString, "history", "maxHitsSpinResults");
-  unrealizeToggle(widget, keyString, "history", "showLinesCheckResults");
+  unrealizeToggle (widget, keyString, "history", "showLinesCheckResults");
   unrealizeSpin(widget, keyString, "history", "showLinesSpinResults");
-  unrealizeToggle(widget, keyString, "history","followSymLinksCheck");
-  unrealizeToggle(widget, keyString, "history", "limitContentsCheckResults");
+  unrealizeToggle (widget, keyString, "history","followSymLinksCheck");
+  unrealizeToggle (widget, keyString, "history", "limitContentsCheckResults");
   unrealizeSpin(widget, keyString, "history", "maxContentHitsSpinResults");
  /* size and date search options */
   unrealize_FileSizeDialog(widget);
@@ -855,8 +856,8 @@ void initTreeView(GtkWidget *widget)
 
   sortedModel = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL(store));
   
-  initTreeView_aux(GTK_TREE_VIEW(lookup_widget(widget, "treeview1")), store, sortedModel);
-  initTreeView_aux(GTK_TREE_VIEW(lookup_widget(widget, "treeview2")), store, sortedModel);
+  initTreeView_aux(GTK_TREE_VIEW(lookup_widget (widget, "treeview1")), store, sortedModel);
+  initTreeView_aux(GTK_TREE_VIEW(lookup_widget (widget, "treeview2")), store, sortedModel);
   g_object_unref(store);
 }
 
@@ -929,8 +930,8 @@ void initTextView_aux(GtkTextView *textview)
 
 void initTextView(GtkWidget *widget)
 {
-  initTextView_aux(GTK_TEXT_VIEW(lookup_widget(widget, "textview1")));
-  initTextView_aux(GTK_TEXT_VIEW(lookup_widget(widget, "textview4")));
+  initTextView_aux(GTK_TEXT_VIEW(lookup_widget (widget, "textview1")));
+  initTextView_aux(GTK_TEXT_VIEW(lookup_widget (widget, "textview4")));
 }
 
 
@@ -940,21 +941,21 @@ void initTextView(GtkWidget *widget)
 void realize_statusbar (GtkWidget *widget)
 {
   statusbarData *status;
-  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget(widget, "statusbar1"));
-  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget(widget, "maxHitsSpinResults")));
+  GtkStatusbar *statusbar = GTK_STATUSBAR(lookup_widget (widget, "statusbar1"));
+  const gint tmpLimit = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(lookup_widget (widget, "maxHitsSpinResults")));
   status = g_object_get_data(G_OBJECT(mainWindowApp), MASTER_STATUSBAR_DATA);
   /* we get the research mode - Luc A Feb 2018 */
 
-  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget(widget, "dosExpressionRadioFile"))))
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (lookup_widget (widget, "dosExpressionRadioFile"))))
     {
-        g_sprintf(status->constantString, _("Ready-research mode with jokers(DOS like)"));
+        g_sprintf (status->constantString, _("Ready-research mode with jokers(DOS like)"));
     }
-  else   g_sprintf(status->constantString, _("Ready-research mode with RegEx"));
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "limitResultsCheckResults")))) {
-       g_strlcat(status->constantString,  g_strdup_printf(_("/Max hits limit:%d"), tmpLimit), MAX_FILENAME_STRING);
+  else   g_sprintf (status->constantString, _("Ready-research mode with RegEx"));
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget (widget, "limitResultsCheckResults")))) {
+       g_strlcat(status->constantString,  g_strdup_printf (_("/Max hits limit:%d"), tmpLimit), MAX_FILENAME_STRING);
   }
   else {
-       g_strlcat(status->constantString,  g_strdup_printf(_("/No Max hits limit")), MAX_FILENAME_STRING);
+       g_strlcat(status->constantString,  g_strdup_printf (_("/No Max hits limit")), MAX_FILENAME_STRING);
   }
   gtk_statusbar_push(statusbar, STATUSBAR_CONTEXT_ID(statusbar), status->constantString);
 }
@@ -969,13 +970,13 @@ void realize_statusbar (GtkWidget *widget)
 void realizeFileDialog(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
     gchar *filename;
-    GtkWidget *dialog = lookup_widget(widget, name);
+    GtkWidget *dialog = lookup_widget (widget, name);
 
-    if (g_key_file_has_key(keyString, group, name, NULL)) {
+    if (g_key_file_has_key (keyString, group, name, NULL)) {
         filename = g_key_file_get_string (keyString, group, name, NULL);
         if (filename != NULL) {
             gtk_file_chooser_set_filename (GTK_FILE_CHOOSER (dialog), filename);
-            g_free(filename);
+            g_free (filename);
         }
     }
 }
@@ -987,12 +988,12 @@ void realizeFileDialog(GtkWidget *widget, GKeyFile *keyString, const gchar *grou
 void unrealizeFileDialog(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
     gchar *filename;
-    GtkWidget *dialog = lookup_widget(widget, name);
+    GtkWidget *dialog = lookup_widget (widget, name);
     
     filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER (dialog));
     if (filename != NULL) {
         g_key_file_set_string (keyString, group, name, filename);
-        g_free(filename);
+        g_free (filename);
     }
 }
 
@@ -1002,8 +1003,8 @@ void unrealizeFileDialog(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
  */
 void realizeMenuCheck(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-    if (g_key_file_has_key(keyString, group, name, NULL)) {
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget(widget, name)),
+    if (g_key_file_has_key (keyString, group, name, NULL)) {
+        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(lookup_widget (widget, name)),
                                      g_key_file_get_boolean (keyString, group, name, NULL));
     }
 }
@@ -1015,7 +1016,7 @@ void realizeMenuCheck(GtkWidget *widget, GKeyFile *keyString, const gchar *group
 void unrealizeMenuCheck(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
     g_key_file_set_boolean (keyString, group, name,                       
-                            gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(widget, name))));
+                            gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget (widget, name))));
 }
 
 /*
@@ -1025,11 +1026,11 @@ void realizeString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
 {
   gchar *tmpString;
   
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     tmpString = g_key_file_get_string (keyString, group, name, NULL);
     if (tmpString != NULL) {
-      gtk_entry_set_text(GTK_ENTRY(lookup_widget((widget), name)), tmpString);
-      g_free(tmpString);
+      gtk_entry_set_text(GTK_ENTRY(lookup_widget ((widget), name)), tmpString);
+      g_free (tmpString);
      }
   }
 }
@@ -1038,24 +1039,24 @@ void realizeString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
 /*
  * Callback helper: store generic text entry box text into config.ini settings
  */
-void unrealizeButtonString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+void unrealizeButtonString (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   g_key_file_set_string (keyString, group, name,
-                         gtk_button_get_label(GTK_BUTTON(lookup_widget(widget, name))));
+                         gtk_button_get_label(GTK_BUTTON(lookup_widget (widget, name))));
 }
 
 /*
  * Callback helper: retrieve generic text entry box text from config.ini settings
  */
-void realizeButtonString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+void realizeButtonString (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   gchar *tmpString;
   
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     tmpString = g_key_file_get_string (keyString, group, name, NULL);
     if (tmpString != NULL) {
-      gtk_button_set_label(GTK_BUTTON(lookup_widget((widget), name)), tmpString);
-      g_free(tmpString);
+      gtk_button_set_label(GTK_BUTTON(lookup_widget ((widget), name)), tmpString);
+      g_free (tmpString);
      }
   }
 }
@@ -1067,7 +1068,7 @@ void realizeButtonString(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
 void unrealizeString(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   g_key_file_set_string (keyString, group, name,
-                         gtk_entry_get_text(GTK_ENTRY(lookup_widget(widget, name))));
+                         gtk_entry_get_text(GTK_ENTRY(lookup_widget (widget, name))));
 }
 
 
@@ -1076,15 +1077,15 @@ void unrealizeString(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
  */
 gboolean realizeFileButton(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  GtkFileChooser *chooser = GTK_FILE_CHOOSER(lookup_widget(widget, name));
+  GtkFileChooser *chooser = GTK_FILE_CHOOSER(lookup_widget (widget, name));
   gchar *tmpString;
   gboolean retVal = FALSE;
   
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     tmpString = g_key_file_get_string (keyString, group, name, NULL);
     if (tmpString != NULL) {
       retVal = gtk_file_chooser_set_filename (chooser, tmpString);
-      g_free(tmpString);
+      g_free (tmpString);
     }
   }
   return retVal;
@@ -1096,12 +1097,12 @@ gboolean realizeFileButton(GtkWidget *widget, GKeyFile *keyString, const gchar *
  */
 void unrealizeFileButton(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  GtkFileChooser *chooser = GTK_FILE_CHOOSER(lookup_widget(widget, name));
+  GtkFileChooser *chooser = GTK_FILE_CHOOSER(lookup_widget (widget, name));
   gchar *tmpString = gtk_file_chooser_get_filename (chooser);
 
   if (tmpString != NULL) {
     g_key_file_set_string (keyString, group, name, tmpString);
-    g_free(tmpString);
+    g_free (tmpString);
   }
 }
 
@@ -1111,27 +1112,27 @@ void unrealizeFileButton(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
 void realizeSwitch(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   gboolean flag = FALSE;
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     flag = g_key_file_get_boolean (keyString, group, name, NULL);
-    gtk_switch_set_active(GTK_SWITCH(lookup_widget(widget, name)), flag);
-    gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard1")) , flag);
-    gtk_widget_set_sensitive(GTK_WIDGET(lookup_widget(widget, "regExpWizard2")) , flag);
+    gtk_switch_set_active(GTK_SWITCH(lookup_widget (widget, name)), flag);
+    gtk_widget_set_sensitive (GTK_WIDGET(lookup_widget (widget, "regExpWizard1")) , flag);
+    gtk_widget_set_sensitive (GTK_WIDGET(lookup_widget (widget, "regExpWizard2")) , flag);
   }
 }
 
 void unrealizeSwitch(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   g_key_file_set_boolean (keyString, group, name,
-                          gtk_switch_get_active(GTK_SWITCH(lookup_widget(widget, name))));
+                          gtk_switch_get_active(GTK_SWITCH(lookup_widget (widget, name))));
 }
 
 /*
  * Callback helper: retrieve generic toggle button value from config.ini settings
  */
-void realizeToggle(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+void realizeToggle (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, name)),
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(lookup_widget (widget, name)),
                                  g_key_file_get_boolean (keyString, group, name, NULL));
   }
 }
@@ -1140,10 +1141,10 @@ void realizeToggle(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
 /*
  * Callback helper: store generic toggle button value into config.ini settings
  */
-void unrealizeToggle(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
+void unrealizeToggle (GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   g_key_file_set_boolean (keyString, group, name,
-                          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, name))));
+                          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget (widget, name))));
 }
 
 
@@ -1154,9 +1155,9 @@ void unrealizeToggle(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
 void realizeSpin(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   gdouble spinValue;
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     spinValue = (gdouble)g_key_file_get_integer (keyString, group, name, NULL);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget(widget, name)), spinValue);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(lookup_widget (widget, name)), spinValue);
   }
 }
 
@@ -1166,7 +1167,7 @@ void realizeSpin(GtkWidget *widget, GKeyFile *keyString, const gchar *group, con
  */
 void unrealizeSpin(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  gdouble spinValue = gtk_spin_button_get_value(GTK_SPIN_BUTTON(lookup_widget(widget, name)));
+  gdouble spinValue = gtk_spin_button_get_value(GTK_SPIN_BUTTON(lookup_widget (widget, name)));
   g_key_file_set_integer (keyString, group, name, (gint)spinValue);
 }
 
@@ -1183,16 +1184,16 @@ void realizeWindow(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
 {
   gint *width_height;
   gsize length;
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     width_height = g_key_file_get_integer_list (keyString, group, name, &length, NULL);
     if (length == 2) {
-      gtk_window_set_default_size (GTK_WINDOW(lookup_widget(widget,name)),
+      gtk_window_set_default_size (GTK_WINDOW(lookup_widget (widget,name)),
                                    width_height[0], width_height[1]);
     }
-    g_free(width_height);
+    g_free (width_height);
   }
    else /* set a default size for the main window */
-     gtk_window_set_default_size (GTK_WINDOW(lookup_widget(widget,name)), 900, 512);
+     gtk_window_set_default_size (GTK_WINDOW(lookup_widget (widget,name)), 900, 512);
 }
 
 
@@ -1202,7 +1203,7 @@ void realizeWindow(GtkWidget *widget, GKeyFile *keyString, const gchar *group, c
 void unrealizeWindow(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
   gint width_height[2];
-  gtk_window_get_size (GTK_WINDOW(lookup_widget(widget, name)),
+  gtk_window_get_size (GTK_WINDOW(lookup_widget (widget, name)),
                        &width_height[0], &width_height[1]);
   g_key_file_set_integer_list (keyString, group, name, width_height, 2);
 }
@@ -1215,9 +1216,9 @@ void realizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
 {
   GtkTextView *textview;
   if (getResultsViewHorizontal(widget)) {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
+    textview = GTK_TEXT_VIEW(lookup_widget (widget, "textview1"));
   } else {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
+    textview = GTK_TEXT_VIEW(lookup_widget (widget, "textview4"));
   }
   gchar *newFont;
   PangoFontDescription *desc;
@@ -1226,16 +1227,16 @@ void realizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
   
   g_assert(context != NULL);
   
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     newFont = g_key_file_get_string (keyString, group, name, NULL);
     if (newFont != NULL) {
       desc = pango_font_description_from_string(newFont);
       if (desc != NULL) {   
-        gtk_widget_modify_font (GTK_WIDGET(lookup_widget(widget, "textview1")), desc);
-        gtk_widget_modify_font (GTK_WIDGET(lookup_widget(widget, "textview4")), desc);
+        gtk_widget_override_font (GTK_WIDGET(lookup_widget (widget, "textview1")), desc);
+        gtk_widget_override_font (GTK_WIDGET(lookup_widget (widget, "textview4")), desc);
         pango_font_description_free(desc);
       }
-      g_free(newFont);
+      g_free (newFont);
     }
   }
 }
@@ -1248,9 +1249,9 @@ void unrealizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *
 {
   GtkTextView *textview;
   if (getResultsViewHorizontal(widget)) {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
+    textview = GTK_TEXT_VIEW(lookup_widget (widget, "textview1"));
   } else {
-    textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
+    textview = GTK_TEXT_VIEW(lookup_widget (widget, "textview4"));
   }
   PangoContext* context = gtk_widget_get_pango_context (GTK_WIDGET(textview));
   PangoFontDescription *desc = pango_context_get_font_description(context);    
@@ -1258,7 +1259,7 @@ void unrealizeTextviewFont(GtkWidget *widget, GKeyFile *keyString, const gchar *
   
   if (newFont != NULL) {  
     g_key_file_set_string (keyString, group, name, newFont);
-    g_free(newFont);
+    g_free (newFont);
   }
 }
 
@@ -1270,8 +1271,8 @@ void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gcha
 {
   GtkTextView *textview1, *textview4;
 
-  textview1 = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
-  textview4 = GTK_TEXT_VIEW(lookup_widget(widget, "textview4"));
+  textview1 = GTK_TEXT_VIEW(lookup_widget (widget, "textview1"));
+  textview4 = GTK_TEXT_VIEW(lookup_widget (widget, "textview4"));
 
   gchar *newColor;
   GdkRGBA cp;
@@ -1293,14 +1294,14 @@ void realizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gcha
   g_assert(textBuf4 != NULL);
 
   
-  if (g_key_file_has_key(keyString, group, name, NULL)) {
+  if (g_key_file_has_key (keyString, group, name, NULL)) {
     newColor = g_key_file_get_string (keyString, group, name, NULL);
     if (newColor != NULL) {
       if (gdk_rgba_parse (&cp, newColor)) {
         g_object_set( G_OBJECT(tag1), "background-rgba", &cp, NULL);
         g_object_set( G_OBJECT(tag4), "background-rgba", &cp, NULL);     
       }
-      g_free(newColor);
+      g_free (newColor);
     }
   }
 }
@@ -1313,7 +1314,7 @@ void unrealizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gc
 {
   GtkTextView *textview;
  
-  textview = GTK_TEXT_VIEW(lookup_widget(widget, "textview1"));
+  textview = GTK_TEXT_VIEW(lookup_widget (widget, "textview1"));
   gchar *newColor;
   GdkRGBA *cp;
   GtkTextBuffer* textBuf = gtk_text_view_get_buffer (textview);
@@ -1325,7 +1326,7 @@ void unrealizeTextviewHighlight(GtkWidget *widget, GKeyFile *keyString, const gc
   
   g_key_file_set_string (keyString, group, name, newColor);
   gdk_rgba_free (cp);
-  g_free(newColor);
+  g_free (newColor);
 }
 
 
@@ -1342,7 +1343,7 @@ void realizeComboModel(GtkListStore *store, GKeyFile *keyString, const gchar *gr
     if(store==NULL)
       return;
     
-    if (g_key_file_has_key(keyString, group, name, NULL)) {
+    if (g_key_file_has_key (keyString, group, name, NULL)) {
         tmpString = g_key_file_get_string_list (keyString, group, name, &length, NULL);
         if (tmpString != NULL) {
             for (i=(gint)length; i>0; i--) {
@@ -1365,7 +1366,7 @@ void realizeComboBox(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
     gsize length;
     gint i;
     gint activeRow = 0;
-    GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget(widget, name));
+    GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget (widget, name));
 
     /*Retrieve model */
     realizeComboModel(GTK_LIST_STORE(gtk_combo_box_get_model(comboBox)), keyString, group, name);
@@ -1373,11 +1374,11 @@ void realizeComboBox(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
     /* Retrieve active row */
     readString = g_strconcat(name, "-active", NULL);
     g_assert(readString != NULL);
-    if (g_key_file_has_key(keyString, group, readString, NULL)) {
+    if (g_key_file_has_key (keyString, group, readString, NULL)) {
       activeRow = g_key_file_get_integer (keyString, group, readString, NULL);
       gtk_combo_box_set_active (comboBox, activeRow);
     }
-    g_free(readString);
+    g_free (readString);
 }
 
 /*
@@ -1388,7 +1389,7 @@ void realizeComboBox(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
 
 void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name )
 {
-  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget(widget, name));
+  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget (widget, name));
   gchar* keyname;
   gint setActive;
 
@@ -1396,12 +1397,12 @@ void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
   setActive = (intptr_t)g_malloc(sizeof(gint));
   keyname = g_strconcat(name, "-active", NULL);
 
-  if (g_key_file_has_key(keyString, group, keyname, NULL)) {
+  if (g_key_file_has_key (keyString, group, keyname, NULL)) {
       setActive = g_key_file_get_integer (keyString, group, keyname, NULL);
     } else {
       setActive = 0;
     }
-  g_free(keyname);
+  g_free (keyname);
   gtk_combo_box_set_active (GTK_COMBO_BOX (comboBox),setActive);
 }
 
@@ -1411,37 +1412,37 @@ void realizeComboBoxText(GtkWidget *widget, GKeyFile *keyString, const gchar *gr
  */
 void realizeComboBox2(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-    GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget(widget, name));
+    GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget (widget, name));
     gint* setActive;
     gchar* keyname;
 
     /*Retrieve model */
     keyname = g_strconcat(name, "regex", NULL);
     realizeComboModel(GTK_LIST_STORE(g_object_get_data(G_OBJECT(comboBox), "regex")), keyString, group, keyname);
-    g_free(keyname);
+    g_free (keyname);
     keyname = g_strconcat(name, "noregex", NULL);
     realizeComboModel(GTK_LIST_STORE(g_object_get_data(G_OBJECT(comboBox), "noregex")), keyString, group, keyname);
-    g_free(keyname);
+    g_free (keyname);
     
     /* Retrieve active row */
     setActive = (gint *)g_malloc(sizeof(gint));
     keyname = g_strconcat(name, "regex-active", NULL);
-    if (g_key_file_has_key(keyString, group, keyname, NULL)) {
+    if (g_key_file_has_key (keyString, group, keyname, NULL)) {
       *setActive = g_key_file_get_integer (keyString, group, keyname, NULL);
     } else {
       *setActive = -1;
     }
-    g_free(keyname);
+    g_free (keyname);
     g_object_set_data_full(G_OBJECT(comboBox), "regex-active", (gpointer)setActive, &g_free);
 
     setActive = (gint *)g_malloc(sizeof(gint));
     keyname = g_strconcat(name, "noregex-active", NULL);
-    if (g_key_file_has_key(keyString, group, keyname, NULL)) {
+    if (g_key_file_has_key (keyString, group, keyname, NULL)) {
       *setActive = g_key_file_get_integer (keyString, group, keyname, NULL);
     } else {
       *setActive = -1;
     }
-    g_free(keyname);
+    g_free (keyname);
     g_object_set_data_full(G_OBJECT(comboBox), "noregex-active", (gpointer)setActive, &g_free);
 
     /* Default to Regex mode */
@@ -1465,7 +1466,7 @@ void unrealizeComboModel(GtkListStore *store, GKeyFile *keyString, const gchar *
   /* Store active row */
   readString = g_strconcat(name, "-active", NULL);
   g_key_file_set_integer (keyString, group, readString, activeRow);
-  g_free(readString);
+  g_free (readString);
   
   /* Find first, and then loop through all until duplicate found */
   if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL(store), &iter)) {
@@ -1493,7 +1494,7 @@ void unrealizeComboModel(GtkListStore *store, GKeyFile *keyString, const gchar *
  */
 void unrealizeComboBox(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget(widget, name));
+  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget (widget, name));
   gint activeRow = gtk_combo_box_get_active(comboBox);
 
   unrealizeComboModel(GTK_LIST_STORE(gtk_combo_box_get_model(comboBox)), keyString, group, name, activeRow);
@@ -1505,11 +1506,11 @@ void unrealizeComboBox(GtkWidget *widget, GKeyFile *keyString, const gchar *grou
  */
 void unrealizeComboBox2(GtkWidget *widget, GKeyFile *keyString, const gchar *group, const gchar *name)
 {
-  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget(widget, name));
+  GtkComboBox *comboBox = GTK_COMBO_BOX(lookup_widget (widget, name));
   gint regexActive;
   gint noregexActive;
 
-  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget(widget, "regularExpressionRadioFile")))) {
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(lookup_widget (widget, "regularExpressionRadioFile")))) {
     regexActive = gtk_combo_box_get_active(comboBox);
     noregexActive = *((gint *)g_object_get_data(G_OBJECT(comboBox), "noregex-active"));
   } else {
@@ -1519,11 +1520,11 @@ void unrealizeComboBox2(GtkWidget *widget, GKeyFile *keyString, const gchar *gro
 
   gchar *keyname = g_strconcat(name, "regex", NULL);
   unrealizeComboModel(GTK_LIST_STORE(g_object_get_data(G_OBJECT(comboBox), "regex")), keyString, group, keyname, regexActive);
-  g_free(keyname);
+  g_free (keyname);
 
   keyname = g_strconcat(name, "noregex", NULL);
   unrealizeComboModel(GTK_LIST_STORE(g_object_get_data(G_OBJECT(comboBox), "noregex")), keyString, group, keyname, noregexActive);
-  g_free(keyname);
+  g_free (keyname);
 }
 
 
@@ -1539,17 +1540,17 @@ void realizeTreeview(GtkWidget *widget, GKeyFile *keyString, const gchar *group,
 
   /* restore sort column */
   fullName = g_strconcat(name, "Sortcol", NULL);
-  if (g_key_file_has_key(keyString, group, fullName, NULL)) {
+  if (g_key_file_has_key (keyString, group, fullName, NULL)) {
     colNum = g_key_file_get_integer (keyString, group, fullName, NULL);
   }
-  g_free(fullName);
+  g_free (fullName);
 
   /* restore sort order */
   fullName = g_strconcat(name, "SortcolOrder", NULL);
-  if (g_key_file_has_key(keyString, group, fullName, NULL)) {
+  if (g_key_file_has_key (keyString, group, fullName, NULL)) {
     colOrder = g_key_file_get_integer (keyString, group, fullName, NULL);
   }
-  g_free(fullName);
+  g_free (fullName);
   setSortMenuItem(colNum, colOrder);
 }
 
@@ -1569,11 +1570,11 @@ void unrealizeTreeview(GtkWidget *widget, GKeyFile *keyString, const gchar *grou
 
   fullName = g_strconcat(name, "Sortcol", NULL);
   g_key_file_set_integer (keyString, group, fullName, colNum);
-  g_free(fullName);
+  g_free (fullName);
   
   fullName = g_strconcat(name, "SortcolOrder", NULL);
   g_key_file_set_integer (keyString, group, fullName, sortOrder);
-  g_free(fullName);
+  g_free (fullName);
 }
 
 
@@ -1588,9 +1589,9 @@ void realizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gchar
   gint column_with=0;
 
   if (getResultsViewHorizontal(widget)) {
-    treeview = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
+    treeview = GTK_TREE_VIEW(lookup_widget (widget, "treeview1"));
   } else {
-    treeview = GTK_TREE_VIEW(lookup_widget(widget, "treeview2"));
+    treeview = GTK_TREE_VIEW(lookup_widget (widget, "treeview2"));
   }
   GList *allColumns = gtk_tree_view_get_columns(treeview);
   GtkTreeViewColumn *column;
@@ -1659,11 +1660,11 @@ void realizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gchar
       gtk_tree_view_column_set_resizable (column, TRUE);
       gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
       fullName = g_strconcat(name, gtk_tree_view_column_get_title(column), NULL);
-      if (g_key_file_has_key(keyString, group, fullName, NULL)) {
+      if (g_key_file_has_key (keyString, group, fullName, NULL)) {
         colWidth = g_key_file_get_integer (keyString, group, fullName, NULL);
         gtk_tree_view_column_set_fixed_width (column, colWidth);
       }
-      g_free(fullName);
+      g_free (fullName);
     }
   } while ((allColumns = g_list_next(allColumns)) != NULL);
   g_list_free(allColumns);
@@ -1677,9 +1678,9 @@ void unrealizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gch
 {
   GtkTreeView *treeview;
   if (getResultsViewHorizontal(widget)) {
-    treeview = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
+    treeview = GTK_TREE_VIEW(lookup_widget (widget, "treeview1"));
   } else {
-    treeview = GTK_TREE_VIEW(lookup_widget(widget, "treeview2"));
+    treeview = GTK_TREE_VIEW(lookup_widget (widget, "treeview2"));
   }
   GList *allColumns = gtk_tree_view_get_columns(treeview);
   GtkTreeViewColumn *column;
@@ -1699,7 +1700,7 @@ void unrealizeTreeviewColumns (GtkWidget *widget, GKeyFile *keyString, const gch
       fullName = g_strconcat(name, gtk_tree_view_column_get_title(column), NULL);
       colWidth = gtk_tree_view_column_get_width (column);
       g_key_file_set_integer (keyString, group, fullName, colWidth);
-      g_free(fullName);
+      g_free (fullName);
     } while ((allColumns = g_list_next(allColumns)) != NULL);
     g_list_free(allColumns);
   }
@@ -1751,9 +1752,9 @@ void detachMenu(GtkMenuItem *menuitem)
 {
   GtkWidget *treeView;
   if (getResultsViewHorizontal(GTK_WIDGET(menuitem))) {
-    treeView = (lookup_widget(GTK_WIDGET(menuitem), "treeview1"));
+    treeView = (lookup_widget (GTK_WIDGET(menuitem), "treeview1"));
   } else {
-    treeView = (lookup_widget(GTK_WIDGET(menuitem), "treeview2"));
+    treeView = (lookup_widget (GTK_WIDGET(menuitem), "treeview2"));
   }
   GList *menuList = gtk_menu_get_for_attach_widget (treeView);
   gtk_menu_detach(menuList->data); /* always first item */
@@ -1798,13 +1799,13 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
    if(gtk_tree_selection_get_selected (selection, &model, &iter)) {
      g_assert(model != NULL);
      if (getResultsViewHorizontal(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)))) {
-       textBox = lookup_widget(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview1");
+       textBox = lookup_widget (GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview1");
      } else {
-       textBox = lookup_widget(GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview4");
+       textBox = lookup_widget (GTK_WIDGET(gtk_tree_selection_get_tree_view(selection)), "textview4");
      }
 
-     window1 = G_OBJECT(lookup_widget(GTK_WIDGET(textBox), "window1"));
-     setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget(textBox, "word_wrap1")));
+     window1 = G_OBJECT(lookup_widget (GTK_WIDGET(textBox), "window1"));
+     setWordWrap = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(lookup_widget (textBox, "word_wrap1")));
      /* luc A janv 2018 */
      GtkWrapMode wrap = GTK_WRAP_NONE;  
      if(setWordWrap)
@@ -1841,11 +1842,11 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
 
        tmpString2 = g_strconcat(fullFileName, " (", size, " ", mdate, ")\n", NULL);
        gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "results_header", NULL);
-       g_free(tmpString2);
+       g_free (tmpString2);
        /* Add line to describe options applied at run-time in medium grey*/
        tmpString2 = generateContentOptionsString(mSearchControl);
        gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString2, -1, "no_context", NULL);
-       g_free(tmpString2);
+       g_free (tmpString2);
 
       //g_static_mutex_lock(&mutex_Data);
        /* count = number of text hits inside the current text == all the file buffer*/
@@ -1872,9 +1873,9 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
 	   if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {
 	     /* tmpcount = nbre caractères écrits, tmpstring buffer avec la chaîne, MAX_FILENAME_STRING longueur maxi autorisée, _("line" ) format d'affichage type C classique, nexyexymatch la valeur numérique sui sera passée dans %d */
              if(newTextMatch->fOfficeFile)
-                tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Paragraph Number: %d\n"),(gint) newTextMatch->lineNum);
+                tmpCount = g_snprintf (tmpString, MAX_FILENAME_STRING, _("Paragraph Number: %d\n"),(gint) newTextMatch->lineNum);
                   else  
-	             tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"),(gint) newTextMatch->lineNum);
+	             tmpCount = g_snprintf (tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"),(gint) newTextMatch->lineNum);
              currentMatchLines++;
 	     gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpString, -1, "results_line_number", NULL);
 	     gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, newTextMatch->pLine, -1, "results_text", NULL);
@@ -1898,8 +1899,8 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
               /* converts from regex format to Gtk gchar format */
                tmpStartOffset = convertRegexGtk(newTextMatch->offsetStart, tmptext);
                tmpEndOffset = convertRegexGtk(newTextMatch->offsetEnd, tmptext); 	
-               g_free(tmptext);
-               //  printf("lineCiunt=%d  pline:::\n%s////\n", lineCount, newTextMatch->pLine);  
+               g_free (tmptext);
+               //  printf ("lineCiunt=%d  pline:::\n%s////\n", lineCount, newTextMatch->pLine);  
 	       if( ((b >= (tmpEndOffset)) &&
 	          (b >= (tmpStartOffset)))) {
                       gtk_text_buffer_get_iter_at_line_offset (buffer, &start, lineCount, tmpStartOffset);
@@ -1909,12 +1910,12 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
 	       }/* if tests a b */ 
                else {
 	          errorCount ++;
-	          g_printf(_("\nInternal error %d! Unable to highlight line - offset beyond line-end.\n"),(gint) errorCount);
-	          g_printf(_("Please email all debug text to cottrela@users.sf.net.\n"));
-	          g_printf(_("  Debug: fn='%s'\n"), fullFileName);
-	          g_printf(_("  Debug: tc=%d + os=%d || oe=%d\n"),(gint) tmpCount,(gint) newTextMatch->offsetStart,
+	          g_printf (_("\nInternal error %d! Unable to highlight line - offset beyond line-end.\n"),(gint) errorCount);
+	          g_printf (_("Please email all debug text to cottrela@users.sf.net.\n"));
+	          g_printf (_("  Debug: fn='%s'\n"), fullFileName);
+	          g_printf (_("  Debug: tc=%d + os=%d || oe=%d\n"),(gint) tmpCount,(gint) newTextMatch->offsetStart,
                                                             (gint) newTextMatch->offsetEnd);
-	          g_printf(_("  Debug: %d) '%s'\n"), (gint)newTextMatch->lineNum, newTextMatch->pLine);
+	          g_printf (_("  Debug: %d) '%s'\n"), (gint)newTextMatch->lineNum, newTextMatch->pLine);
 	          if (errorCount > 3) {
 	             break; /* Exit loop as the rest of the file is likely to be corrupt too...*/
 	          }
@@ -1928,7 +1929,7 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
 	   newTextMatch = g_ptr_array_index(mSearchData->lineMatchArray, (i + matchIndex));	  
 	   g_assert(newTextMatch != NULL);	  
 	   if ((prevTextMatch == NULL) || (prevTextMatch->lineNum != newTextMatch->lineNum)) {	    
-	     tmpCount = g_snprintf(tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), (gint)newTextMatch->lineNum);
+	     tmpCount = g_snprintf (tmpString, MAX_FILENAME_STRING, _("Line Number: %d\n"), (gint)newTextMatch->lineNum);
 	     gtk_text_buffer_insert (buffer, &txtIter, tmpString, -1);
 	     lineCount += newTextMatch->lineCountBefore;
 	   } else {
@@ -1953,7 +1954,7 @@ void tree_selection_changed_cb (GtkTreeSelection *selection, gpointer data)
                                         MATCH_INDEX_COLUMN, &matchIndex, -1);      
          tmpString2 = g_strconcat(fullFileName, " (", size, " ", mdate, ")\n", NULL);
          gtk_text_buffer_insert (buffer, &txtIter, tmpString2, -1);
-         g_free(tmpString2);      
+         g_free (tmpString2);      
          gtk_text_buffer_insert_with_tags_by_name (buffer, &txtIter, tmpStr, -1, "no_context", NULL);
      }/* elseif */
    }
@@ -1976,7 +1977,7 @@ gchar *generateContentOptionsString(searchControl *mSearchControl)
   options_flag = mSearchControl->flags;
   count1 = mSearchControl->numExtraLines;
 
-// printf("* nbre extra lines :%d *\n", count1);
+// printf ("* nbre extra lines :%d *\n", count1);
 
   count2 = mSearchControl->limitContentResults;
   //g_static_mutex_unlock(&mutex_Control);
@@ -1991,7 +1992,7 @@ gchar *generateContentOptionsString(searchControl *mSearchControl)
       g_string_append(retGString, _("display 1 extra line around match; "));
       noFlags = FALSE;
     } else if (count1 > 1) {
-      g_string_append_printf(retGString, _("display %d extra lines around match; "), count1);
+      g_string_append_printf (retGString, _("display %d extra lines around match; "), count1);
       noFlags = FALSE;
     }
   } else {
@@ -2004,7 +2005,7 @@ gchar *generateContentOptionsString(searchControl *mSearchControl)
       g_string_append(retGString, _("only showing first content match; "));
       noFlags = FALSE;
     } else {
-      g_string_append_printf(retGString, _("only showing first %d content matches; "), count2);
+      g_string_append_printf (retGString, _("only showing first %d content matches; "), count2);
       noFlags = FALSE;
     }
   }
@@ -2016,7 +2017,7 @@ gchar *generateContentOptionsString(searchControl *mSearchControl)
   }
   g_string_append(retGString, _(".\n"));
 
-  return g_string_free(retGString, FALSE);
+  return g_string_free (retGString, FALSE);
 }
 
 
@@ -2042,9 +2043,9 @@ void columnClick(GtkWidget *widget, gint column)
   GtkSortType direction;
   GtkTreeView *listview;
   if (getResultsViewHorizontal(widget)) {
-    listview = GTK_TREE_VIEW(lookup_widget(widget, "treeview1"));
+    listview = GTK_TREE_VIEW(lookup_widget (widget, "treeview1"));
   } else {
-    listview = GTK_TREE_VIEW(lookup_widget(widget, "treeview2"));
+    listview = GTK_TREE_VIEW(lookup_widget (widget, "treeview2"));
   }
   GtkTreeSortable *sortable = GTK_TREE_SORTABLE(gtk_tree_view_get_model(listview));
   GtkTreeViewColumn *treeviewcolumn;
@@ -2095,9 +2096,9 @@ void getSortMenuItem(gint *columnId, GtkSortType *sortOrder)
 {
   GtkTreeView *treeview;
   if (getResultsViewHorizontal(GTK_WIDGET(mainWindowApp))) {
-    treeview = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(mainWindowApp), "treeview1"));
+    treeview = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET(mainWindowApp), "treeview1"));
   } else {
-    treeview = GTK_TREE_VIEW(lookup_widget(GTK_WIDGET(mainWindowApp), "treeview2"));
+    treeview = GTK_TREE_VIEW(lookup_widget (GTK_WIDGET(mainWindowApp), "treeview2"));
   }
   GtkTreeSortable *sortable = GTK_TREE_SORTABLE(gtk_tree_view_get_model(treeview));
   gtk_tree_sortable_get_sort_column_id (sortable, columnId, sortOrder);
@@ -2114,26 +2115,26 @@ void setSortMenuItem(gint columnId, GtkSortType order)
   GtkCheckMenuItem *toggle_button;
   switch(columnId) {
   case LOCATION_COLUMN:
-    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(mainWindowApp), "location1"));
+    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget (GTK_WIDGET(mainWindowApp), "location1"));
     break;
   case INT_SIZE_COLUMN:  /* Force to SIZE column */
   case SIZE_COLUMN: 
-    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(mainWindowApp), "size1"));
+    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget (GTK_WIDGET(mainWindowApp), "size1"));
     break;
   case TYPE_COLUMN:
-    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(mainWindowApp), "type1"));
+    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget (GTK_WIDGET(mainWindowApp), "type1"));
     break;
   case INT_MODIFIED_COLUMN: /* Force to MODIFIED column */
   case MODIFIED_COLUMN:
-    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(mainWindowApp), "modified1"));
+    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget (GTK_WIDGET(mainWindowApp), "modified1"));
     break;
   case MATCHES_COUNT_STRING_COLUMN: /* Force to MATCHES column */
   case MATCHES_COUNT_COLUMN:
-    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(mainWindowApp), "matches1"));
+    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget (GTK_WIDGET(mainWindowApp), "matches1"));
     break;
   case FILENAME_COLUMN: /* This is the default option */
   default:
-    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(mainWindowApp), "file_name1"));
+    toggle_button = GTK_CHECK_MENU_ITEM(lookup_widget (GTK_WIDGET(mainWindowApp), "file_name1"));
     break;
   }
   
@@ -2166,7 +2167,7 @@ gboolean getExtendedRegexMode(GtkWidget *widget)
 {
   GKeyFile *keyString = getGKeyFile(widget);
   
-  if (g_key_file_has_key(keyString, "configuration", "configExtendedRegex", NULL)) {
+  if (g_key_file_has_key (keyString, "configuration", "configExtendedRegex", NULL)) {
     return (g_key_file_get_boolean(keyString, "configuration", "configExtendedRegex", NULL));
   }
   return TRUE; /* default enable extended regex mode */
