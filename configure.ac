@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([searchmonkey],[0.9.20200820])
+AC_INIT([searchmonkey],[0.9.20200821])
 AC_CONFIG_SRCDIR([configure.ac])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
